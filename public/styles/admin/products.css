@@ -1,0 +1,33 @@
+/* Products Page Styles */
+
+/* Product List Styles */
+.list-group-item {
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 0.5rem;
+    background-color: #495057;
+    color: #ffffff;
+}
+
+.list-group-item:hover {
+    background-color: #6c757d; /* Highlight on hover */
+}
+
+.product-image {
+    width: 100px; /* Adjust size as needed */
+    height: 100px; /* Ensure it's a square */
+    object-fit: cover; /* Ensure the image covers the space without distortion */
+}
+
+/* Product Image Display Area */
+.product-image-display {
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+}
+
+.product-image-display img {
+    max-width: 100%;
+    height: auto;
+}

@@ -1,0 +1,127 @@
+/* Sidebar Styles */
+.sidebar {
+    height: 100vh;
+    width: 250px;
+    background-color: #343a40;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: all 0.3s;
+    z-index: 1000; /* Ensure the sidebar is above other content */
+}
+
+.sidebar.active {
+    width: 0;
+    overflow: hidden; /* Prevent content from overflowing */
+}
+
+.sidebar .sidebar-header {
+    padding: 15px;
+    background: #343a40;
+}
+
+.sidebar .list-unstyled {
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar .list-unstyled li {
+    padding: 10px 15px;
+}
+
+.sidebar .list-unstyled li a {
+    color: #ffffff;
+    display: block;
+    text-decoration: none;
+}
+
+.sidebar .list-unstyled li a:hover {
+    background: #495057;
+}
+
+/* Page Content Styles */
+#page-content-wrapper {
+    width: 100%;
+    padding: 20px;
+    margin-left: 250px; /* Adjust this margin to the width of the sidebar */
+    transition: margin-left 0.3s, width 0.3s;
+}
+
+#page-content-wrapper.toggled {
+    margin-left: 0;
+    width: 100%; /* Take up the full width of the viewport */
+}
+
+/* Navbar Styles */
+.navbar {
+    padding: 10px 40px;
+    background-color: #343a40; /* Dark background for navbar */
+    border-radius: 10px;
+    height: 70px;
+
+}
+
+.profile-photo {
+    width: 40px; /* Adjust size as needed */
+    height: 40px; /* Ensure it's a square */
+    border-radius: 50%; /* Circular profile photo */
+    object-fit: cover; /* Ensure the photo covers the space without distortion */
+}
+
+/* Card Styles */
+.card {
+    border: none;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Custom Background Colors for Dark Mode */
+.bg-primary {
+    background-color: #007bff !important;
+}
+
+.bg-success {
+    background-color: #28a745 !important;
+}
+
+.bg-info {
+    background-color: #17a2b8 !important;
+}
+
+.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+.text-white {
+    color: #ffffff !important;
+}
+
+.text-dark {
+    color: #212529 !important;
+}
+
+/* Form Inline Styles */
+.form-inline {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+.navbar-text {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+

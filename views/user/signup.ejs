@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHOEZIE</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Poppins Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles/user/signup.css"> <!-- Point to black-and-white CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+    <div class="register-container">
+        <h2 class="text-center">SHOEZIE</h2>
+        <form id="signupForm" action="/user/register" method="post">
+            <div class="form-group">
+                <label for="firstname"><small>Firstname</small></label>
+                <input type="text" class="form-control rounded-pill" id="firstname" name="firstname" placeholder="Enter firstname" >
+                <div class="invalid-feedback"><small>Name must be at least 3 characters long.</small></div>
+            </div>
+            <div class="form-group">
+                <label for="lastname"><small>Lastname</small></label>
+                <input type="text" class="form-control rounded-pill" id="lastname" name="lastname" placeholder="Enter lastname" >
+                <div class="invalid-feedback"><small>Name must be at least 3 characters long.</small></div>
+            </div>
+            <div class="form-group">
+                <label for="email"><small>Email</small></label>
+                <input type="email" class="form-control rounded-pill" id="email" name="email" placeholder="Enter email" >
+                <div class="invalid-feedback"><small>Please enter a valid email address.</small></div>
+            </div>
+            <div class="form-group">
+                <label for="confirm-password"> <small>Password</small></label>
+                <input type="password" class="form-control rounded-pill" id="password" name="password" placeholder=" Enter password">
+                <div class="invalid-feedback"><small>Password must be at least 6 characters long.</small></div>
+            </div>
+            <div class="form-group">
+                <label for="confirm-password"><small>Confirm Password</small></label>
+                <input  type="password"  class="form-control  rounded-pill" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" >
+                <div class="invalid-feedback"><small>Password doesn`t match</small></div>
+            </div>
+            <button type="submit" class="btn  btn-primary btn-block rounded-pill ">Signup</button>
+        </form>
+        <p class="text-center or">or</p>
+        <button type="submit" class="btn btn-sm btn-outline-dark btn-block rounded-pill "><i class="fa-brands fa-google fa-beat-fade" style="color: #000000;"></i> Signup with google</button>
+        <p class="text-center mt-3"><small>Already have an account? </small><a href="/user/login"><small>Login here</small></a></p>
+    </div>
+    <!-- Bootstrap JS and dependencies -->
+     <script src="/js/signup.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - SHOEZIE Admin Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles/admin/dashboard.css">
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-dark sidebar" id="sidebar">
+            <div class="text-center mt-4 mb-3">
+                <h3 class="text-white">Admin panel</h3>
+            </div>
+            <ul class="list-unstyled components">
+                <li><a href="dashboard">Dashboard</a></li>
+                <li><a href="users">Users</a></li>
+                <li><a href="products">Products</a></li>
+                <li><a href="orderList">Order List</a></li>
+                <li><a href="offers">Offers</a></li>
+                <li><a href="coupons">Coupons</a></li>
+                <li><a href="deals">Deals</a></li>
+                <li><a href="category">Category</a></li>
+                <li><a href="settings">Settings</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+                <!-- New Hamburger Menu Button -->
+                <button class="btn btn-light btn-sm" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <form class="form-inline ml-3">
+                    <input class="form-control mr-sm-2 rounded-pill" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-light my-2 my-sm-0 rounded-pill" type="submit">Search</button>
+                </form>
+                <div class="navbar-brand d-flex align-items-center ml-auto">
+                    <!-- Admin Profile Photo -->
+                    <img src="path/to/profile-photo.jpg" alt="Admin Profile" class="profile-photo">
+                    <span class="navbar-text text-light ml-2">Admin Name</span>
+                </div>
+            </nav>
+
+            <!-- Content Area -->
+            <div class="container-fluid">
+                <div class="row mb-4 align-items-center">
+                    <div class="col">
+                        <h5 class="mt-2">Categories</h5>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+                            Add Category
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Categories Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>No</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sample Data -->
+                            <tr>
+                                <td>1</td>
+                                <td>Footwear</td>
+                                <td>150</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm">Edit</button>
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Accessories</td>
+                                <td>80</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm">Edit</button>
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </td>
+                            </tr>
+                            <!-- Add more rows as needed -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="categoryName">Category Name</label>
+                            <input type="text" class="form-control" id="categoryName" placeholder="Enter category name">
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryStock">Stock</label>
+                            <input type="number" class="form-control" id="categoryStock" placeholder="Enter stock quantity">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Add Category</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap and jQuery Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Sidebar toggle functionality
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('page-content-wrapper').classList.toggle('toggled');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - SHOEZIE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles/admin/dashboard.css"> <!-- Point to your custom CSS -->
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-dark sidebar" id="sidebar">
+      
+                <div class="text-center mt-4 mb-3">
+                    <h3 class="text-white">Admin panel</h3>
+                </div>
+            
+            <ul class="list-unstyled components">
+               
+                <li><a href="dashboard" >Dashboard</a></li>
+                <li><a href="users" >Users</a></li>
+                <li><a href="products">Products</a></li>
+                <li><a href="orderList">Order List</a></li>
+                <li><a href="offers" >Offers</a></li>
+                <li><a href="coupons" >Coupons</a></li>
+                <li><a href="deals" >Deals</a></li>
+                <li><a href="category" >Category</a></li>
+                <li><a href="settings">Settings</a></li>
+                <li><a href="/logout" >Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3 ">
+                <!-- New Hamburger Menu Button -->
+                <button class="btn btn-light btn-sm" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <form class="form-inline ml-3">
+                    <input class="form-control mr-sm-2 rounded-pill" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-light my-2 my-sm-0 rounded-pill" type="submit">Search</button>
+                </form>
+                <div class="navbar-brand d-flex align-items-center ml-auto">
+                    <!-- Admin Profile Photo -->
+                    <img src="path/to/profile-photo.jpg" alt="Admin Profile" class="profile-photo">
+                    <span class="navbar-text text-light ml-2">Admin Name</span>
+                </div>
+            </nav>
+
+            <!-- Content Area -->
+            <div class="container-fluid">
+                <!-- Dashboard Section -->
+                <div class="row">
+                    <!-- Card for Total Users -->
+                    <div class="col-md-3 mb-4">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Users</h5>
+                                <p class="card-text" id="totalUsers">1,234</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card for Total Orders -->
+                    <div class="col-md-3 mb-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Orders</h5>
+                                <p class="card-text" id="totalOrders">567</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card for Total Sales -->
+                    <div class="col-md-3 mb-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Sales</h5>
+                                <p class="card-text" id="totalSales">$89,345</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card for Total Pending -->
+                    <div class="col-md-3 mb-4">
+                        <div class="card bg-warning text-dark">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Pending</h5>
+                                <p class="card-text" id="totalPending">12</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap and jQuery Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Sidebar toggle functionality
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('page-content-wrapper').classList.toggle('toggled');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+/* Users Page Styles */
+.table {
+    border-radius: 0.25rem; /* Rounded corners for the table */
+}
+
+.table-dark {
+    background-color: #343a40; /* Dark mode background for table */
+}
+
+.table-dark thead th {
+    background-color: #495057; /* Slightly lighter dark mode for table headers */
+}
+
+.table-dark tbody tr:nth-child(odd) {
+    background-color: #495057; /* Darker rows for better readability */
+}
+
+.table-dark tbody tr:nth-child(even) {
+    background-color: #343a40; /* Base dark mode for even rows */
+}
+
+.badge-success {
+    background-color: #28a745; /* Green badge for active users */
+}
+
+.badge-danger {
+    background-color: #dc3545; /* Red badge for blocked users */
+}
+
+/* Button Styles */
+
