@@ -1,10 +1,14 @@
 const express = require('express')
 const router = express.Router()
-const controller = require('../controller/adminController')
+const {
+     getLogin, getHome,getUsers,getProducts,getCategory    
+} = require('../controller/adminController')
 
-router.get('/login',controller.getLogin)
-router.get('/dashboard',controller.getHome)
-router.get('/users',controller.getUsers)
-router.get('/products',controller.getProducts)
-router.get('/category',controller.getCategory)
+
+router.get('/login',getLogin)
+router.get('/dashboard',getHome)
+router.get('/users',getUsers)
+router.get('/products',getProducts)
+router.get('/category',getCategory)
+
 module.exports = router

@@ -1,13 +1,12 @@
 
 const mongoose = require('mongoose');
+require('dotenv').config()
 
-const dbURI = 'mongodb://localhost:27017/Shoezie'; 
+const dbURI = process.env.dbURI 
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(dbURI, {
-          
-           
+        await mongoose.connect(dbURI, {   
         });
         console.log('MongoDB connected successfully');
     } catch (error) {
