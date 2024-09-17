@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else { 
             passwordInput.classList.remove('is-invalid');
             passwordInput.classList.add('is-valid');
-            togglePassword.style.marginTop='10px'
+            togglePassword.style.marginTop='12px'
 			flag=true
         }
     }

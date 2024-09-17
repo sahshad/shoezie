@@ -72,8 +72,8 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th>Category</th>
-                                <th>Stock</th>
+                                <th>Image</th>
+                                <th>Category</th>    
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -81,19 +81,19 @@
                             <!-- Sample Data -->
                             <tr>
                                 <td>1</td>
+                                <td><img src="path/to/footwear-image.jpg" alt="Footwear" class="img-thumbnail" style="max-width: 100px;"></td>
                                 <td>Footwear</td>
-                                <td>150</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm">Edit</button>
+                                    <button class="btn btn-warning btn-sm" onclick="editCategory('1', 'Footwear', 'path/to/footwear-image.jpg')">Edit</button>
                                     <button class="btn btn-danger btn-sm">Delete</button>
                                 </td>
                             </tr>
                             <tr>
                                 <td>2</td>
+                                <td><img src="path/to/accessories-image.jpg" alt="Accessories" class="img-thumbnail" style="max-width: 100px;"></td>
                                 <td>Accessories</td>
-                                <td>80</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm">Edit</button>
+                                    <button class="btn btn-warning btn-sm" onclick="editCategory('2', 'Accessories', 'path/to/accessories-image.jpg')">Edit</button>
                                     <button class="btn btn-danger btn-sm">Delete</button>
                                 </td>
                             </tr>
@@ -116,20 +116,53 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="addCategoryForm">
                         <div class="form-group">
                             <label for="categoryName">Category Name</label>
                             <input type="text" class="form-control" id="categoryName" placeholder="Enter category name">
                         </div>
                         <div class="form-group">
-                            <label for="categoryStock">Stock</label>
-                            <input type="number" class="form-control" id="categoryStock" placeholder="Enter stock quantity">
+                            <label for="categoryImage">Category Image</label>
+                            <input type="file" class="form-control-file" id="categoryImage" accept="image/*">
+                            <div id="imagePreview" class="mt-2"></div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Add Category</button>
+                    <button type="button" class="btn btn-primary" id="saveCategoryBtn">Add Category</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div class="modal fade" id="editCategoryModal" tabindex="-1" role="dialog" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCategoryForm">
+                        <input type="hidden" id="editCategoryId">
+                        <div class="form-group">
+                            <label for="editCategoryName">Category Name</label>
+                            <input type="text" class="form-control" id="editCategoryName" placeholder="Enter category name">
+                        </div>
+                        <div class="form-group">
+                            <label for="editCategoryImage">Category Image</label>
+                            <input type="file" class="form-control-file" id="editCategoryImage" accept="image/*">
+                            <div id="editImagePreview" class="mt-2"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="updateCategoryBtn">Update Category</button>
                 </div>
             </div>
         </div>
@@ -144,6 +177,59 @@
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('page-content-wrapper').classList.toggle('toggled');
+        });
+
+        // Image preview functionality for add category
+        document.getElementById('categoryImage').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('imagePreview');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Category Image" class="img-thumbnail" style="max-width: 100px;">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+            }
+        });
+
+        // Image preview functionality for edit category
+        document.getElementById('editCategoryImage').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('editImagePreview');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Category Image" class="img-thumbnail" style="max-width: 100px;">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+            }
+        });
+
+        // Populate the edit modal with data
+        function editCategory(id, name, imageUrl) {
+            document.getElementById('editCategoryId').value = id;
+            document.getElementById('editCategoryName').value = name;
+            const editImagePreview = document.getElementById('editImagePreview');
+            editImagePreview.innerHTML = `<img src="${imageUrl}" alt="Category Image" class="img-thumbnail" style="max-width: 100px;">`;
+            $('#editCategoryModal').modal('show');
+        }
+
+        // Handle saving a new category
+        document.getElementById('saveCategoryBtn').addEventListener('click', function() {
+            // Implement the logic for adding a new category here
+            alert('Add category functionality needs to be implemented.');
+        });
+
+        // Handle updating an existing category
+        document.getElementById('updateCategoryBtn').addEventListener('click', function() {
+            // Implement the logic for updating a category here
+            alert('Update category functionality needs to be implemented.');
         });
     </script>
 </body>

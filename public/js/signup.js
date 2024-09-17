@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if(name===''){
             lastnameInput.classList.remove('is-invalid', 'is-valid');
             lastnameInput.nextElementSibling.style.display = 'none';
-        }else if(name.length<3){
+        }else if(name.length<1){
             lastnameInput.classList.add('is-invalid');
             lastnameInput.classList.remove('is-valid');
             lastnameInput.nextElementSibling.style.display = 'block';

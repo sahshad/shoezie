@@ -5,7 +5,8 @@ const session = require('express-session')
 const userRoute = require('./routes/user')
 const adminRoute = require('./routes/admin')
 const db =require('./config/db')
-
+const passport = require('passport')
+require('./passport');
 
 require('dotenv').config()
 
@@ -26,6 +27,7 @@ db()
 
 app.use('/user',userRoute)
 app.use('/admin',adminRoute)
+app.use('/auth',require('./routes/auth'))
 
 
 

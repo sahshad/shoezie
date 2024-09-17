@@ -22,6 +22,21 @@ body {
     box-sizing: border-box; /* Include padding and border in element’s total width and height */
 }
 
+.form-control:valid {
+    background: none; /* Ensure no default background image or icon */
+    padding-right: 0; /* Remove any default padding that might be used for icons */
+}
+
+/* Hide default validation icons for invalid inputs */
+.form-control:invalid {
+    background: none; /* Ensure no default background image or icon */
+    padding-right: 0; /* Remove any default padding that might be used for icons */
+}
+
+.form-control:focus::-webkit-input-placeholder {
+    color: transparent; /* Ensure placeholder does not interfere */
+}
+
 .register-container h1 {
     margin-bottom: 20px;
 }
