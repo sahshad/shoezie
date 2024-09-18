@@ -31,3 +31,11 @@
     max-width: 100%;
     height: auto;
 }
+.product-table-image {
+    width: 50px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+
+#imagePreview {
+    margin-top: 10px; /* Adds some space above the image preview */
+}

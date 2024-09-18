@@ -23,16 +23,16 @@
                 <h3 class="text-white">Admin panel</h3>
             </div>
             <ul class="list-unstyled components">
-                <li><a href="dashboard" >Dashboard</a></li>
-                <li><a href="users" >Users</a></li>
+                <li><a href="dashboard">Dashboard</a></li>
+                <li><a href="users">Users</a></li>
                 <li><a href="products">Products</a></li>
                 <li><a href="orderList">Order List</a></li>
-                <li><a href="offers" >Offers</a></li>
-                <li><a href="coupons" >Coupons</a></li>
-                <li><a href="deals" >Deals</a></li>
-                <li><a href="category" >Category</a></li>
+                <li><a href="offers">Offers</a></li>
+                <li><a href="coupons">Coupons</a></li>
+                <li><a href="deals">Deals</a></li>
+                <li><a href="category">Category</a></li>
                 <li><a href="settings">Settings</a></li>
-                <li><a href="/logout" >Logout</a></li>
+                <li><a href="/logout">Logout</a></li>
             </ul>
         </div>
 
@@ -64,25 +64,51 @@
                             <th>#</th>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Example user entry -->
-                        <tr>
-                            <td>1</td>
-                            <td>John Doe</td>
-                            <td>john.doe@example.com</td>
-                            <td><span class="badge badge-success">Active</span></td>
-                            <td>
-                                <button class="btn btn-danger btn-sm" onclick="toggleUserStatus(1, 'block')">Block</button>
-                                <button class="btn btn-success btn-sm" onclick="toggleUserStatus(1, 'unblock')">Unblock</button>
-                            </td>
-                        </tr>
-                        <!-- Add more user entries as needed -->
+                        <% if(user){ %>
+                            <% user.forEach((user, index) => { %>
+                                <tr>
+                                    <td><%= index + 1 %></td>
+                                    <td><%= user.firstname %> <%= user.lastname %></td>
+                                    <td><%= user.email %></td>
+                                    <td>
+                                        <% if (user.isBlock) { %>
+                                            <!-- Show Unblock button if the user is blocked -->
+                                            <button class="btn btn-success btn-sm" onclick="toggleUserStatus('<%= user._id %>', 'unblock')">Unblock</button>
+                                        <% } else { %>
+                                            <!-- Show Block button if the user is not blocked -->
+                                            <button class="btn btn-danger btn-sm" onclick="toggleUserStatus('<%= user._id %>', 'block')">Block</button>
+                                        <% } %>
+                                        </tr>
+                            <% }) %>
+                        <% } %>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Block/Unblock Confirmation Modal -->
+    <div class="modal fade" id="blockUnblockModal" tabindex="-1" aria-labelledby="blockUnblockModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="blockUnblockModalLabel">Confirm Action</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to <span id="blockUnblockAction"></span> <span id="blockUnblockUserName"></span>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmBlockUnblockButton">Confirm</button>
+                </div>
             </div>
         </div>
     </div>
@@ -98,16 +124,38 @@
             document.getElementById('page-content-wrapper').classList.toggle('toggled');
         });
 
-        // Function to toggle user status
+        // Variables to store current action data
+        let currentAction = '';
+        let currentUserId = '';
+
         function toggleUserStatus(userId, action) {
-            if (action === 'block') {
-                // Handle block action (e.g., send an API request to block the user)
-                alert('User ' + userId + ' has been blocked.');
-            } else if (action === 'unblock') {
-                // Handle unblock action (e.g., send an API request to unblock the user)
-                alert('User ' + userId + ' has been unblocked.');
-            }
+            currentAction = action;
+            currentUserId = userId;
+            document.getElementById('blockUnblockAction').textContent = action;
+            document.getElementById('blockUnblockUserName').textContent = userId;
+            $('#blockUnblockModal').modal('show');
         }
+
+        // Handle confirm block/unblock button click
+        document.getElementById('confirmBlockUnblockButton').addEventListener('click', function() {
+            fetch(`/admin/users/${currentUserId}/${currentAction}`, {
+                method: 'POST', // or 'PUT' depending on your server setup
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(`User ${currentUserId} has been ${currentAction}ed.`);
+                $('#blockUnblockModal').modal('hide');
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing the request.');
+            });
+        });
+
     </script>
 </body>
 </html>

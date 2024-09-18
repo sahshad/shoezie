@@ -39,7 +39,8 @@ const userSchema = new mongoose.Schema({
   googleId: String,
   firstname: String,
   lastname: String,
-  email: String, 
+  email: String,
+  isBlock: { type: Boolean, default: false },
 },{ timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

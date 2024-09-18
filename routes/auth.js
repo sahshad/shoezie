@@ -4,12 +4,12 @@ const passport = require('passport');
 
 // Auth Routes
 router.get('/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
+  scope: ['profile', 'email'],
+  prompt: 'select_account' // This parameter forces the account selection screen
 }));
 
 router.get('/google/callback', passport.authenticate('google'), (req, res) => {
 
-  
   res.redirect('/user/login');
 });
 

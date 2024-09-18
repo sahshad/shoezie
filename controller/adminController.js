@@ -1,5 +1,7 @@
 const Admin = require('../model/admin');
+const User = require('../model/user')
 const bcrypt = require('bcrypt');
+
 
 function getLogin(req, res) {
     if (req.session.admin) {
@@ -29,20 +31,38 @@ async function getHome(req, res) {
     }
 }
 
-function getUsers(req, res) {
-    res.render('admin/usersList');
+async function getUsers(req, res) {
+    const user = await User.find()  
+    res.render('admin/usersList',{user});
 }
-function getProducts(req, res) {
-    res.render('admin/products');
+
+async function changeStatus(req,res){
+  const { userId, action } = req.params;
+
+  if (action !== 'block' && action !== 'unblock') {
+  return res.status(400).json({ message: 'Invalid action. Use "block" or "unblock".' });
+  }
+  try {
+      const update = action === 'block' ? { isBlock: true } : { isBlock: false };
+
+      const result = await User.findByIdAndUpdate(userId, update, { new: true });
+
+      if (result) {
+          res.json({ message: `User ${userId} has been ${action}ed.` });
+      } else {
+          res.status(404).json({ message: 'User not found.' });
+      }
+  } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ message: 'An error occurred while processing the request.' });
+  }
 }
-function getCategory(req, res) {
-    res.render('admin/category');
-}
+
+
 
 module.exports = {
     getLogin,
     getHome,
     getUsers,
-    getProducts,
-    getCategory
+    changeStatus,
 };
