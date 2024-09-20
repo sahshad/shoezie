@@ -61,6 +61,17 @@
     width: 70px;
     height: 70px;
 }
+.image-wrapper {
+    display: inline-block;
+    position: relative;
+    margin-right: 10px;
+}
 
+.delete-button {
+    position: absolute;
+    bottom: -25px; /* Adjust based on your layout */
+    left: 50%;
+    transform: translateX(-50%);
+}
 
 

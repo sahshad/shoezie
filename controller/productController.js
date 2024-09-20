@@ -109,6 +109,8 @@ async function getProducts(req, res) {
 const addProduct = (req, res) => {
     const { productName, productDescription, productCategory, productPrice, productStock } = req.body;
 console.log(req.files);
+console.log(req.body);
+
 
     if (!req.files || !Array.isArray(req.files)) {
         return res.status(400).json({ message: 'No images uploaded' });
@@ -157,7 +159,56 @@ console.log(req.files);
         });
 };
 
+async function editProduct(req,res){
+
+        const { id, name, description, category, price, stock, newImages } = req.body;
+
+    try {
+        // Find the product by ID
+        const product = await Product.findById(id);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Create an object to hold the updates
+        const updates = {};
+
+        // Check for changes in the product details
+        if (name && name !== product.name) updates.name = name;
+        if (description && description !== product.description) updates.description = description;
+        if (category && category !== product.category) updates.category = category;
+        if (price && price !== product.price) updates.price = price;
+        if (stock && stock !== product.stock) updates.stock = stock;
+
+        // Handle new image uploads
+        if (newImages && newImages.length > 0) {
+            const uploadPromises = newImages.map(image => {
+                return cloudinary.uploader.upload(image, {
+                    folder: 'products', // optional: specify a folder
+                });
+            });
+
+            // Wait for all images to upload
+            const uploadResponses = await Promise.all(uploadPromises);
+
+            // Extract the URLs from the upload responses
+            const imageUrls = uploadResponses.map(response => response.secure_url);
+
+            // Add the new image URLs to the existing ones
+            updates.imageUrls = [...product.imageUrls, ...imageUrls];
+        }
+
+        // Update the product
+        await Product.findByIdAndUpdate(id, updates, { new: true });
+
+        res.status(200).json({ message: 'Product updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating product', error });
+    }
+        
+}
 
 module.exports = {
-    getProducts,addProduct, upload: upload.array('productImage[]'),deleteProduct
+    getProducts,addProduct, upload: upload.array('productImage[]'),deleteProduct,editProduct
 }
