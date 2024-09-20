@@ -37,5 +37,30 @@
 }
 
 #imagePreview {
-    margin-top: 10px; /* Adds some space above the image preview */
+    height: 100px;
+    width: auto;
 }
+
+.form-group{
+    padding: 0;
+    margin: 0;
+}
+.form-control{
+    padding: 0 12px;
+}
+.modal-body {
+    padding: 5px 20px;
+}
+.image-card {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.img-group img{
+    width: 70px;
+    height: 70px;
+}
+
+
+

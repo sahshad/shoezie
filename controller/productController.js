@@ -11,6 +11,7 @@ cloudinary.config({
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+// const upload = multer({ dest: 'uploads/' });
 
 async function getProducts(req, res) {
 
@@ -48,49 +49,50 @@ async function getProducts(req, res) {
 
 
 
-const addProduct = (req, res) => {
-    const { productName, productDescription, productCategory, productPrice, productStock } = req.body;
+// const addProduct = (req, res) => {
+//     const { productName, productDescription, productCategory, productPrice, productStock } = req.body;
+// console.log(req.files);
 
-    if (!req.file) {
-        return res.status(400).json({ message: 'No image uploaded' });
-    }
+//     if (!req.files) {
+//         return res.status(400).json({ message: 'No image uploaded' });
+//     }
 
-    // Create a stream from the buffer
-    const stream = cloudinary.uploader.upload_stream(
-        { folder: 'product' }, // Specify the folder in Cloudinary
-        async (error, result) => {
-            if (error) {
-                return res.status(500).json({ message: 'Error uploading to Cloudinary', error });
-            }
+//     // Create a stream from the buffer
+//     const stream = cloudinary.uploader.upload_stream(
+//         { folder: 'product' }, // Specify the folder in Cloudinary
+//         async (error, result) => {
+//             if (error) {
+//                 return res.status(500).json({ message: 'Error uploading to Cloudinary', error });
+//             }
 
-            // Create a new product document
-            const newProduct = new Product({
-                name: productName,
-                description: productDescription,
-                category: productCategory,
-                price: productPrice,
-                stock: productStock,
-                imageUrl: result.secure_url,
-            });
+//             // Create a new product document
+//             const newProduct = new Product({
+//                 name: productName,
+//                 description: productDescription,
+//                 category: productCategory,
+//                 price: productPrice,
+//                 stock: productStock,
+//                 imageUrl: result.secure_url,
+//             });
 
-            try {
-                // Save the product to the database
-                await newProduct.save();
-                // res.status(200).json({
-                //     message: 'Product added successfully!',
-                //     imageUrl: result.secure_url,
-                // });
-                return res.redirect('/admin/products')
-            } catch (dbError) {
-                console.error(dbError);
-                res.status(500).json({ message: 'Error saving product to database', dbError });
-            }
-        }
-    );
+//             try {
+//                 // Save the product to the database
+//                 await newProduct.save();
+//                 // res.status(200).json({
+//                 //     message: 'Product added successfully!',
+//                 //     imageUrl: result.secure_url,
+//                 // });
+//                 return res.redirect('/admin/products')
+//             } catch (dbError) {
+//                 console.error(dbError);
+//                 res.status(500).json({ message: 'Error saving product to database', dbError });
+//             }
+//         }
+//     );
 
-    // Stream the buffer to Cloudinary
-    streamifier.createReadStream(req.file.buffer).pipe(stream);
-};
+//     // Stream the buffer to Cloudinary
+//     streamifier.createReadStream(req.files.buffer).pipe(stream);
+// };
 
  async function deleteProduct (req, res){
     const productId = req.params.id;
@@ -103,6 +105,59 @@ const addProduct = (req, res) => {
     }
 }
 
+
+const addProduct = (req, res) => {
+    const { productName, productDescription, productCategory, productPrice, productStock } = req.body;
+console.log(req.files);
+
+    if (!req.files || !Array.isArray(req.files)) {
+        return res.status(400).json({ message: 'No images uploaded' });
+    }
+
+    const uploadPromises = req.files.map(file => {
+        return new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                { folder: 'product' }, // Specify the folder in Cloudinary
+                (error, result) => {
+                    if (error) {
+                        return reject(error);
+                    }
+                    resolve(result.secure_url); // Resolve with the secure URL
+                }
+            );
+
+            streamifier.createReadStream(file.buffer).pipe(stream);
+        });
+    });
+
+    Promise.all(uploadPromises)
+        .then(async (imageUrls) => {
+            // Create a new product document
+            const newProduct = new Product({
+                name: productName,
+                description: productDescription,
+                category: productCategory,
+                price: productPrice,
+                stock: productStock,
+                imageUrls, // Save the array of image URLs
+            });
+
+            try {
+                // Save the product to the database
+                await newProduct.save();
+                return res.redirect('/admin/products'); // Redirect after success
+            } catch (dbError) {
+                console.error(dbError);
+                return res.status(500).json({ message: 'Error saving product to database', dbError });
+            }
+        })
+        .catch(uploadError => {
+            console.error(uploadError);
+            return res.status(500).json({ message: 'Error uploading images to Cloudinary', uploadError });
+        });
+};
+
+
 module.exports = {
-    getProducts,addProduct, upload: upload.single('productImage'),deleteProduct
+    getProducts,addProduct, upload: upload.array('productImage[]'),deleteProduct
 }
