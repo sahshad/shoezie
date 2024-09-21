@@ -377,3 +377,29 @@ document.getElementById('editProductButton').addEventListener('click', function(
 
     newImages = [];
 });
+
+
+function toggleProductStatus(productId, button) {
+    const currentStatus = button.innerText === 'Unlist'; // Determine current status
+
+    fetch(`/admin/products/${currentStatus ? 'unlist' : 'list'}/${productId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            // Toggle button properties
+            button.classList.toggle('btn-danger', !currentStatus);
+            button.classList.toggle('btn-success', currentStatus);
+            button.innerText = currentStatus ? 'List' : 'Unlist';
+        } else {
+            alert('Failed to toggle product status.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while toggling the product status.');
+    });
+}

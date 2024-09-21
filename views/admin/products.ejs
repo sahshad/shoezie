@@ -61,8 +61,10 @@
                                 <button class="btn btn-warning btn-sm" data-toggle="modal"
                                     data-target="#editProductModal"
                                     onclick="populateEditModal('<%= product.name %>','<%= product.description %>', '<%= product.category %>',' <%= product.price %>', '<%= product.stock %>','<%= JSON.stringify(product.imageUrls) %>','<%= product._id %>')">Edit</button>
-                                <button class="btn btn-danger btn-sm"
-                                    onclick="showConfirmDeleteModal('<%= product._id %>','<%= product.name%>')">Delete</button>
+                                    <button class="btn <%= product.status ? 'btn-danger' : 'btn-success' %> btn-sm" 
+                                        onclick="toggleProductStatus('<%= product._id %>', this)">
+                                    <%= product.status ? 'Unlist' : 'List' %>
+                                </button>
                             </td>
                         </tr>
                         <% }); %>

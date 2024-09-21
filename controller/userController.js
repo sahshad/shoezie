@@ -1,4 +1,5 @@
 const User = require('../model/user')
+const Product = require('../model/product')
 const bcrypt = require('bcrypt')
 const saltRounds = 10;
 function getLogin(req,res){
@@ -25,6 +26,17 @@ const {firstname,lastname,email,password} = req.body
     }
 }
 
+async function getHome(req,res){
+  const product =await Product.find({})
+    res.render('user/home',{product})
+}
+
+async function getShop(req,res){
+    const product = await Product.find({})
+    res.render('user/shop',{product})
+}
+
+
 module.exports ={
-    getLogin,getSignup,addUser
+    getLogin,getSignup,addUser,getHome,getShop
 }

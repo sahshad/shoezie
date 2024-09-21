@@ -1,0 +1,379 @@
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif; /* Apply Poppins font globally */
+}
+
+body {
+    background-color: #f4f4f4;
+}
+
+/* Ensure hero section takes full height of viewport without scrolling */
+main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+.navbar {
+    background-color: #FFFBEA !important; /* Light yellowish */
+}
+
+.navbar-brand {
+    color: #000 !important; /* Brand name color to black */
+    font-weight: 600;
+}
+
+/* Add spacing between navigation links */
+.navbar-nav .nav-item {
+    margin-right: 15px;
+}
+
+.navbar-nav .nav-link {
+    color: #000 !important;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: #F3EACB !important; /* Slightly darker yellow */
+    border-radius: 5px;
+}
+
+/* Move search bar slightly left */
+.search-container {
+    margin-right: 50px; /* Move search container 50px to the left */
+}
+
+.search-container input {
+    background-color: #FFFBEA;
+}
+
+.search-container button {
+    background-color: #000; /* Black */
+    color: #fff;
+}
+
+.search-container button:hover {
+    background-color: #F5BF25; /* Yellow */
+}
+
+/* Hero Section */
+.hero-section {
+    background-color: #fff; /* Set to white */
+    padding: 50px 0;
+    flex-grow: 1; /* Allow hero to grow in height */
+    display: flex;
+    align-items: center;
+}
+
+.hero-section h1 {
+    font-size: 2.5em;
+    color: #000;
+}
+
+.hero-section p {
+    font-size: 1.2em;
+    color: #333;
+}
+
+.shop-button {
+    background-color: #000;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+
+.shop-button:hover {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+}
+
+/* Statistics */
+.stat-number {
+    font-weight: bold;
+    font-size: 1.8em;
+    color: #000;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    color: #555;
+}
+
+.icons a {
+    color: #000 !important;
+}
+
+.icons a:hover {
+    color: #F5BF25 !important;
+}
+.new-arrivals {
+padding: 50px 0;
+text-align: center;
+}
+
+.card {
+margin: 20px;
+border: none; /* Remove border */
+transition: transform 0.2s;
+}
+
+.card:hover {
+transform: scale(1.05); /* Slight zoom effect */
+}
+
+.star-rating {
+color: #F5BF25; /* Gold color for stars */
+}
+
+.price {
+font-weight: bold;
+color: #000;
+}
+
+.top-selling {
+padding: 50px 0;
+text-align: center;
+}
+
+.card {
+margin: 20px;
+border: none; /* Remove border */
+transition: transform 0.2s;
+}
+
+.card:hover {
+transform: scale(1.05); /* Slight zoom effect */
+}
+
+.star-rating {
+color: #F5BF25; /* Gold color for stars */
+}
+
+.price {
+font-weight: bold;
+color: #000;
+}
+
+.categories {
+padding: 50px 0;
+background-color: #fff; /* White background */
+}
+
+.categories h2 {
+text-align: center;
+margin-bottom: 30px;
+color: #333;
+}
+
+.category-card {
+text-align: center;
+border: 1px solid #ddd; /* Light border */
+border-radius: 10px;
+overflow: hidden;
+position: relative; /* For absolute positioning of title */
+transition: transform 0.3s;
+}
+
+.category-card:hover {
+transform: scale(1.05); /* Scale effect on hover */
+}
+
+.category-img {
+height: 200px; /* Fixed height */
+width: 100%; /* Full width */
+object-fit: cover; /* Maintain aspect ratio */
+}
+
+.category-title {
+font-size: 1.5em; /* Title size */
+margin: 10px 0;
+color: #fff; /* White text */
+position: absolute; /* Positioning */
+top: 10px; /* From top */
+left: 50%;
+transform: translateX(-50%); /* Center horizontally */
+background: rgba(0, 0, 0, 0.5); /* Black background with transparency */
+padding: 5px 10px; /* Padding around text */
+border-radius: 5px; /* Rounded corners */
+}
+
+/* Make vertical category taller */
+.vertical {
+height: 100%; /* Full height */
+}
+
+.reviews-section {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: white; /* Set background color to white */
+}
+
+.reviews-section h2 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.review-slider {
+    display: flex;
+    overflow: hidden;
+    width: 80%;
+    margin: 20px auto;
+}
+
+.review-container {
+    display: flex;
+    width: calc(30% * 3); /* Adjust for 3 reviews */
+    transition: transform 0.5s ease-in-out;
+}
+
+.review-card {
+    background-color: #f9f9f9;
+    border: 1px solid #333; /* Thin black border */
+    border-radius: 8px;
+    padding: 20px;
+    min-width: calc(100% / 3 - 20px); /* 3 reviews visible at a time */
+    margin-right: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Light shadow */
+}
+
+.stars {
+    color: #F5BF25; /* Yellow color for stars */
+    font-size: 20px;
+}
+
+.review-card h3 {
+    font-size: 18px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.review-card p {
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
+}
+
+.slider-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.slider-controls button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.slider-controls button:hover {
+    background-color: #555;
+}
+
+.slider-controls button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+.footer {
+    background-color: #000000; /* Light yellowish */
+    color: white;
+    padding: 20px 0;
+    text-align: left;
+}
+
+.footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.footer-content > div {
+    flex: 1; /* Equal space for all sections */
+    margin-right: 20px; /* Space between sections */
+}
+
+.footer-content > div:last-child {
+    margin-right: 0; /* Remove margin from the last section */
+}
+
+.brand-section {
+    flex: 1.5; /* Increased width for brand section */
+}
+
+.brand-section h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.brand-section p {
+    font-size: 14px;
+    color: #555;
+    margin: 5px 0 15px;
+}
+
+.brand-section .social-icons a {
+    color: #ffffff;
+    margin-right: 10px;
+    font-size: 20px; /* Adjust icon size */
+    transition: color 0.3s;
+}
+
+.brand-section .social-icons a:hover {
+    color: #F5BF25; /* Change color on hover */
+}
+
+.footer-content h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.footer-content ul {
+    list-style: none; /* Remove bullet points */
+    padding: 0;
+}
+
+.footer-content ul li {
+    margin-bottom: 5px;
+}
+
+.footer-content a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.footer-content a:hover {
+    text-decoration: underline;
+}
+
+.footer-divider {
+    border: 1px solid #ccc; /* Thin line */
+    margin: 20px 0; /* Spacing around the line */
+}
+
+.copyright {
+    text-align: center;
+    font-size: 14px; /* Adjust font size */
+    color: #555;
+}
+
+.fixed-height {
+    height: 200px; /* Set your desired height */
+    object-fit: cover; /* This maintains the aspect ratio */
+    width: 100%; /* Ensure it takes the full width of the card */
+}

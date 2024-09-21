@@ -94,16 +94,6 @@ async function getProducts(req, res) {
 //     streamifier.createReadStream(req.files.buffer).pipe(stream);
 // };
 
- async function deleteProduct (req, res){
-    const productId = req.params.id;
-    try {
-        await Product.findByIdAndDelete(productId); // Adjust based on your database setup
-        res.status(200).send({ message: 'Product deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting product:', error);
-        res.status(500).send({ message: 'Failed to delete product' });
-    }
-}
 
 
 const addProduct = (req, res) => {
@@ -209,6 +199,20 @@ async function editProduct(req,res){
         
 }
 
+async function changeProductStatus (req, res){
+    const { action, id } = req.params;
+    
+    try {
+        const newStatus = action === 'list'; // Set status based on action
+        const result=await Product.findByIdAndUpdate(id, { status: newStatus });
+        if(result)
+        res.status(200).json({ message: `Product ${action === 'list' ? 'listed' : 'unlisted'} successfully.` });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error toggling product status.', error });
+    }
+}
+
 module.exports = {
-    getProducts,addProduct, upload: upload.array('productImage[]'),deleteProduct,editProduct
+    getProducts,addProduct, upload: upload.array('productImage[]'),editProduct,changeProductStatus
 }

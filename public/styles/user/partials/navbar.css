@@ -1,0 +1,68 @@
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif; /* Apply Poppins font globally */
+}
+
+body {
+    background-color: #f4f4f4;
+}
+
+/* Ensure hero section takes full height of viewport without scrolling */
+main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+.navbar {
+    background-color: #FFFBEA !important; /* Light yellowish */
+}
+
+.navbar-brand {
+    color: #000 !important; /* Brand name color to black */
+    font-weight: 600;
+}
+
+/* Add spacing between navigation links */
+.navbar-nav .nav-item {
+    margin-right: 15px;
+}
+
+.navbar-nav .nav-link {
+    color: #000 !important;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: #F3EACB !important; /* Slightly darker yellow */
+    border-radius: 5px;
+}
+
+/* Move search bar slightly left */
+.search-container {
+    margin-right: 50px; /* Move search container 50px to the left */
+}
+
+.search-container input {
+    background-color: #FFFBEA;
+}
+
+.search-container button {
+    background-color: #000; /* Black */
+    color: #fff;
+}
+
+.search-container button:hover {
+    background-color: #F5BF25; /* Yellow */
+}
+
+.icons a:hover {
+    color: #F5BF25 !important;
+}
+
+.icons a {
+    color: #000 !important;
+}
