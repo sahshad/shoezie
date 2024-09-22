@@ -1,5 +1,6 @@
 const User = require('../model/user')
 const Product = require('../model/product')
+const Category = require('../model/category')
 const bcrypt = require('bcrypt')
 const saltRounds = 10;
 function getLogin(req,res){
@@ -27,8 +28,9 @@ const {firstname,lastname,email,password} = req.body
 }
 
 async function getHome(req,res){
-  const product =await Product.find({})
-    res.render('user/home',{product})
+  const product = await Product.find({})
+  const category = await Category.find({})
+    res.render('user/home',{product,category})
 }
 
 async function getShop(req,res){
@@ -36,7 +38,17 @@ async function getShop(req,res){
     res.render('user/shop',{product})
 }
 
+async function getProduct(req,res){
+    const productId = req.params.id // Get the ID from the route parameters
+    const product = await Product.findById(productId)
+
+    if (product) {
+        res.render('user/productView', { product });
+    } else {
+        res.status(404).send('Product not found'); 
+    }
+}
 
 module.exports ={
-    getLogin,getSignup,addUser,getHome,getShop
+    getLogin,getSignup,addUser,getHome,getShop,getProduct
 }

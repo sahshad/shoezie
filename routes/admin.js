@@ -4,7 +4,7 @@ const {
     getLogin, getHome, getUsers,changeStatus,
 } = require('../controller/adminController');
 const { getProducts,addProduct,upload,editProduct,changeProductStatus } = require('../controller/productController')
-const {getCategory} = require('../controller/categoryController')
+const {getCategory,addCategory,uploadCategory} = require('../controller/categoryController')
 const { isAuthenticated } = require('../middleware/authMiddleware');
 
 
@@ -25,5 +25,6 @@ router.post('/products/:action/:id',changeProductStatus)
 
 
 router.get('/category', isAuthenticated, getCategory);
+router.post('/category/add',uploadCategory,addCategory)
 
 module.exports = router;

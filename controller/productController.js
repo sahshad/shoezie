@@ -1,25 +1,22 @@
+require('dotenv').config()
 const Product = require('../model/product')
-const cloudinary = require('cloudinary').v2
+const Category = require('../model/category')
+const cloudinary = require('../config/cloudinary')
 const streamifier = require('streamifier')
 const multer = require('multer')
-require('dotenv').config()
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-// const upload = multer({ dest: 'uploads/' });
 
 async function getProducts(req, res) {
 
     try {
-        const product =await Product.find({})
-        res.render('admin/products',{product})
+        const product =await Product.find({}).populate('category')
+        const category = await Category.find({})
+        res.render('admin/products',{product,category})
 
     } catch (error) {
+        console.log(error);
         
     }
 }
@@ -98,9 +95,6 @@ async function getProducts(req, res) {
 
 const addProduct = (req, res) => {
     const { productName, productDescription, productCategory, productPrice, productStock } = req.body;
-console.log(req.files);
-console.log(req.body);
-
 
     if (!req.files || !Array.isArray(req.files)) {
         return res.status(400).json({ message: 'No images uploaded' });

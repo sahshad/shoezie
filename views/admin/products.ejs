@@ -54,13 +54,13 @@
                             <td><img src="<%= product.imageUrls[0]%>" alt="Product Image"
                                     class="img-thumbnail product-table-image"></td>
                             <td><%= product.name %></td>
-                            <td><%= product.category %></td>
+                            <td><%= product.category.name %></td>
                             <td><%= product.price %></td>
                             <td><%= product.stock %></td>
                             <td>
                                 <button class="btn btn-warning btn-sm" data-toggle="modal"
                                     data-target="#editProductModal"
-                                    onclick="populateEditModal('<%= product.name %>','<%= product.description %>', '<%= product.category %>',' <%= product.price %>', '<%= product.stock %>','<%= JSON.stringify(product.imageUrls) %>','<%= product._id %>')">Edit</button>
+                                    onclick="populateEditModal('<%= product.name %>','<%= product.description %>', '<%= product.category.name %>',' <%= product.price %>', '<%= product.stock %>','<%= JSON.stringify(product.imageUrls) %>','<%= product._id %>') ">Edit</button>
                                     <button class="btn <%= product.status ? 'btn-danger' : 'btn-success' %> btn-sm" 
                                         onclick="toggleProductStatus('<%= product._id %>', this)">
                                     <%= product.status ? 'Unlist' : 'List' %>
@@ -101,7 +101,12 @@
                             </div>
                             <div class="form-group">
                                 <label for="productCategory">Category</label>
-                                <input type="text" class="form-control" name="productCategory" id="productCategory" placeholder="Enter product category" required>
+                                <select class="form-control" name="productCategory" id="productCategory" required>
+                                    <option value="">Select a category</option>
+                                    <% category.forEach(category =>{%>
+                                        <option value="<%= category._id %>"><%= category.name %></option>
+                                    <%}) %>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="productPrice">Price</label>
@@ -164,7 +169,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="editProductCategory">Category</label>
-                                <input type="text" class="form-control" id="editProductCategory" placeholder="Enter product category" required>
+                                <select class="form-control" name="editProductCategory" id="editProductCategory" required>
+                                    <% category.forEach(category =>{%>
+                                        <option value="<%= category.name %>"><%= category.name %></option>
+                                    <%}) %>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="editProductPrice">Price</label>

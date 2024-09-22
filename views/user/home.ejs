@@ -86,8 +86,8 @@
                         <div class="col-md-3">
                             <div class="card">
                                 <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
-                                <div class="card-body">
-                                    <h5 class="card-title"><%= product.name %></h5>
+                                <div class="card-body" style="text-align: left;">
+                                    <p class="card-title"><%= product.name %></p>
                                     <div class="star-rating">
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
@@ -97,6 +97,10 @@
                                         <span>(4.5)</span>
                                     </div>
                                     <p class="price">₹ <%= product.price %></p>
+                                    <div class="button-group">
+                                        <a href="shop/<%= product.id %>" class="btn shop-btn btn-white">Buy Now</a>
+                                        <a href="cart/add/<%= product.id %>" class="btn cart-btn btn-black">Add to Cart</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>               
@@ -130,6 +134,10 @@
                                         <span>(4.5)</span>
                                     </div>
                                     <p class="price">₹ <%= product.price %></p>
+                                    <div class="button-group">
+                                        <a href="shop/<%= product.id %>" class="btn shop-btn  btn-white">Buy Now</a>
+                                        <a href="cart/add/<%= product.id %>" class="btn cart-btn btn-black">Add to Cart</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>               
@@ -141,37 +149,40 @@
 
 <!-- CATEGORIES Section -->
 <section class="categories">
-    <div class="container">
-        <h2>CATEGORIES</h2>
-        <div class="row">
-            <!-- Vertical Category -->
-            <div class="col-md-4">
-                <div class="category-card vertical">
-                    <h5 class="category-title">Men</h5>
-                    <img src="/image/men.jpg" class="category-img" alt="Men's Fashion">
-                </div>
-            </div>
-            <!-- Horizontal Categories -->
-            <div class="col-md-8">
-                <div class="row">
-                    <!-- Women Category -->
-                    <div class="col-md-6">
-                        <div class="category-card">
-                            <h5 class="category-title">Women</h5>
-                            <img src="/image/women.jpg" class="category-img" alt="Women's Fashion">
+    <% if(category){%>
+        <div class="container">
+            <h2>CATEGORIES</h2>
+            <div class="row">
+                <!-- Vertical Category -->
+                 <% category.forEach(category =>{%>
+                    <div class="col-md-4">
+                        <div class="category-card vertical">
+                            <h5 class="category-title"><%= category.name %></h5>
+                            <img src="<%= category.imageUrl %>" class="category-img" alt="Men's Fashion">
                         </div>
                     </div>
-                    <!-- Kids Category -->
-                    <div class="col-md-6">
-                        <div class="category-card">
-                            <h5 class="category-title">Kids</h5>
-                            <img src="/image/kids.jpg" class="category-img" alt="Kids' Fashion">
+                 <%}) %>
+             
+                        <!-- Women Category -->
+                        <!-- <div class="col-md-4">
+                            <div class="category-card">
+                                <h5 class="category-title">Women</h5>
+                                <img src="/image/women.jpg" class="category-img" alt="Women's Fashion">
+                            </div>
                         </div>
+                         Kids Category -->
+                        <!-- <div class="col-md-4">
+                            <div class="category-card">
+                                <h5 class="category-title">Kids</h5>
+                                <img src="/image/kids.jpg" class="category-img" alt="Kids' Fashion">
+                            </div>
+                        </div> --> 
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    <%} %>
+    
 </section>
 <!-- review section -->
 <div class="reviews-section">

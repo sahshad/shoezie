@@ -35,40 +35,35 @@
                 </div>
 
                 <!-- Categories Table -->
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>No</th>
-                                <th>Image</th>
-                                <th>Category</th>    
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Sample Data -->
-                            <tr>
-                                <td>1</td>
-                                <td><img src="path/to/footwear-image.jpg" alt="Footwear" class="img-thumbnail" style="max-width: 100px;"></td>
-                                <td>Footwear</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editCategory('1', 'Footwear', 'path/to/footwear-image.jpg')">Edit</button>
-                                    <button class="btn btn-danger btn-sm">Delete</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td><img src="path/to/accessories-image.jpg" alt="Accessories" class="img-thumbnail" style="max-width: 100px;"></td>
-                                <td>Accessories</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editCategory('2', 'Accessories', 'path/to/accessories-image.jpg')">Edit</button>
-                                    <button class="btn btn-danger btn-sm">Delete</button>
-                                </td>
-                            </tr>
-                            <!-- Add more rows as needed -->
-                        </tbody>
-                    </table>
-                </div>
+                 <% if(category){%>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Image</th>
+                                    <th>Category</th>    
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                 <% category.forEach((category,index)=>{%>
+                                    <tr>
+                                        <td><%= index+1 %></td>
+                                        <td><img src="<%= category.imageUrl %>" alt="category <%= index+1  %>" class="img-thumbnail" style="max-width: 50px;"></td>
+                                        <td><%= category.name %></td>
+                                        <td>
+                                            <button class="btn btn-warning btn-sm" onclick="editCategory('1', 'Footwear', 'path/to/footwear-image.jpg')">Edit</button>
+                                            <button class="btn btn-danger btn-sm">Delete</button>
+                                        </td>
+                                    </tr>
+                                 <%}) %>
+                                <!-- Add more rows as needed -->
+                            </tbody>
+                        </table>
+                    </div>
+                 <%} %>
+                
             </div>
         </div>
     </div>
@@ -84,22 +79,23 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="addCategoryForm">
+                    <form id="addCategoryForm" action="/admin/category/add" method="post" enctype="multipart/form-data">
                         <div class="form-group">
                             <label for="categoryName">Category Name</label>
-                            <input type="text" class="form-control" id="categoryName" placeholder="Enter category name">
+                            <input type="text" class="form-control" id="categoryName" name="categoryName" placeholder="Enter category name">
                         </div>
                         <div class="form-group">
                             <label for="categoryImage">Category Image</label>
-                            <input type="file" class="form-control-file" id="categoryImage" accept="image/*">
+                            <input type="file" class="form-control-file" name="categoryImage" id="categoryImage" accept="image/*">
                             <div id="imagePreview" class="mt-2"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" id="saveCategoryBtn">Add Category</button>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveCategoryBtn">Add Category</button>
-                </div>
+            
             </div>
         </div>
     </div>
@@ -189,10 +185,10 @@
         }
 
         // Handle saving a new category
-        document.getElementById('saveCategoryBtn').addEventListener('click', function() {
-            // Implement the logic for adding a new category here
-            alert('Add category functionality needs to be implemented.');
-        });
+        // document.getElementById('saveCategoryBtn').addEventListener('click', function() {
+        //     // Implement the logic for adding a new category here
+        //     alert('Add category functionality needs to be implemented.');
+        // });
 
         // Handle updating an existing category
         document.getElementById('updateCategoryBtn').addEventListener('click', function() {

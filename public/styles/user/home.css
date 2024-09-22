@@ -377,3 +377,37 @@ height: 100%; /* Full height */
     object-fit: cover; /* This maintains the aspect ratio */
     width: 100%; /* Ensure it takes the full width of the card */
 }
+
+.button-group {
+    display: flex;
+    justify-content: space-between; /* Space between buttons */
+    margin-top: 10px; /* Margin on top for better spacing */
+    gap: 10px;
+}
+
+.shop-btn, .cart-btn {
+    flex: 1; /* Equal width for buttons */
+    padding: 0.5rem 0; /* Adjust padding for a smaller button size */
+    font-size: 0.5rem; /* Reduce font size for buttons */
+}
+
+.btn-white {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+}
+
+.btn-black {
+    background-color: black;
+    color: white;
+}
+
+.btn-white:hover {
+    background-color: black; /* Change background to black on hover */
+    color: white; /* Change text color to white on hover */
+}
+
+.btn-black:hover {
+    opacity: 0.8; /* Slightly transparent on hover */
+    color: white;
+}
