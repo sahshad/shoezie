@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema({
   firstname: String,
   lastname: String,
   email: String,
+  password:String,
   isBlock: { type: Boolean, default: false },
 },{ timestamps: true });
 

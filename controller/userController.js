@@ -2,21 +2,60 @@ const User = require('../model/user')
 const Product = require('../model/product')
 const Category = require('../model/category')
 const bcrypt = require('bcrypt')
-const saltRounds = 10;
+
 function getLogin(req,res){
+
     res.render('user/login')
 }
 
 function getSignup(req,res){
-    
+
     res.render('user/signup')
+}
+
+function getProfile(req,res){
+   res.render('user/profile')
+}
+
+function userLogOut(req,res){
+        req.session.destroy(err => {
+            if (err) {
+                return res.redirect('/user/profile'); // Redirect to profile on error
+            }
+           return res.redirect('/user/login'); // Redirect to login on success
+        });
+}
+
+async function userLogIn(req,res){
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.send('User not found');
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if(user.isBlock===false){
+        if (isMatch) {
+            req.session.user = user.id;
+            return res.redirect('/user/profile');
+        } else {
+            return res.send('Invalid credentials'); 
+        }
+    }else{
+        res.send('you are blocked')
+    }
+    } catch (error) {
+        console.error(error);
+        return res.send('An error occurred');
+    }
 }
 
  async function addUser (req, res){
 const {firstname,lastname,email,password} = req.body
+const saltRounds = 10;
     try {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
-        const newUser = new User({firstname,lastname, email, password:hashedPassword,
+        const newUser = new User({firstname,lastname, email, password:hashedPassword
             
          });
         await newUser.save();
@@ -50,5 +89,5 @@ async function getProduct(req,res){
 }
 
 module.exports ={
-    getLogin,getSignup,addUser,getHome,getShop,getProduct
+    getLogin,getSignup,addUser,getHome,getShop,getProduct,getProfile,userLogIn,userLogOut
 }

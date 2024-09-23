@@ -53,8 +53,8 @@ document.getElementById('confirmDeleteButton').addEventListener('click', functio
     });
 
     function populateEditModal(name, description,category, price, stock, imageUrl,id) {
+
     const imageUrls = JSON.parse(imageUrl);
-    
     price = parseInt(price);
     document.getElementById('editProductName').value = name;
     document.getElementById('editProductDescription').value = description;
@@ -327,6 +327,7 @@ document.getElementById('addProductButton').addEventListener('click', function (
 document.getElementById('editProductButton').addEventListener('click', function() {
     const currentName = document.getElementById('editProductName').value;
     const currentCategory = document.getElementById('editProductCategory').value;
+    const currentDescription = document.getElementById('editProductDescription').value
     const currentPrice = parseInt(document.getElementById('editProductPrice').value);
     const currentStock = document.getElementById('editProductStock').value;
 
@@ -344,6 +345,10 @@ document.getElementById('editProductButton').addEventListener('click', function(
     }
     if (currentStock !== originalData.stock) {
         payload.stock = currentStock;
+    }
+
+    if(currentDescription !== originalData.description){
+        payload.description = currentDescription
     }
 
     // Check if new images have been added

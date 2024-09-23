@@ -6,8 +6,13 @@ function isAuthenticated(req, res, next) {
     res.redirect('/admin/login') 
 }
 
-
+function userAuthenticated(req,res,next){
+    if(req.session.user){
+        return next()
+    }
+    res.redirect('/user/login')
+}
 
 module.exports = {
-    isAuthenticated
+    isAuthenticated,userAuthenticated
 };

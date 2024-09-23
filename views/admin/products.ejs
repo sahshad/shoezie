@@ -58,13 +58,19 @@
                             <td><%= product.price %></td>
                             <td><%= product.stock %></td>
                             <td>
-                                <button class="btn btn-warning btn-sm" data-toggle="modal"
+                                    <button class="btn btn-warning btn-sm" data-toggle="modal"
                                     data-target="#editProductModal"
-                                    onclick="populateEditModal('<%= product.name %>','<%= product.description %>', '<%= product.category.name %>',' <%= product.price %>', '<%= product.stock %>','<%= JSON.stringify(product.imageUrls) %>','<%= product._id %>') ">Edit</button>
+                                    onclick="populateEditModal('<%= product.name %>',
+                                    '<%= product.description  %>', 
+                                    '<%= product.category.name %>',
+                                    ' <%= product.price %>', 
+                                    '<%= product.stock %>',
+                                    '<%= JSON.stringify(product.imageUrls) %>',
+                                    '<%= product._id %>') ">Edit</button>
                                     <button class="btn <%= product.status ? 'btn-danger' : 'btn-success' %> btn-sm" 
-                                        onclick="toggleProductStatus('<%= product._id %>', this)">
+                                    onclick="toggleProductStatus('<%= product._id %>', this)">
                                     <%= product.status ? 'Unlist' : 'List' %>
-                                </button>
+                                   </button>
                             </td>
                         </tr>
                         <% }); %>
@@ -97,7 +103,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="productDescription">Description</label>
-                                <input type="text" class="form-control" name="productDescription" id="productDescription" placeholder="Enter product description" required>
+                                <textarea  type="text" class="form-control" name="productDescription" id="productDescription" placeholder="Enter product description" required> </textarea>
                             </div>
                             <div class="form-group">
                                 <label for="productCategory">Category</label>
@@ -165,7 +171,7 @@
                             <input type="hidden"id="editProductId">
                             <div class="form-group">
                                 <label for="editProductDescription">Description</label>
-                                <input type="text" class="form-control" id="editProductDescription" placeholder="Enter product description" required>
+                                <textarea type="text" class="form-control" id="editProductDescription" placeholder="Enter product description" required> </textarea>
                             </div>
                             <div class="form-group">
                                 <label for="editProductCategory">Category</label>
@@ -193,8 +199,7 @@
                                 <label for="editProductImage">Update Image</label>
                                 <input type="file" class="form-control" id="editProductImage" accept="image/*" multiple>
                             </div>
-                            <!-- <img id="editImagePreview" style="display: none; max-width: 100%; margin-bottom: 10px;" />
-                            <button type="button" class="btn btn-primary" id="editCropImageButton" style="display: none;">Crop Image</button> -->
+              
                             <img id="imagePreview" style="display: none; max-width: 100%;" />
                             <button type="button" id="cropImageButton" style="display: none;">Crop Image</button>
                         </div>
