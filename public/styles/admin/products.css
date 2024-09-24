@@ -1,17 +1,52 @@
 /* Products Page Styles */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse; /* Remove vertical lines */
+    border-radius: 0.5rem; /* Rounded edges */
+    overflow: hidden; /* Ensure corners are rounded */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
 
-/* Product List Styles */
-.list-group-item {
-    margin-bottom: 10px;
-    padding: 15px;
-    border-radius: 0.5rem;
-    background-color: #495057;
+.custom-table thead {
+    background-color: rgb(153, 176, 220); /* Header background */
     color: #ffffff;
 }
 
-.list-group-item:hover {
-    background-color: #6c757d; /* Highlight on hover */
+.custom-table th, .custom-table td {
+    text-align: center; /* Center align */
+    padding: 10px; /* Padding for cells */
+    border: none; /* No cell borders */
 }
+
+.custom-table tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9; /* Alternate row color */
+}
+
+.custom-table tbody tr:nth-of-type(even) {
+    background-color: #ffffff; /* Base row color */
+}
+
+/* Button Styles */
+.btn-warning {
+    background-color: #ffeeba; /* Light warning */
+    color: #856404; /* Dark text color */
+}
+
+.btn-success {
+    background-color: #d4edda; /* Light green */
+    color: #155724; /* Dark green text */
+}
+
+.btn-danger {
+    background-color: #f5c6cb; /* Light danger */
+    color: #721c24; /* Dark text color */
+}
+
+.icon-spacing {
+    margin-right: 5px; /* Space between icon and text */
+}
+/* Product List Styles */
+
 
 .product-image {
     width: 100px; /* Adjust size as needed */

@@ -411,3 +411,9 @@ height: 100%; /* Full height */
     opacity: 0.8; /* Slightly transparent on hover */
     color: white;
 }
+
+.line {
+    border-top: 1px solid #ccc;
+    margin: 15px 60px;
+
+}

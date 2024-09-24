@@ -12,58 +12,93 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/styles/admin/dashboard.css">
+    <style>
+        /* Custom Table Styles */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse; /* Remove vertical lines */
+            border: px solid #dee2e6; /* Narrow rounded edge border */
+            border-radius: 5px; /* Rounded edges */
+            overflow: hidden; /* Ensure corners are rounded */
+        }
+        .custom-table thead {
+            background-color: rgb(153, 176, 220); /* Dark background for table header */
+            color: #ffffff;
+        }
+        .custom-table th, .custom-table td {
+            text-align: center; /* Center align table content */
+            padding: 10px; /* Padding for cells */
+            border: none; /* Remove individual cell borders */
+        }
+        .custom-table tbody tr:nth-of-type(odd) {
+            background-color: #f9f9f9; /* Alternate row color */
+        }
+        .btn-warning {
+            background-color: #ffeeba; /* Light version of warning */
+            color: #856404; /* Dark text color */
+            margin-right: 10px;
+        }
+        .btn-danger {
+            background-color: #f5c6cb; /* Light version of danger */
+            color: #721c24; /* Dark text color */
+        }
+
+        .icon-spacing {
+    margin-right: 2px; /* Adjust the value as needed */
+}
+    </style>
 </head>
 <body>
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
-<%- include('partials/sidebar') %>
+        <%- include('partials/sidebar') %>
         <!-- Page Content -->
         <div id="page-content-wrapper">
             <!-- Navbar -->
             <%- include('partials/navbar') %>
             <!-- Content Area -->
-            <div class="container-fluid">
+            <div class="container">
                 <div class="row mb-4 align-items-center">
                     <div class="col">
                         <h5 class="mt-2">Categories</h5>
                     </div>
                     <div class="col-auto">
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+                        <button class="btn btn-sm btn-outline-dark " data-toggle="modal" data-target="#addCategoryModal">
                             Add Category
                         </button>
                     </div>
                 </div>
 
                 <!-- Categories Table -->
-                 <% if(category){%>
+                <% if (category) { %>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
-                            <thead class="thead-dark">
+                        <table class="custom-table">
+                            <thead>
                                 <tr>
                                     <th>No</th>
                                     <th>Image</th>
-                                    <th>Category</th>    
+                                    <th>Category</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                 <% category.forEach((category,index)=>{%>
+                                <% category.forEach((category, index) => { %>
                                     <tr>
-                                        <td><%= index+1 %></td>
-                                        <td><img src="<%= category.imageUrl %>" alt="category <%= index+1  %>" class="img-thumbnail" style="max-width: 50px;"></td>
+                                        <td><%= index + 1 %></td>
+                                        <td><img src="<%= category.imageUrl %>" alt="category <%= index + 1 %>" class="img-thumbnail" style="max-width: 50px;"></td>
                                         <td><%= category.name %></td>
                                         <td>
-                                            <button class="btn btn-warning btn-sm" onclick="editCategory('1', 'Footwear', 'path/to/footwear-image.jpg')">Edit</button>
-                                            <button class="btn btn-danger btn-sm">Delete</button>
+                                            <button class="btn btn-warning btn-sm" onclick="editCategory('1', 'Footwear', 'path/to/footwear-image.jpg')">
+                                                <i class="fas fa-edit icon-spacing"></i>Edit</button>
+                                            <button class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash-alt icon-spacing"></i>Delete</button>
                                         </td>
                                     </tr>
-                                 <%}) %>
-                                <!-- Add more rows as needed -->
+                                <% }) %>
                             </tbody>
                         </table>
                     </div>
-                 <%} %>
-                
+                <% } %>
             </div>
         </div>
     </div>
@@ -94,39 +129,6 @@
                             <button type="submit" class="btn btn-primary" id="saveCategoryBtn">Add Category</button>
                         </div>
                     </form>
-                </div>
-            
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Category Modal -->
-    <div class="modal fade" id="editCategoryModal" tabindex="-1" role="dialog" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="editCategoryForm">
-                        <input type="hidden" id="editCategoryId">
-                        <div class="form-group">
-                            <label for="editCategoryName">Category Name</label>
-                            <input type="text" class="form-control" id="editCategoryName" placeholder="Enter category name">
-                        </div>
-                        <div class="form-group">
-                            <label for="editCategoryImage">Category Image</label>
-                            <input type="file" class="form-control-file" id="editCategoryImage" accept="image/*">
-                            <div id="editImagePreview" class="mt-2"></div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="updateCategoryBtn">Update Category</button>
                 </div>
             </div>
         </div>
@@ -159,22 +161,6 @@
             }
         });
 
-        // Image preview functionality for edit category
-        document.getElementById('editCategoryImage').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            const preview = document.getElementById('editImagePreview');
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = `<img src="${e.target.result}" alt="Category Image" class="img-thumbnail" style="max-width: 100px;">`;
-                };
-                reader.readAsDataURL(file);
-            } else {
-                preview.innerHTML = '';
-            }
-        });
-
         // Populate the edit modal with data
         function editCategory(id, name, imageUrl) {
             document.getElementById('editCategoryId').value = id;
@@ -183,18 +169,6 @@
             editImagePreview.innerHTML = `<img src="${imageUrl}" alt="Category Image" class="img-thumbnail" style="max-width: 100px;">`;
             $('#editCategoryModal').modal('show');
         }
-
-        // Handle saving a new category
-        // document.getElementById('saveCategoryBtn').addEventListener('click', function() {
-        //     // Implement the logic for adding a new category here
-        //     alert('Add category functionality needs to be implemented.');
-        // });
-
-        // Handle updating an existing category
-        document.getElementById('updateCategoryBtn').addEventListener('click', function() {
-            // Implement the logic for updating a category here
-            alert('Update category functionality needs to be implemented.');
-        });
     </script>
 </body>
 </html>

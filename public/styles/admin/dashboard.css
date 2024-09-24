@@ -1,23 +1,50 @@
-/* Sidebar Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff;
+}
+
 .sidebar {
     height: 100vh;
     width: 250px;
-    background-color: #343a40;
+    background-color: rgb(153, 176, 220);
     position: fixed;
     top: 0;
     left: 0;
-    transition: all 0.3s;
-    z-index: 1000; /* Ensure the sidebar is above other content */
+    transition: transform 0.3s ease;
+    z-index: 1000;
+
 }
 
 .sidebar.active {
-    width: 0;
-    overflow: hidden; /* Prevent content from overflowing */
+    transform: translateX(-100%);
 }
 
 .sidebar .sidebar-header {
     padding: 15px;
-    background: #343a40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.sidebar .profile-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sidebar .profile-container img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.sidebar .profile-container h3 {
+    font-size: 1rem;
+    color: #ffffff;
+    margin: 0;
 }
 
 .sidebar .list-unstyled {
@@ -26,49 +53,66 @@
 }
 
 .sidebar .list-unstyled li {
-    padding: 10px 15px;
+    padding: 13px 15px;
+    text-align: left;
+    margin-left: 40px;
 }
 
 .sidebar .list-unstyled li a {
-    color: #ffffff;
-    display: block;
+    color: #000000;
+    display: flex;
+    align-items: center;
     text-decoration: none;
+    transition: background 0.3s, transform 0.3s, color 0.3s;
 }
 
 .sidebar .list-unstyled li a:hover {
-    background: #495057;
+    color: #ffffff;
+    transform: scale(1.05);
 }
 
-/* Page Content Styles */
+.sidebar .list-unstyled li a i {
+    margin-right: 8px;
+}
+
 #page-content-wrapper {
+    padding: 3px;
     width: 100%;
-    padding: 20px;
-    margin-left: 250px; /* Adjust this margin to the width of the sidebar */
+    margin-left: 250px;
     transition: margin-left 0.3s, width 0.3s;
 }
 
 #page-content-wrapper.toggled {
     margin-left: 0;
-    width: 100%; /* Take up the full width of the viewport */
+    width: 100%;
 }
 
-/* Navbar Styles */
 .navbar {
-    padding: 10px 40px;
-    background-color: #343a40; /* Dark background for navbar */
-    border-radius: 10px;
-    height: 70px;
+    background-color: #ffffff;
+    height: 50px; /* Reduced height */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.navbar button {
+    height: 30px; /* Reduced height of toggle button */
 
 }
 
-.profile-photo {
-    width: 40px; /* Adjust size as needed */
-    height: 40px; /* Ensure it's a square */
-    border-radius: 50%; /* Circular profile photo */
-    object-fit: cover; /* Ensure the photo covers the space without distortion */
+.form-inline input {
+    height: 30px; /* Reduced height of input */
+    padding: 0 10px; /* Adjusted padding */
+    font-size: 14px; /* Font size of input */
 }
 
-/* Card Styles */
+.form-inline button {
+    height: 30px; /* Reduced height of button */
+    padding: 0 10px; /* Adjusted padding */
+    font-size: 14px; /* Font size of button */
+}
+
 .card {
     border: none;
 }
@@ -87,7 +131,6 @@
     font-weight: bold;
 }
 
-/* Custom Background Colors for Dark Mode */
 .bg-primary {
     background-color: #007bff !important;
 }
@@ -112,7 +155,6 @@
     color: #212529 !important;
 }
 
-/* Form Inline Styles */
 .form-inline {
     display: flex;
     flex-flow: row nowrap;
@@ -123,5 +165,36 @@
     color: #ffffff;
     font-weight: bold;
 }
+.line {
+    border:1px solid rgb(243, 243, 243);
+  margin-bottom: 25px;
+}
 
+/* Custom Card Styles */
+.custom-card {
+    border-radius: 0.5rem; /* Rounded corners */
+    padding: 20px; /* Padding inside the card */
+    color: #333; /* Dark text color for better contrast */
+    transition: transform 0.2s; /* Smooth scaling on hover */
+}
 
+.custom-card:hover {
+    transform: scale(1.05); /* Scale effect on hover */
+}
+
+/* Light Background Colors for Different Card Types */
+.card-users {
+    background-color: #e7f1ff; /* Light blue */
+}
+
+.card-orders {
+    background-color: #d4edda; /* Light green */
+}
+
+.card-sales {
+    background-color: #d1ecf1; /* Light cyan */
+}
+
+.card-pending {
+    background-color: #fff3cd; /* Light yellow */
+}

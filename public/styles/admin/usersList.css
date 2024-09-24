@@ -1,31 +1,32 @@
-/* Users Page Styles */
-.table {
-    border-radius: 0.25rem; /* Rounded corners for the table */
+        /* Custom Table Styles */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse; /* Remove vertical lines */
+            border: px solid #dee2e6; /* Narrow rounded edge border */
+            border-radius: 5px; /* Rounded edges */
+            overflow: hidden; /* Ensure corners are rounded */
+        }
+        .custom-table thead {
+            background-color: rgb(153, 176, 220); /* Dark background for table header */
+            color: #ffffff;
+        }
+        .custom-table th, .custom-table td {
+            text-align: left; /* Center align table content */
+            padding: 10px; /* Padding for cells */
+            border: none; /* Remove individual cell borders */
+        }
+        .custom-table tbody tr:nth-of-type(odd) {
+            background-color: #f9f9f9; /* Alternate row color */
+        }
+        .btn-success {
+            background-color: #d4edda; /* Light green */
+            color: #155724; /* Dark green text */
+        }
+        .btn-danger {
+            background-color: #f5c6cb; /* Light version of danger */
+            color: #721c24; /* Dark text color */
+        }
+
+        .icon-spacing {
+    margin-right: 2px; /* Adjust the value as needed */
 }
-
-.table-dark {
-    background-color: #343a40; /* Dark mode background for table */
-}
-
-.table-dark thead th {
-    background-color: #495057; /* Slightly lighter dark mode for table headers */
-}
-
-.table-dark tbody tr:nth-child(odd) {
-    background-color: #495057; /* Darker rows for better readability */
-}
-
-.table-dark tbody tr:nth-child(even) {
-    background-color: #343a40; /* Base dark mode for even rows */
-}
-
-.badge-success {
-    background-color: #28a745; /* Green badge for active users */
-}
-
-.badge-danger {
-    background-color: #dc3545; /* Red badge for blocked users */
-}
-
-/* Button Styles */
-

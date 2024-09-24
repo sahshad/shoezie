@@ -18,47 +18,15 @@
 <body>
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
-        <div class="bg-dark sidebar" id="sidebar">
-            <div class="text-center mt-4 mb-3">
-                <h3 class="text-white">Admin panel</h3>
-            </div>
-            <ul class="list-unstyled components">
-                <li><a href="dashboard">Dashboard</a></li>
-                <li><a href="users">Users</a></li>
-                <li><a href="products">Products</a></li>
-                <li><a href="orderList">Order List</a></li>
-                <li><a href="offers">Offers</a></li>
-                <li><a href="coupons">Coupons</a></li>
-                <li><a href="deals">Deals</a></li>
-                <li><a href="category">Category</a></li>
-                <li><a href="settings">Settings</a></li>
-                <li><a href="/logout">Logout</a></li>
-            </ul>
-        </div>
-
+        <%- include('partials/sidebar') %>
         <!-- Page Content -->
         <div id="page-content-wrapper">
             <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3 rounded-1">
-                <!-- New Hamburger Menu Button -->
-                <button class="btn btn-light btn-sm" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <form class="form-inline ml-3">
-                    <input class="form-control mr-sm-2 rounded-pill" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-light my-2 my-sm-0 rounded-pill" type="submit">Search</button>
-                </form>
-                <div class="navbar-brand d-flex align-items-center ml-auto">
-                    <!-- Admin Profile Photo -->
-                    <img src="path/to/profile-photo.jpg" alt="Admin Profile" class="profile-photo">
-                    <span class="navbar-text text-light ml-2">Admin Name</span>
-                </div>
-            </nav>
-
+            <%- include('partials/navbar') %>
             <!-- Content Area -->
             <div class="container-fluid">
-                <h2 class="mb-4">Users</h2>
-                <table class="table table-dark table-striped">
+                <h5 class="mb-4">Users</h5>
+                <table class="custom-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -68,7 +36,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Example user entry -->
                         <% if(user){ %>
                             <% user.forEach((user, index) => { %>
                                 <tr>
@@ -77,17 +44,19 @@
                                     <td><%= user.email %></td>
                                     <td>
                                         <% if (user.isBlock) { %>
-                                            <!-- Show Unblock button if the user is blocked -->
-                                            <button class="btn btn-success btn-sm" onclick="toggleUserStatus('<%= user._id %>', 'unblock')">Unblock</button>
+                                            <button class="btn btn-success btn-sm" onclick="toggleUserStatus('<%= user._id %>', 'unblock')">
+                                                <i class="fas fa-user-check icon-spacing"></i>Unblock</button>
                                         <% } else { %>
-                                            <!-- Show Block button if the user is not blocked -->
-                                            <button class="btn btn-danger btn-sm" onclick="toggleUserStatus('<%= user._id %>', 'block')">Block</button>
+                                            <button class="btn btn-danger btn-sm" onclick="toggleUserStatus('<%= user._id %>', 'block')">
+                                                 <i class="fas fa-trash-alt icon-spacing"></i>Block</button>
                                         <% } %>
-                                        </tr>
+                                    </td>
+                                </tr>
                             <% }) %>
                         <% } %>
                     </tbody>
                 </table>
+                
             </div>
         </div>
     </div>

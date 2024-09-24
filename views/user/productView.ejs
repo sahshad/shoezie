@@ -21,52 +21,69 @@
         }
 
         .thumbnails {
-            width: 20%; /* Set width for thumbnails */
+            width: 20%;
             margin-right: 20px;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Vertically center thumbnails */
+            justify-content: center;
         }
 
         .thumbnail {
             cursor: pointer;
-            margin-bottom: 20px; /* Increased gap between thumbnails */
-            width: 85px; /* Fixed width for thumbnails */
-            height: 85px; /* Fixed height for thumbnails */
+            margin-bottom: 20px;
+            width: 85px;
+            height: 85px;
             border: 1px solid rgb(222, 218, 218);
             border-radius: 10px;
         }
 
         .main-image {
-            width: 30%; /* Set width for main image */
+            width: 30%;
             display: flex;
-            align-items: center; /* Vertically center */
-            justify-content: center; /* Horizontally center */
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
         .product-image {
             max-height: 350px;
             object-fit: cover;
-            width: 100%; /* Full width for the main image */
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .zoom-preview {
+            position: absolute;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            display: none;
+            overflow: hidden;
+            z-index: 100;
+            width: 200px;
+            height: 200px;
+            pointer-events: none; /* Prevent interactions */
+        }
+
+        .zoom-preview img {
+            width: 300%; /* Make it larger for zoom */
+            height: auto; /* Maintain aspect ratio */
         }
 
         .product-details {
-            width: 40%; /* Reduced width by 20% from 50% to 40% */
+            width: 40%;
             margin-top: 20px;
-            margin-left: auto; /* Move it to the right */
+            margin-left: auto;
         }
-
-        
 
         .price {
             font-weight: bold;
-            font-size: 1.2em; /* Reduced size for price */
-            margin: 0; /* Removed margin */
+            font-size: 1.2em;
+            margin: 0;
         }
 
         .description {
-            font-size: 0.9em; /* Smaller font size for description */
-            color: #666; /* Lighter color for description */
+            font-size: 0.9em;
+            color: #666;
         }
 
         .line {
@@ -81,52 +98,52 @@
         .related-products {
             margin-top: 60px;
             padding-bottom: 100px;
-            position: relative; /* For absolute positioning of buttons */
+            position: relative;
         }
 
         .related-products h4 {
-            text-align: left; /* Align the heading to the left */
-            margin-bottom: 20px; /* Spacing below heading */
+            text-align: left;
+            margin-bottom: 20px;
             margin-left: 80px;
         }
 
         .related-products-wrapper {
             display: flex;
-            justify-content: center; /* Center the cards */
-            overflow: hidden; /* Hide scrollbar */
-            position: relative; /* To position buttons */
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
         }
 
         .related-product {
             border: 1px solid #ccc;
             border-radius: 5px;
-            padding: 5px; /* Reduced padding */
-            text-align: left; /* Align text to left */
-            width: 170px; /* Fixed width */
-            margin: 0 20px; /* Increased spacing between cards */
-            flex: none; /* Prevent shrinking */
+            padding: 5px;
+            text-align: left;
+            width: 170px;
+            margin: 0 20px;
+            flex: none;
         }
 
         .related-product img {
-            width: 100%; /* Full width for related product images */
-            height: 170px; /* Set height to make square */
-            object-fit: cover; /* Maintain aspect ratio */
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
         }
 
         .related-product h5 {
-            font-size: 0.9em; /* Reduced size for product name */
+            font-size: 0.9em;
             margin-top: 10px;
         }
 
         .related-product .price {
-            font-size: 0.8em; /* Reduced size for price */
-            margin: 0; /* Removed margin */
+            font-size: 0.8em;
+            margin: 0;
         }
 
         .rating {
-            color: #ffcc00; /* Gold color for rating stars */
-            font-size: 0.8em; /* Smaller font size for rating */
-            margin: 0; /* Removed margin */
+            color: #ffcc00;
+            font-size: 0.8em;
+            margin: 0;
         }
 
         .scroll-button {
@@ -138,7 +155,6 @@
             cursor: pointer;
             padding: 10px;
             z-index: 1;
-            /* Adjusted button size */
             width: 30px;
             height: 30px;
             border-radius: 50%;
@@ -148,11 +164,11 @@
         }
 
         .scroll-left {
-            left: 80px; /* Moved in by 100px */
+            left: 80px;
         }
 
         .scroll-right {
-            right: 80px; /* Moved in by 100px */
+            right: 80px;
         }
     </style>
 </head>
@@ -186,32 +202,26 @@
 <!-- Product View Section -->
 <div class="container">
     <% if(product){%>
-        <div class="thumbnails"> <!-- Thumbnails column -->
+        <div class="thumbnails">
             <% product.imageUrls.forEach((url,index)=>{ %>
-
            <img src="<%= url %>" class="thumbnail" alt="Thumbnail 1" onclick="changeMainImage('<%=url %>')">
-
            <% }) %>
         </div>
     
-        <div class="main-image"> <!-- Main product image column -->
+        <div class="main-image" onmousemove="zoom(event)" onmouseleave="hideZoom()">
             <img id="mainImage" src="<%= product.imageUrls[0]%>" class="product-image" alt="Product Image">
+            <div class="zoom-preview" id="zoomPreview">
+                <img src="<%= product.imageUrls[0]%>" alt="Zoomed Image" id="zoomedImage">
+            </div>
         </div>
     
-        <div class="product-details"> <!-- Product details column -->
+        <div class="product-details">
             <h5 class="card-title"><%= product.name %></h5>
-            
-            <!-- Rating Section -->
             <div>
-                <span class="text-warning">
-                    ★★★★☆ (4.0)
-                </span>
+                <span class="text-warning">★★★★☆ (4.0)</span>
             </div>
-    
             <p class="price">₹ <%= product.price %></p>
             <div class="line"></div>
-            
-            <!-- Select Color Section -->
             <label>Select Color:</label>
             <div>
                 <span class="badge badge-primary" style="cursor: pointer;">Blue</span>
@@ -219,23 +229,15 @@
                 <span class="badge badge-success" style="cursor: pointer;">Green</span>
             </div>
             <div class="line"></div>
-    
-            <!-- Sizes Section -->
             <label>Available Sizes:</label>
             <div>
                 <button class="btn btn-outline-secondary size-button">UK 8</button>
                 <button class="btn btn-outline-secondary size-button">UK 8.5</button>
                 <button class="btn btn-outline-secondary size-button">UK 9</button>
             </div>
-    
             <div class="line"></div>
-            
-            <!-- Product Description -->
             <p class="description"><%= product.description %></p>
-            
-            <div class="line"></div> <!-- Line under description -->
-    
-            <!-- Action Buttons -->
+            <div class="line"></div>
             <div>
                 <button class="btn btn-primary">Add To Cart</button>
                 <button class="btn btn-secondary">Add To Fav</button>
@@ -290,7 +292,36 @@
 
 <script>
     function changeMainImage(imageUrl) {
-        document.getElementById('mainImage').src = imageUrl;
+        const mainImage = document.getElementById('mainImage');
+        mainImage.src = imageUrl;
+        document.getElementById('zoomedImage').src = imageUrl; // Update zoom image
+    }
+
+    function zoom(event) {
+        const img = document.getElementById('mainImage');
+        const zoomPreview = document.getElementById('zoomPreview');
+        const zoomedImage = document.getElementById('zoomedImage');
+
+        const x = event.offsetX;
+        const y = event.offsetY;
+        const width = img.offsetWidth-90;
+        const height = img.offsetHeight-90;
+
+        const xPercent = (x / width) * 100;
+        const yPercent = (y / height) * 100;
+
+        zoomPreview.style.display = 'block'; // Show zoom preview
+        zoomPreview.style.left = (event.pageX -450)+ 'px'; // Position the preview
+        zoomPreview.style.top = (event.pageY -200)+ 'px';
+        
+        // Set the transform origin and scale for the zoomed image
+        zoomedImage.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+        zoomedImage.style.transform = `scale(3)`; // Scale the zoomed image
+    }
+
+    function hideZoom() {
+        const zoomPreview = document.getElementById('zoomPreview');
+        zoomPreview.style.display = 'none'; // Hide zoom preview
     }
 
     function scrollLeft() {
