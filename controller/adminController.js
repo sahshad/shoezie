@@ -58,11 +58,21 @@ async function changeStatus(req,res){
   }
 }
 
-
+function getLogout(req,res){
+    req.session.destroy( err =>{
+        if(err){
+            console.log(err);
+            res.redirect('/')
+        }else{
+            res.redirect('/admin/login')
+        }
+    })
+}
 
 module.exports = {
     getLogin,
     getHome,
     getUsers,
     changeStatus,
+    getLogout
 };

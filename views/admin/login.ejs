@@ -9,37 +9,47 @@
     <title>Admin Login SHOEZIE</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Bootstrap CSS CDN -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom Dark Mode CSS -->
     <link rel="stylesheet" href="/styles/admin/login.css"> <!-- Point to your dark mode CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
-    <div class="login-container pb-5">
-        <p class="text-center"><small>Admin Login</small> </p>
-        <h2 class="text-center"> SHOEZIE</h2>
-      
-        <form id="loginForm" action="/admin/login" method="post">
-            <div class="form-group">
-                <label for="email"><small>Email</small></label>
-                <input type="email" class="form-control rounded-pill" id="email" name="email" placeholder="Enter email">
-                <div class="invalid-feedback"><small>Please enter a valid email address.</small></div>
+    <div class="container">
+        <div class="login-container d-flex pb-5">
+            <div class="text-section d-flex flex-column justify-content-center align-items-center pl-0"> 
+                <h3 class="text-center">SHOEZIE</h3>
+                <img src="/images/Nike_Blazer_-removebg-preview.png" alt="Brand Image" class="img-fluid mt-3 w-75">
             </div>
-            <div class="form-group password-wrapper">
-                <label for="password"><small>Password</small></label>
-                <input type="password" class="form-control rounded-pill" id="password" name="password" placeholder="Enter password">
-                <i class="fa-regular fa-eye" id="togglePassword" style="color: #ffffff; opacity: 0.5;"></i>
-                <div class="invalid-feedback"><small>Password must be at least 6 characters long.</small></div>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block rounded-pill">Login</button>
-        </form>
+            <div class="input-section">
+            <h5 class="text-center mb-3"><small>Admin Login</small></h5>
+                <form id="loginForm" class="pr-2" action="/admin/login" method="post">
+                    <div class="form-group">
+                        <label for="email"><small>Email</small></label>
+                        <input type="email" class="form-control rounded-pill" id="email" name="email" placeholder="Enter email">
+                        <div class="invalid-feedback"><small>Please enter a valid email address.</small></div>
+                    </div>
+                    <div class="form-group password-wrapper">
+                        <label for="password"><small>Password</small></label>
+                        <input type="password" class="form-control rounded-pill" id="password" name="password" placeholder="Enter password">
+                        <i class="fa-regular fa-eye" id="togglePassword" style="color: #000000;"></i>
+                        <div class="invalid-feedback"><small>Password must be at least 6 characters long.</small></div>
+                    </div>
+                    <button type="submit" class="btn btn-p btn-block rounded-pill ">Login</button>
+                </form>
 
-        <p class="text-center or">or</p>
-        <button type="button" class="btn btn-sm btn-outline-light btn-block rounded-pill">
-            <i class="fa-brands fa-google fa-beat-fade" style="color: #ffffff;"></i> Login with Google
-        </button>  
+                <p class="text-center or">or</p>
+                <div class="pr-2">
+                    <button type="button" class="btn btn-sm btn-outline-light btn-block rounded-pill ">
+                        <i class="fa-brands fa-google fa-beat-fade" style="color: #000000;margin-right: 5px;"></i> Login with Google
+                    </button>
+                </div>
+             
+            </div>
+
+           
+        </div>
     </div>
+
     <script src="/js/login.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>

@@ -1,5 +1,3 @@
-/* login-bw.css */
-
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #ffffff; /* White background for the body */
@@ -11,109 +9,35 @@ body {
     margin: 0;
 }
 
-
 .login-container {
-    max-width: 360px;
+    max-width: 800px; /* Increased width for better layout */
     width: 100%;
     padding: 20px;
+    display: flex; /* Use flexbox for layout */
     background-color: #f5f5f5;
     border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); 
-    box-sizing: border-box; 
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
 }
 
-.form-control:valid {
-    background: none; 
-    padding-right: 0; 
+.input-section {
+    flex: 1; /* Allow input section to grow */
+    padding-right: 20px; /* Space between input and brand section */
 }
 
-.form-control:invalid {
-    background: none; 
-    padding-right: 0; 
+.brand-section {
+    flex: 1; /* Fixed width for brand section */
+    text-align: left; /* Align text to the left */
 }
 
-.form-control:focus::-webkit-input-placeholder {
-    color: transparent;
-}
-.login-container h1 {
+.brand-section h2 {
     margin-bottom: 20px;
 }
 
-.login-container .alert {
-    margin-bottom: 15px;
+.brand-section img {
+    max-width: 100%; /* Ensure image is responsive */
+    height: auto; /* Maintain aspect ratio */
 }
-
-.login-container .alert-danger {
-    background-color: #f44336; /* Red background for error alert */
-    color: #fff; /* White text color */
-}
-
-.login-container .form-control {
-    color: #000; /* Black text color */
-    background-color: #fff; /* White background for input fields */
-    border: 1px solid #ccc; /* Light gray border color */
-    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for changes */
-}
-
-.login-container .form-control::placeholder {
-    color: #888; /* Placeholder text color */
-}
-
-.login-container .btn-primary {
-    background-color: #000; /* Black background for primary button */
-    border: none; /* Remove border */
-    color: #fff; /* White text color */
-}
-
-.login-container .btn-primary:hover {
-    background-color: #333; /* Darker shade on hover */
-}
-
-.login-container a {
-    color: #000; /* Black color for links */
-}
-
-.login-container a:hover {
-    color: #555; /* Darker gray color for link hover */
-}
-
-.logout-button {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background-color: #f44336; /* Red background for logout button */
-    color: #fff; /* White text color */
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.logout-button:hover {
-    background-color: #d32f2f; /* Darker red color on hover */
-}
-
-.or{
-    margin-bottom: 0px;
-}
-label{
-    margin: 0;
-}
-
-.invalid-feedback {
-    display: none;
-    color: #b71c1c;
-    font-size: 0.875em;
-}
-.form-control.is-invalid {
-    border-color: #b71c1c;
-}
-.form-control.is-valid {
-    border-color: #28a745;
-}
-
-/* login.css or your custom CSS file */
 
 .password-wrapper {
     position: relative;
@@ -136,4 +60,78 @@ label{
     color: #333;
 }
 
+.or {
+    margin: 10px 0;
+    text-align: center; /* Center the "or" text */
+}
 
+label {
+    margin: 0;
+}
+
+.login-container .btn-p {
+    margin-top: 30px;
+    background-color: #c1b77f; /* White background for primary button */
+    border: none; /* Remove border */
+    color: #ffffff; /* Black text color */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.login-container .btn-p:hover {
+    background-color: #c9be83; /* Light gray on hover */
+}
+
+.form-control:valid {
+    background: none; 
+    padding-right: 0; 
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-control:invalid {
+    background: none; 
+    padding-right: 0; 
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.invalid-feedback {
+    display: none;
+    color: #b71c1c;
+    font-size: 0.875em;
+}
+
+.form-control.is-invalid {
+    border-color: #b71c1c;
+}
+
+.form-control.is-valid {
+    border-color: #28a745;
+}
+
+.form-control {
+    color: #000; /* Black text color */
+    background-color: #fff; /* White background for input fields */
+    border: 1px solid #ccc; /* Light gray border color */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for changes */
+}
+
+.form-control::placeholder {
+    color: #888; /* Placeholder text color */
+}
+
+.btn-primary {
+    background-color: #000; /* Black background for primary button */
+    border: none; /* Remove border */
+    color: #fff; /* White text color */
+}
+
+.btn-primary:hover {
+    background-color: #333; /* Darker shade on hover */
+}
+
+a {
+    color: #000; /* Black color for links */
+}
+
+a:hover {
+    color: #555; /* Darker gray color for link hover */
+}

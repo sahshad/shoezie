@@ -9,50 +9,54 @@
     <title>SHOEZIE</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Bootstrap CSS CDN -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="/styles/user/login.css"> <!-- Point to your CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
-    <div class="login-container">
-        <h2 class="text-center">SHOEZIE</h2>
-      
-        <form id="loginForm" action="/user/login" method="post">
-            <div class="form-group">
-                <label for="usermail"><small>Email</small></label>
-                <input type="email" class="form-control rounded-pill" id="email" name="email" placeholder="Enter email" >
-                <div class="invalid-feedback"><small>Please enter a valid email address.</small></div>
+    <div class="login-container d-flex">
+        <div class="input-section ">
+            <h5 class="text-center mb-4"><small>Login</small></h5>
+            <form id="loginForm" action="/user/login" method="post">
+                <div class="form-group">
+                    <label for="email"><small>Email</small></label>
+                    <input type="email" class="form-control rounded-pill" id="email" name="email" placeholder="Enter email">
+                    <div class="invalid-feedback"><small>Please enter a valid email address.</small></div>
+                </div>
+                <div class="form-group password-wrapper">
+                    <label for="password"><small>Password</small></label>
+                    <input type="password" class="form-control rounded-pill" id="password" name="password" placeholder="Enter password">
+                    <i class="fa-regular fa-eye" id="togglePassword" style="color: #000000;"></i>
+                    <div class="invalid-feedback"><small>Password must be at least 6 characters long.</small></div>
+                </div>
+                <button type="submit" class="btn btn-p btn-block rounded-pill">Login</button>
+            </form>
+
+            <p class="text-center or">or</p>
+            <div>
+                <a href="#" class="btn btn-sm btn-outline-dark btn-block rounded-pill">
+                    <i class="fa-brands fa-google fa-beat-fade" style="color: #000000;"></i> Login with Google
+                </a>
             </div>
-            <div class="form-group password-wrapper ">
-                <label for="password"><small>Password</small></label>
-				
-                <input type="password" class="form-control rounded-pill" id="password" name="password" placeholder="Enter password">
-				<i class="fa-regular fa-eye" id="togglePassword" style="color: #000000;"></i>
-			
-                <div class="invalid-feedback"><small>Password must be at least 6 characters long.</small></div>
-            </div>       
-            <button type="submit" class="btn btn-primary btn-block rounded-pill">Login</button>
-        </form>
-
-        <p class="text-center or">or</p>
-        <a href="#" class="btn btn-sm btn-outline-dark btn-block rounded-pill">
-            <i class="fa-brands fa-google fa-beat-fade" style="color: #000000;"></i> Login with Google
-        </a>
-
-        <div>
-            <p class="text-center mt-3 text-sm"><small>Forgot Password?</small></p>
+            <div>
+                <p class="text-center mt-3 text-sm"><small><a href="#">Forgot Password?</a></small></p>
+            </div>
+            <div class="text-center">
+                <a href="/user/home"><small<i class="fa-solid fa-house " style="color: #000000;"></i></small></a>
+            </div>
         </div>
 
-        <div>
-            <p class="text-center mt-3"><small>Don't have an account? </small><a href="/user/signup"><small>Sign Up</small></a></p>
+        <div class="brand-section d-flex flex-column justify-content-center align-items-center">
+            <h2 class="text-left"><small>SHOEZIE</small></h2>
+            <img src="/images/userlogin2.png" alt="Brand Image" class="img-fluid mt-3 w-75">
+            <div>
+                <p class="text-center mt-3"><small>Don't have an account? </small><a href="/user/signup"><small>Sign Up</small></a></p>
+            </div>
         </div>
     </div>
-	<script src="/js/login.js"></script>
+    <script src="/js/login.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
 </body>
 </html>

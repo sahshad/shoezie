@@ -1,106 +1,106 @@
-/* register-bw.css */
-
 body {
     font-family: 'Poppins', sans-serif; /* Apply Poppins font */
     background-color: #ffffff; /* White background for the body */
     color: #000000; /* Black text color for readability */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh; /* Ensure body takes full viewport height */
     margin: 0;
 }
 
 .register-container {
-    max-width: 400px;
+    max-width: 800px;
     width: 100%;
     padding: 20px;
-    padding-bottom: 0;
     background-color: #f5f5f5; /* Light gray background for the container */
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* Slightly darker shadow for contrast */
-    box-sizing: border-box; /* Include padding and border in element’s total width and height */
+    display: flex;
 }
 
-.form-control:valid {
-    background: none; /* Ensure no default background image or icon */
-    padding-right: 0; /* Remove any default padding that might be used for icons */
+.brand-section {
+    flex: 1; /* Allow brand section to take up space */
+    text-align: center; /* Align text to the left */
+ /* Add padding for spacing */
+ padding: 10px;
+ padding-top: 30px;
+ padding-left: 0;
 }
 
-/* Hide default validation icons for invalid inputs */
-.form-control:invalid {
-    background: none; /* Ensure no default background image or icon */
-    padding-right: 0; /* Remove any default padding that might be used for icons */
+.input-section {
+    flex: 1; /* Allow input section to take up more space */
+    /* Add padding for spacing */
+    padding: 10px;
 }
 
-.form-control:focus::-webkit-input-placeholder {
-    color: transparent; /* Ensure placeholder does not interfere */
+.brand-section img {
+    max-width: 100%; /* Ensure image is responsive */
+    height: auto; /* Maintain aspect ratio */
 }
 
-.register-container h1 {
-    margin-bottom: 20px;
+.or {
+    margin: 0;
 }
-
-.register-container .alert {
-    margin-bottom: 15px;
+label{
+    margin: 0;
 }
-
-.register-container .alert-danger {
-    background-color: #f44336; /* Red background for error alert */
-    color: #fff; /* White text color */
-}
-
 .form-group{
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .register-container .form-control {
     color: #000; /* Black text color */
     border: 1px solid #ccc; /* Light gray border color */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .register-container .form-control::placeholder {
-    color: #888; /* Placeholder text color */
+    color: #bcbcbc; /* Placeholder text color */
 }
 
-.register-container .btn-primary {
-    background-color: #000; /* Black background for primary button */
+.register-container .btn-p {
+    margin-top: 15px;
+    background-color: #c1b77f; /* White background for primary button */
     border: none; /* Remove border */
-    color: #fff; /* White text color */
+    color: #ffffff; /* Black text color */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
-.register-container .btn-primary:hover {
-    background-color: #333; /* Darker shade on hover */
+.register-container .btn-p:hover {
+    background-color: #c9be83; /* Light gray on hover */
+
 }
 
 .register-container a {
     color: #000; /* Black color for links */
 }
 
-.register-container a:hover {
-    color: #555; /* Darker gray color for link hover */
-}
-.or{
-    margin-bottom: 0px;
-}
-label{
-    margin: 0;
-}
 
 .invalid-feedback {
     display: none;
     color: #b71c1c;
     font-size: 0.875em;
 }
+
 .form-control.is-invalid {
     border-color: #b71c1c;
 }
+
 .form-control.is-valid {
     border-color: #28a745;
+}
+.form-control:valid {
+    background: none; 
+    padding-right: 0; 
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-control:invalid {
+    background: none; 
+    padding-right: 0; 
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 @media(max-width: 415px) {
     .register-container {
+        flex-direction: column; /* Stack elements on smaller screens */
         width: 97%;
     }
 }
