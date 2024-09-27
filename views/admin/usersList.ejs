@@ -43,13 +43,18 @@
                                     <td><%= user.firstname %> <%= user.lastname %></td>
                                     <td><%= user.email %></td>
                                     <td>
-                                        <% if (user.isBlock) { %>
+                                        <!-- <% if (user.isBlock) { %>
                                             <button class="btn btn-success btn-sm" onclick="toggleUserStatus('<%= user._id %>', 'unblock')">
                                                 <i class="fas fa-user-check icon-spacing"></i>Unblock</button>
                                         <% } else { %>
                                             <button class="btn btn-danger btn-sm" onclick="toggleUserStatus('<%= user._id %>', 'block')">
                                                  <i class="fas fa-trash-alt icon-spacing"></i>Block</button>
-                                        <% } %>
+                                        <% } %> -->
+
+                                        <button class="btn <%= user.isBlock ? 'btn-danger' : 'btn-success' %> btn-sm" 
+                                            onclick="toggleUserStatus('<%= user._id %>', this)">
+                                            <%= user.isBlock ? 'Unlist' : 'List' %>
+                                           </button>
                                     </td>
                                 </tr>
                             <% }) %>
@@ -93,22 +98,34 @@
             document.getElementById('page-content-wrapper').classList.toggle('toggled');
         });
 
-        // Variables to store current action data
-        let currentAction = '';
-        let currentUserId = '';
+        function toggleUserStatus(UserId, button) {
+    const currentStatus = button.innerText === 'Unlist'; // Determine current status
 
-        function toggleUserStatus(userId, action) {
-            currentAction = action;
-            currentUserId = userId;
-            document.getElementById('blockUnblockAction').textContent = action;
-            document.getElementById('blockUnblockUserName').textContent = userId;
-            $('#blockUnblockModal').modal('show');
+    fetch(`/admin/users/${currentStatus ? 'unlist' : 'list'}/${UserId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            // Toggle button properties
+            button.classList.toggle('btn-danger', !currentStatus);
+            button.classList.toggle('btn-success', currentStatus);
+            button.innerText = currentStatus ? 'List' : 'Unlist';
+        } else {
+            alert('Failed to toggle product status.');
         }
-
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while toggling the product status.');
+    });
+}
         // Handle confirm block/unblock button click
         document.getElementById('confirmBlockUnblockButton').addEventListener('click', function() {
-            fetch(`/admin/users/${currentUserId}/${currentAction}`, {
-                method: 'POST', // or 'PUT' depending on your server setup
+            fetch(`/admin/users/${currentAction}/${currentUserId}`, {
+                method: 'PATCH', // or 'PUT' depending on your server setup
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -117,13 +134,14 @@
             .then(data => {
                 console.log(`User ${currentUserId} has been ${currentAction}ed.`);
                 $('#blockUnblockModal').modal('hide');
-                location.reload();
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('An error occurred while processing the request.');
             });
         });
+
+
 
     </script>
 </body>

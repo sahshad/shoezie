@@ -9,16 +9,9 @@ passport.use(new GoogleStrategy({
     callbackURL: '/auth/google/callback'
   },
   async (accessToken, refreshToken, profile, done) => {
-    // Log the user's profile information
-    console.log('Google Profile:', profile);
-
     // Extract user details
     const { id, displayName, emails } = profile;
     const [email] = emails;
-
-    console.log('User ID:', id);
-    console.log('Display Name:', displayName);
-    console.log('Email:', email.value);
 
     // Check if user already exists in our db
     const existingUser = await User.findOne({ googleId: id });

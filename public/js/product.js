@@ -388,7 +388,7 @@ function toggleProductStatus(productId, button) {
     const currentStatus = button.innerText === 'Unlist'; // Determine current status
 
     fetch(`/admin/products/${currentStatus ? 'unlist' : 'list'}/${productId}`, {
-        method: 'POST',
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
         },

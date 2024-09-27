@@ -4,17 +4,31 @@ const Category = require('../model/category')
 const bcrypt = require('bcrypt')
 
 function getLogin(req,res){
-
     res.render('user/login')
 }
 
 function getSignup(req,res){
-
     res.render('user/signup')
 }
 
-function getProfile(req,res){
-   res.render('user/profile')
+async function getProfile(req,res){
+    const _id = req.session.user
+
+ const user=await User.findOne({_id})
+ console.log(user);
+ 
+   res.render('user/profile',{user})
+}
+function getAddress(req,res){
+    res.render('user/address')
+}
+
+function getOrders(req,res){
+    res.render('user/order')
+}
+
+function getOrderDetails(req,res){
+  res.render('user/orderDetails')
 }
 
 function userLogOut(req,res){
@@ -89,5 +103,8 @@ async function getProduct(req,res){
 }
 
 module.exports ={
-    getLogin,getSignup,addUser,getHome,getShop,getProduct,getProfile,userLogIn,userLogOut
+    getLogin,getSignup,addUser,getHome,getShop,
+    getProduct,getProfile,userLogIn,userLogOut,
+    getAddress,getOrders,getOrderDetails
+
 }

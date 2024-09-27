@@ -1,0 +1,42 @@
+.sidebar {
+    background-color: #ebebeb; /* Dark background color */
+    color: #000000; /* Black text */
+    padding: 40px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+.links {
+    color: #000000; /* Black link color */
+    padding: 12px 0; /* Added padding for spacing */
+    display: block; /* Block display for full-width clickable area */
+    border-radius: 30px;
+    transition: font-size 0.3s ease; /* Smooth transition for font size */
+}
+.links:hover {
+    text-decoration: none;
+    font-size: 16px; /* Increase font size slightly on hover */
+    color: #4b4b4b;
+}
+.btn-logout {
+    margin-top: 40px;
+    color: #000000; /* Black link color */
+    padding: 10px 0; /* Added padding for spacing */
+    display: block; /* Block display for full-width clickable area */
+    border-radius: 30px;
+    color: white; /* White text color for the logout button */
+    background-color: #dc3545; /* Bootstrap danger color */
+}
+.btn-logout:hover {
+    color: rgb(0, 0, 0); /* Keep text color white on hover */
+    background-color: #c82333; /* Darker shade on hover */
+}
+.username {
+    font-size: 1.2rem; /* Reduced font size */
+    margin-bottom: 20px; /* Add space below username */
+}
+.profile-photo {
+    text-align: center;
+    margin-bottom: 20px; /* Add space below photo */
+}

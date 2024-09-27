@@ -35,6 +35,24 @@ body {
     height: auto; /* Maintain aspect ratio */
 }
 
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input[type="password"] {
+    padding-right: 40px; /* Adjust this value based on the size of the icon */
+}
+
+.password-wrapper i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+}
+
 .or {
     margin: 0;
 }

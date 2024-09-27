@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    
     function validatelastName() {
         var name = lastnameInput.value;
         if(name===''){
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function validatePassword() {
         var password = passwordInput.value;
+        var togglePassword=document.getElementById('togglePassword')
         if (password === '') {
             passwordInput.classList.remove('is-invalid', 'is-valid');
             passwordInput.nextElementSibling.style.display = 'none';
@@ -62,10 +64,14 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordInput.classList.add('is-invalid');
             passwordInput.classList.remove('is-valid');
             passwordInput.nextElementSibling.style.display = 'block';
+            if(flag===true){
+				togglePassword.style.marginTop='0px'
+			}
         } else {
             passwordInput.classList.remove('is-invalid');
             passwordInput.classList.add('is-valid');
-            passwordInput.nextElementSibling.style.display = 'none';
+            togglePassword.style.marginTop='12px'
+			flag=true
         }
     }
     function isPasswordMatch(){
@@ -85,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmPasswordInput.nextElementSibling.style.display = 'none';
        }
     }
+    
     firstnameInput.addEventListener('input',()=>{
         validatefirstName();
     })
@@ -100,6 +107,20 @@ document.addEventListener('DOMContentLoaded', function() {
     confirmPasswordInput.addEventListener('input',()=>{
         isPasswordMatch();
     })
+
+    togglePassword.addEventListener('click', function() {
+        // Toggle the type attribute
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            togglePassword.classList.remove('fa-eye');
+            togglePassword.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            togglePassword.classList.remove('fa-eye-slash');
+            togglePassword.classList.add('fa-eye');
+        }
+    });
+    
     document.getElementById('signupForm').addEventListener('submit', function(event) {
         var name =nameInput.value;
         var email = emailInput.value;

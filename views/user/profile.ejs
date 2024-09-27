@@ -3,101 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2 {
-            color: #333;
-        }
-        .profile-info, .order-history, .saved-items {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: #fafafa;
-        }
-        .order-item, .saved-item {
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
-        }
-        .order-item:last-child, .saved-item:last-child {
-            border-bottom: none;
-        }
-        .logout-button {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            padding: 10px 15px;
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-    </style>
+    <title>SHOEZIE - User Profile</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet" href="/styles/user/partials/navbar.css">
+    <link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
+    
 </head>
 <body>
 
-<div class="container">
-    <h1>User Profile</h1>
-    <form action="logout" method="post">
-        <button type="submit" class="logout-button">Logout</button>
-    </form>
-
-    <div class="profile-info">
-        <h2>Personal Information</h2>
-        <p><strong>Name:</strong> John Doe</p>
-        <p><strong>Email:</strong> john.doe@example.com</p>
-        <p><strong>Phone:</strong> (123) 456-7890</p>
-        <p><strong>Address:</strong> 123 Main St, Anytown, USA</p>
+<!-- Navbar -->
+<%- include('partials/navbar') %>
+<!-- User Profile Section -->
+<main>
+    <div class="container mt-5">
+        <div class="row">
+            <aside class="col-md-3">
+                <div class="sidebar">
+                    <div class="profile-photo">
+                        <img src="/images/profile_photo.png" alt="Profile Photo" class="rounded-circle" style="width: 100px; height: 100px;">
+                    </div>
+                    <% if(user){ %>
+                    <h5 class="username text-center "><%= user.firstname %></h5>
+                    <% } %>
+                    <ul class="list-unstyled mt-5">
+                        <li><a class="links" href="/user/profile"><i class="fas fa-user"></i> My Details</a></li>
+                        <li><a class="links" href="/user/profile/address"><i class="fas fa-map-marker-alt"></i> Address</a></li>
+                        <li><a class="links" href="/user/profile/orders"><i class="fas fa-box"></i> Orders</a></li>
+                        <li><a class="links" href="/user/profile/wishlist"><i class="fas fa-heart"></i> Wishlist</a></li>
+                    </ul>
+                    <a href="/user/logout" class="btn btn-logout rounded-pill btn-sm btn-danger "><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+                
+            </aside>
+           
+            <div class="col-md-9 ">
+                <!-- My Details Section -->
+                <div class="my-details mt-4 pl-5">
+                    <h3 class="mb-4"><small>My Details</small></h3>
+                    <% if(user){ %>
+                       <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>First Name</th>
+                                <td id="firstName"><%= user.firstname %></td>
+                            </tr>
+                            <tr>
+                                <th>Last Name</th>
+                                <td id="lastName"><%= user.lastname %></td>
+                            </tr>
+                            <tr>
+                                <th>Phone Number</th>
+                                <td id="phoneNumber">(123) 456-7890</td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td id="email"><%= user.email %></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit"></i> Edit</button>
+                    <% } %>
+                    
+                </div>
+            </div>
+        </div>
     </div>
+</main>
 
-    <div class="order-history">
-        <h2>Order History</h2>
-        <div class="order-item">
-            <p><strong>Order #1001</strong> - Date: 2024-01-15</p>
-            <p>Items: Widget A, Widget B</p>
-            <p>Status: Shipped</p>
-        </div>
-        <div class="order-item">
-            <p><strong>Order #1002</strong> - Date: 2024-02-10</p>
-            <p>Items: Widget C</p>
-            <p>Status: Delivered</p>
-        </div>
-        <div class="order-item">
-            <p><strong>Order #1003</strong> - Date: 2024-03-05</p>
-            <p>Items: Widget D, Widget E</p>
-            <p>Status: Pending</p>
-        </div>
-    </div>
-
-    <div class="saved-items">
-        <h2>Saved Items</h2>
-        <div class="saved-item">
-            <p><strong>Item Name:</strong> Widget F</p>
-            <p><strong>Price:</strong> $19.99</p>
-        </div>
-        <div class="saved-item">
-            <p><strong>Item Name:</strong> Widget G</p>
-            <p><strong>Price:</strong> $29.99</p>
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit My Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <div class="form-group">
+                        <label for="editFirstName">First Name</label>
+                        <input type="text" class="form-control" id="editFirstName" value="John">
+                    </div>
+                    <div class="form-group">
+                        <label for="editLastName">Last Name</label>
+                        <input type="text" class="form-control" id="editLastName" value="Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPhoneNumber">Phone Number</label>
+                        <input type="text" class="form-control" id="editPhoneNumber" value="(123) 456-7890">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" class="form-control" id="editEmail" value="john.doe@example.com">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveChanges">Save changes</button>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // JavaScript to handle the edit modal and save changes
+    document.getElementById('saveChanges').addEventListener('click', function() {
+        // Get values from the modal inputs
+        const firstName = document.getElementById('editFirstName').value;
+        const lastName = document.getElementById('editLastName').value;
+        const phoneNumber = document.getElementById('editPhoneNumber').value;
+        const email = document.getElementById('editEmail').value;
+
+        // Update the displayed values
+        document.getElementById('firstName').innerText = firstName;
+        document.getElementById('lastName').innerText = lastName;
+        document.getElementById('phoneNumber').innerText = phoneNumber;
+        document.getElementById('email').innerText = email;
+
+        // Close the modal
+        $('#editModal').modal('hide');
+    });
+</script>
 </body>
 </html>

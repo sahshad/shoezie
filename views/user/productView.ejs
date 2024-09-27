@@ -175,30 +175,7 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg">
-    <a class="navbar-brand" href="#">SHOEZIE</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-            <li class="nav-item"><a class="nav-link" href="../home">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="../shop">Shop</a></li>
-            <li class="nav-item"><a class="nav-link" href="about">About</a></li>
-            <li class="nav-item"><a class="nav-link" href="login">Sign In</a></li>
-        </ul>
-        <form class="form-inline ml-auto search-container">
-            <input class="form-control mr-2" type="search" placeholder="Search">
-            <button class="btn" type="submit"><i class="fas fa-search"></i></button>
-        </form>
-        <div class="ml-3 icons">
-            <a href="/favorites" class="icon pr-3"><i class="fas fa-heart"></i></a>
-            <a href="/cart" class="icon pr-3"><i class="fas fa-shopping-cart"></i></a>
-            <a href="/user" class="icon"><i class="fas fa-user"></i></a>
-        </div>
-    </div>
-</nav>
-
+<%- include('partials/navbar') %>
 <!-- Product View Section -->
 <div class="container">
     <% if(product){%>

@@ -7,8 +7,8 @@ const adminRoute = require('./routes/admin')
 const db =require('./config/db')
 const passport = require('passport')
 require('./passport');
-
 require('dotenv').config()
+
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -22,6 +22,10 @@ app.use(session({
     saveUninitialized:false,
     cookie:{secure:false}
 }))
+
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 db()
 

@@ -36,11 +36,11 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  googleId: String,
-  firstname: String,
-  lastname: String,
-  email: String,
-  password:String,
+  googleId: {type:String},
+  firstname: {type:String,require:true},
+  lastname:{type: String,required:true},
+  email: {type:String,reuired:true,unique:true},
+  password:{type:String},
   isBlock: { type: Boolean, default: false },
 },{ timestamps: true });
 

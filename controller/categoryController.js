@@ -54,5 +54,22 @@ function addCategory(req,res){
     streamifier.createReadStream(req.file.buffer).pipe(stream);
 };
 
+async function changeCategoryStatus(req,res) {
+    const { action, id } = req.params;
+    
+    try {
+        const newStatus = action === 'list'; // Set status based on action
+        const result=await Category.findByIdAndUpdate(id, { status: newStatus });
+        if(result)
+        res.status(200).json({ message: `Category ${action === 'list' ? 'listed' : 'unlisted'} successfully.` });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error toggling product status.', error });
+    }
+    
+}
 
-module.exports = {getCategory,addCategory, uploadCategory:upload.single('categoryImage')}
+module.exports = {getCategory,addCategory, 
+    uploadCategory:upload.single('categoryImage'),
+    changeCategoryStatus
+}

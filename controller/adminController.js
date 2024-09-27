@@ -36,26 +36,19 @@ async function getUsers(req, res) {
     res.render('admin/usersList',{user});
 }
 
-async function changeStatus(req,res){
-  const { userId, action } = req.params;
+async function changeUserStatus(req,res){
 
-  if (action !== 'block' && action !== 'unblock') {
-  return res.status(400).json({ message: 'Invalid action. Use "block" or "unblock".' });
-  }
-  try {
-      const update = action === 'block' ? { isBlock: true } : { isBlock: false };
-
-      const result = await User.findByIdAndUpdate(userId, update, { new: true });
-
-      if (result) {
-          res.json({ message: `User ${userId} has been ${action}ed.` });
-      } else {
-          res.status(404).json({ message: 'User not found.' });
-      }
-  } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ message: 'An error occurred while processing the request.' });
-  }
+const { action, id } = req.params;
+    
+    try {
+        const newStatus = action === 'list'; // Set status based on action
+        const result=await User.findByIdAndUpdate(id, { isBlock: newStatus });
+        if(result)
+        res.status(200).json({ message: `User ${action === 'list' ? 'listed' : 'unlisted'} successfully.` });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error toggling product status.', error });
+    }
 }
 
 function getLogout(req,res){
@@ -73,6 +66,6 @@ module.exports = {
     getLogin,
     getHome,
     getUsers,
-    changeStatus,
+    changeUserStatus,
     getLogout
 };
