@@ -4,11 +4,25 @@ const Category = require('../model/category')
 const bcrypt = require('bcrypt')
 
 function getLogin(req,res){
-    res.render('user/login')
+    let error
+   if(req.session.error){
+     error = req.session.error
+    delete req.session.error
+   }else{
+    error=''
+   }
+    res.render('user/login',{error})
 }
 
 function getSignup(req,res){
-    res.render('user/signup')
+    let error
+    if(req.session.error){
+      error = req.session.error
+     delete req.session.error
+    }else{
+     error=''
+    }
+    res.render('user/signup',{error})
 }
 
 async function getProfile(req,res){
@@ -45,7 +59,8 @@ async function userLogIn(req,res){
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.send('User not found');
+            req.session.error = 'user not found'
+            return res.redirect('/user/login') 
         }
         const isMatch = await bcrypt.compare(password, user.password);
         if(user.isBlock===false){
@@ -53,7 +68,8 @@ async function userLogIn(req,res){
             req.session.user = user.id;
             return res.redirect('/user/profile');
         } else {
-            return res.send('Invalid credentials'); 
+            req.session.error = 'incorrect password'
+            return res.redirect('/user/login') 
         }
     }else{
         res.send('you are blocked')
@@ -68,14 +84,23 @@ async function userLogIn(req,res){
 const {firstname,lastname,email,password} = req.body
 const saltRounds = 10;
     try {
+        const user = await User.findOne({email})
+        if(user){
+            req.session.error='email already exist'
+            return res.redirect('/user/signup')
+        }
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         const newUser = new User({firstname,lastname, email, password:hashedPassword
             
          });
         await newUser.save();
+        req.session.error='User registered successfully'
+        return res.redirect('/user/login')
         res.status(201).send('User registered successfully');
     } catch (error) {
         console.error(error);
+         req.session.error='Error registering user'
+        return res.redirect(500,'/user/signup')
         res.status(500).send('Error registering user');
     }
 }

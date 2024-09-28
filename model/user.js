@@ -42,6 +42,7 @@ const userSchema = new mongoose.Schema({
   email: {type:String,reuired:true,unique:true},
   password:{type:String},
   isBlock: { type: Boolean, default: false },
+  cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' }
 },{ timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

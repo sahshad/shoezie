@@ -11,11 +11,11 @@ body {
 }
 
 /* Ensure hero section takes full height of viewport without scrolling */
-main {
+/* main {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-}
+} */
 
 /* Header Styles */
 .navbar {

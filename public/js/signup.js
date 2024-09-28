@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var emailInput = document.getElementById('email');
     var passwordInput = document.getElementById('password');
     var confirmPasswordInput = document.getElementById('confirmPassword');
+    var togglePassword=document.getElementById('togglePassword')
+    var toggleConfirmPassword=document.getElementById('toggleConfirmPassword')
 	
     function validatefirstName() {
         var name = firstnameInput.value;
@@ -56,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function validatePassword() {
         var password = passwordInput.value;
-        var togglePassword=document.getElementById('togglePassword')
+       
         if (password === '') {
             passwordInput.classList.remove('is-invalid', 'is-valid');
             passwordInput.nextElementSibling.style.display = 'none';
@@ -118,6 +120,19 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordInput.type = 'password';
             togglePassword.classList.remove('fa-eye-slash');
             togglePassword.classList.add('fa-eye');
+        }
+    });
+
+    toggleConfirmPassword.addEventListener('click', function() {
+        // Toggle the type attribute
+        if (confirmPasswordInput.type === 'password') {
+            confirmPasswordInput.type = 'text';
+            toggleConfirmPassword.classList.remove('fa-eye');
+            toggleConfirmPassword.classList.add('fa-eye-slash');
+        } else {
+            confirmPasswordInput.type = 'password';
+            toggleConfirmPassword.classList.remove('fa-eye-slash');
+            toggleConfirmPassword.classList.add('fa-eye');
         }
     });
     
