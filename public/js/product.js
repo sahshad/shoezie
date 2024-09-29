@@ -8,10 +8,10 @@
         document.getElementById('sidebar').classList.toggle('active');
         document.getElementById('page-content-wrapper').classList.toggle('toggled');
     });
- 
+ let deletedImages = [];
  let originalData={}
  let newImages = []; 
-
+ let deletedSizes = [];
 //populate edit fields with existing data
 function populateEditModal(name, description,category, price, sizes, imageUrl,id) {
      sizes =JSON.parse(sizes)
@@ -45,10 +45,10 @@ function populateEditModal(name, description,category, price, sizes, imageUrl,id
         newPair.className = 'row align-items-center size-stock-pair mt-2';
         newPair.innerHTML = `
             <div class="col-md-5">
-                <input type="number" class="form-control" name="productSize[]" value="${sizeStock.size}" placeholder="Enter size" required>
+                <input type="number" class="form-control" name="editProductSize[]" value="${sizeStock.size}" placeholder="Enter size" required>
             </div>
             <div class="col-md-5">
-                <input type="number" class="form-control" name="productStock[]" value="${sizeStock.stock}" placeholder="Enter stock" min="1" required>
+                <input type="number" class="form-control" name="editProductStock[]" value="${sizeStock.stock}" placeholder="Enter stock" min="1" required>
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-success add-size-stock">
@@ -65,10 +65,10 @@ function populateEditModal(name, description,category, price, sizes, imageUrl,id
         newPair.className = 'row align-items-center size-stock-pair mt-2';
         newPair.innerHTML = `
             <div class="col-md-5">
-                <input type="number" class="form-control" name="productSize[]" value="" placeholder="Enter size" required>
+                <input type="number" class="form-control" name="editProductSize[]" value="" placeholder="Enter size" required>
             </div>
             <div class="col-md-5">
-                <input type="number" class="form-control" name="productStock[]" value="" placeholder="Enter stock" min="1" required>
+                <input type="number" class="form-control" name="editProductStock[]" value="" placeholder="Enter stock" min="1" required>
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-danger remove-size-stock">
@@ -80,6 +80,7 @@ function populateEditModal(name, description,category, price, sizes, imageUrl,id
         
         // Add event listener for the new remove button
         newPair.querySelector('.remove-size-stock').addEventListener('click', function() {
+            deletedSizes.push(sizeStock._id)
             sizeStockContainer.removeChild(newPair);
         });
         
@@ -89,10 +90,10 @@ function populateEditModal(name, description,category, price, sizes, imageUrl,id
         newPair.className = 'row align-items-center size-stock-pair mt-2';
         newPair.innerHTML = `
             <div class="col-md-5">
-                <input type="number" class="form-control" name="productSize[]" value="${sizeStock.size}" placeholder="Enter size" required>
+                <input type="number" class="form-control" name="editProductSize[]" value="${sizeStock.size}" placeholder="Enter size" required>
             </div>
             <div class="col-md-5">
-                <input type="number" class="form-control" name="productStock[]" value="${sizeStock.stock}" placeholder="Enter stock" min="1" required>
+                <input type="number" class="form-control" name="editProductStock[]" value="${sizeStock.stock}" placeholder="Enter stock" min="1" required>
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-danger remove-size-stock">
@@ -104,6 +105,7 @@ function populateEditModal(name, description,category, price, sizes, imageUrl,id
 
         // Add event listener for the new remove button
         newPair.querySelector('.remove-size-stock').addEventListener('click', function() {
+            deletedSizes.push(sizeStock._id)
             sizeStockContainer.removeChild(newPair);
         });}
     });
@@ -127,7 +129,7 @@ function appendImage(container, url) {
     const img = document.createElement('img');
     img.src = url;
     img.alt = 'Product image';
-    img.style = 'margin-right:10px; max-width: 100px;';
+    img.style = 'margin-right:10px; max-width: 70px; border: 1px solid #ccc; margin-bottom:10px';
     img.classList.add('img-fluid');
 
     const deleteButton = document.createElement('button');
@@ -154,8 +156,12 @@ function appendImage(container, url) {
     deleteButton.onclick = () => {
         imageWrapper.remove(); // Remove the image wrapper
         // Add additional logic to handle removal from the product data if needed
+        deletedImages.push(url);
     };
-    
+
+    img.onclick = () => {
+        openCropper(url,imageWrapper);
+    };
 
     imageWrapper.appendChild(img);
     imageWrapper.appendChild(deleteButton);
@@ -187,6 +193,43 @@ document.getElementById('editProductImage').addEventListener('change', function(
 
 
 let cropper;
+
+function openCropper(imageUrl, imageWrapper) {
+    const cropperContainer = document.getElementById('cropperContainer');
+    const cropImage = document.getElementById('cropImage');
+
+    cropImage.src = imageUrl; // Set the image source for cropping
+    cropperContainer.style.display = 'block'; // Show cropping container
+
+    if (cropper) {
+        cropper.destroy(); // Destroy previous cropper instance
+    }
+
+    cropper = new Cropper(cropImage, {
+        aspectRatio: 1,
+        viewMode: 1,
+        autoCropArea: 1,
+    });
+
+    currentImageWrapper = imageWrapper; // Store the current image wrapper for later replacement
+
+    document.getElementById('editCropImageButton').onclick = function() {
+        if (cropper) {
+            const canvas = cropper.getCroppedCanvas();
+            const croppedImageUrl = canvas.toDataURL(); // Get the cropped image
+
+            // Replace the original image
+            const imgElement = currentImageWrapper.querySelector('img');
+            imgElement.src = croppedImageUrl; // Update the image source
+
+            cropper.destroy(); // Clean up
+            cropper = null;
+            cropperContainer.style.display = 'none'; // Hide cropping container
+        }
+    };
+}
+
+
 const imageInput = document.getElementById('productImage');
 const imagePreview = document.getElementById('imagePreview');
 const cropImageButton = document.getElementById('cropImageButton');
@@ -376,14 +419,37 @@ document.getElementById('addProductButton').addEventListener('click', function (
 // })
 
 
+
 document.getElementById('editProductButton').addEventListener('click', function() {
     const currentName = document.getElementById('editProductName').value;
     const currentCategory = document.getElementById('editProductCategory').value;
-    const currentDescription = document.getElementById('editProductDescription').value
+    const currentDescription = document.getElementById('editProductDescription').value;
     const currentPrice = parseInt(document.getElementById('editProductPrice').value);
-    const currentStock = document.getElementById('editProductStock').value;
 
     const payload = {}; // Object to hold only edited data
+
+    // Check if sizes and stocks have changed
+    const sizeInputs = document.querySelectorAll('input[name="editProductSize[]"]');
+    const stockInputs = document.querySelectorAll('input[name="editProductStock[]"]');
+
+    const updatedSizes = Array.from(sizeInputs).map((input, index) => {
+        return {
+            size: input.value,
+            stock: stockInputs[index].value,
+            id: originalData.sizes[index] ? originalData.sizes[index]._id : null // Include ObjectId if it exists
+        };
+    });
+
+    // Compare sizes with original data
+    const sizeChanged = JSON.stringify(updatedSizes) !== JSON.stringify(originalData.sizes.map(size => ({
+        size: size.size,
+        stock: size.stock,
+        id: size._id // Adjust to include ObjectId comparison
+    })));
+
+    if (sizeChanged) {
+        payload.sizes = updatedSizes; // Just assign the updated sizes directly
+    }
 
     // Check if any field has changed and add to payload
     if (currentName !== originalData.name) {
@@ -395,23 +461,27 @@ document.getElementById('editProductButton').addEventListener('click', function(
     if (currentPrice !== originalData.price) {
         payload.price = currentPrice;
     }
-    if (currentStock !== originalData.stock) {
-        payload.stock = currentStock;
-    }
-
-    if(currentDescription !== originalData.description){
-        payload.description = currentDescription
+    if (currentDescription !== originalData.description) {
+        payload.description = currentDescription;
     }
 
     // Check if new images have been added
     if (newImages.length > 0) {
         payload.newImages = newImages; // Only include new images
     }
+    if (deletedImages.length > 0) {
+        payload.deletedImages = deletedImages; // Only include deleted images
+    }
+
+    if (deletedSizes.length > 0) {
+        payload.deletedSizes = deletedSizes; // Include deleted sizes in the payload
+    }
 
     // Only send payload if there are any changes
     if (Object.keys(payload).length > 0) {
         console.log('Sending data to backend:', payload);
-       payload.id = originalData.id
+        payload.id = originalData.id; // Include the product ID
+
         // Example: AJAX request (replace with your actual logic)
         fetch('/admin/products/edit', {
             method: 'POST',
@@ -419,17 +489,29 @@ document.getElementById('editProductButton').addEventListener('click', function(
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(payload)
-        }).then(response => {
-            if (response.ok) {
-                $('#editProductModal').modal('hide'); 
-                // Optionally, close the modal or refresh the product list
-                location.reload()
-            } else {
-                location.reload()
+        })
+        .then(response => {
+            if (!response.ok) {
+                // Log the response status and message if not ok
+                console.error('Server error:', response.status, response.statusText);
+                return response.json().then(err => {
+                    console.error('Error details:', err);
+                });
             }
+            return response.json(); // Assuming you expect a JSON response
+        })
+        .then(data => {
+            console.log('Success:', data);
+            $('#editProductModal').modal('hide'); 
+            location.reload(); // Reload the page or update UI accordingly
+        })
+        .catch(error => {
+            // Log network errors or any other errors
+            console.error('Fetch error:', error);
         });
+        
     } else {
- 
+        console.log('No changes detected.');
     }
 
     newImages = [];

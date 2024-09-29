@@ -198,18 +198,15 @@ const addProduct = (req, res) => {
 //         });
 // };
 
-async function editProduct(req,res){
-
-        const { id, name, description, category, price, stock, newImages } = req.body;
+async function editProduct(req, res) {
+    const { id, name, description, category, price, sizes, newImages, deletedImages, deletedSizes } = req.body;
 
     try {
-        // Find the product by ID
         const product = await Product.findById(id);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Create an object to hold the updates
         const updates = {};
 
         // Check for changes in the product details
@@ -217,26 +214,64 @@ async function editProduct(req,res){
         if (description && description !== product.description) updates.description = description;
         if (category && category !== product.category) updates.category = category;
         if (price && price !== product.price) updates.price = price;
-        if (stock && stock !== product.stock) updates.stock = stock;
 
-        // Handle new image uploads
-        if (newImages && newImages.length > 0) {
-            const uploadPromises = newImages.map(image => {
-                return cloudinary.uploader.upload(image, {
-                    folder: 'products', // optional: specify a folder
-                });
+        // Handle sizes update
+        if (sizes) {
+            sizes.forEach(size => {
+                if (size.id) {
+                    // Update existing size
+                    const existingSizeIndex = product.sizes.findIndex(s => s._id.toString() === size.id);
+                    if (existingSizeIndex !== -1) {
+                        product.sizes[existingSizeIndex].size = size.size;
+                        product.sizes[existingSizeIndex].stock = size.stock;
+                    }
+                } else {
+                    // Add new size
+                    product.sizes.push({ size: size.size, stock: size.stock });
+                }
             });
-
-            // Wait for all images to upload
-            const uploadResponses = await Promise.all(uploadPromises);
-
-            // Extract the URLs from the upload responses
-            const imageUrls = uploadResponses.map(response => response.secure_url);
-
-            // Add the new image URLs to the existing ones
-            updates.imageUrls = [...product.imageUrls, ...imageUrls];
+            updates.sizes = product.sizes; // Assign updated sizes to updates
         }
 
+        // Handle deleted sizes
+        if (deletedSizes && deletedSizes.length > 0) {
+            product.sizes = product.sizes.filter(size => !deletedSizes.includes(size._id.toString()));
+            updates.sizes = product.sizes; // Assign updated sizes to updates
+        }
+
+        // Handle new image uploads and deletions (same as before)...
+ // Handle new image uploads
+ if (newImages && newImages.length > 0) {
+    const uploadPromises = newImages.map(image => {
+        return cloudinary.uploader.upload(image, {
+            folder: 'products', // optional: specify a folder
+        });
+    });
+
+    // Wait for all images to upload
+    const uploadResponses = await Promise.all(uploadPromises);
+
+    // Extract the URLs from the upload responses
+    const imageUrls = uploadResponses.map(response => response.secure_url);
+
+    // Add the new image URLs to the existing ones
+    updates.imageUrls = [...product.imageUrls, ...imageUrls];
+}
+
+// Handle deleted images
+if (deletedImages && deletedImages.length > 0) {
+    const deletePromises = deletedImages.map(async (imageUrl) => {
+        const publicId = imageUrl.split('/').pop().split('.')[0]; // Assuming the URL structure allows for this
+        await cloudinary.uploader.destroy(publicId); // Remove the image from Cloudinary
+    });
+
+    // Wait for all deletions to complete
+    await Promise.all(deletePromises);
+
+    // Remove deleted images from the product's imageUrls
+    product.imageUrls = product.imageUrls.filter(url => !deletedImages.includes(url));
+    updates.imageUrls = product.imageUrls; // Assign updated imageUrls to updates
+}
         // Update the product
         await Product.findByIdAndUpdate(id, updates, { new: true });
 
@@ -245,8 +280,10 @@ async function editProduct(req,res){
         console.error(error);
         res.status(500).json({ message: 'Error updating product', error });
     }
-        
 }
+
+
+
 
 async function changeProductStatus (req, res){
     const { action, id } = req.params;
@@ -263,5 +300,5 @@ async function changeProductStatus (req, res){
 }
 
 module.exports = {
-    getProducts,addProduct, upload: upload.array('productImage[]'),editProduct,changeProductStatus
+    getProducts,addProduct, upload: upload.array('editProductImage[]'),editProduct,changeProductStatus
 }

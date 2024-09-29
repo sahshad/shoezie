@@ -22,7 +22,7 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
 router.get('/users', isAuthenticated, getUsers);
 router.patch('/users/:action/:id',changeUserStatus)
 
-router.get('/products', isAuthenticated, getProducts);
+router.get('/products',  getProducts);
 router.post('/products/add',upload,addProduct)
 router.post('/products/edit',upload,editProduct)
 router.patch('/products/:action/:id',changeProductStatus)
