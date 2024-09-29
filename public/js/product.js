@@ -8,59 +8,21 @@
         document.getElementById('sidebar').classList.toggle('active');
         document.getElementById('page-content-wrapper').classList.toggle('toggled');
     });
-
-    // Variables to handle modal actions
-    let productToDelete = null;
-
-function showConfirmDeleteModal(productId,productName) {
-    document.getElementById('delete-target').innerHTML=productName
-    productToDelete = productId; // Store the product ID
-    $('#confirmDeleteModal').modal('show'); // Show the modal
-    
-}
-
-document.getElementById('confirmDeleteButton').addEventListener('click', function () {
-    if (productToDelete) {
-        // Send a DELETE request to your server
-        fetch(`/admin/products/delete/${productToDelete}`, {
-            method: 'DELETE',
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log('Product deleted:', productToDelete);
-                $('#confirmDeleteModal').modal('hide'); // Hide the modal
-                // Optionally refresh the product list or remove the product from the UI
-                // For example, you could remove the product row from the table
-                location.reload();
-            } else {
-                console.error('Error deleting product:', response.statusText);
-            }
-        })
-        .catch(error => {
-            console.error('Error deleting:', error);
-        });
-    }
-});
  
  let originalData={}
  let newImages = []; 
 
-    document.getElementById('confirmDeleteButton').addEventListener('click', function () {
-        if (productToDelete) {
-            console.log('Product deleted:', productToDelete);
-            $('#confirmDeleteModal').modal('hide');
-        }
-    });
-
-    function populateEditModal(name, description,category, price, stock, imageUrl,id) {
-
+//populate edit fields with existing data
+function populateEditModal(name, description,category, price, sizes, imageUrl,id) {
+     sizes =JSON.parse(sizes)
     const imageUrls = JSON.parse(imageUrl);
+    console.log(sizes);
+    
     price = parseInt(price);
     document.getElementById('editProductName').value = name;
     document.getElementById('editProductDescription').value = description;
     document.getElementById('editProductCategory').value = category;
     document.getElementById('editProductPrice').value = price;
-    document.getElementById('editProductStock').value = stock;
     document.getElementById('editProductId').value = id
 
     originalData = {
@@ -68,11 +30,83 @@ document.getElementById('confirmDeleteButton').addEventListener('click', functio
         description:description,
         category: category,
         price: parseInt(price),
-        stock: stock,
+        sizes: sizes,
         images: imageUrls,
         id
 
     };
+
+    const sizeStockContainer = document.getElementById('editSizeStockContainer');
+    sizeStockContainer.innerHTML = ''; 
+
+    sizes.forEach((sizeStock,index) => {
+        if(index===0){
+            const newPair = document.createElement('div');
+        newPair.className = 'row align-items-center size-stock-pair mt-2';
+        newPair.innerHTML = `
+            <div class="col-md-5">
+                <input type="number" class="form-control" name="productSize[]" value="${sizeStock.size}" placeholder="Enter size" required>
+            </div>
+            <div class="col-md-5">
+                <input type="number" class="form-control" name="productStock[]" value="${sizeStock.stock}" placeholder="Enter stock" min="1" required>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-success add-size-stock">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        `;
+        sizeStockContainer.appendChild(newPair);
+
+        // Add event listener for the new remove button
+        newPair.querySelector('.add-size-stock').addEventListener('click', function() {
+            const container = document.getElementById('sizeStockContainer');
+        const newPair = document.createElement('div');
+        newPair.className = 'row align-items-center size-stock-pair mt-2';
+        newPair.innerHTML = `
+            <div class="col-md-5">
+                <input type="number" class="form-control" name="productSize[]" value="" placeholder="Enter size" required>
+            </div>
+            <div class="col-md-5">
+                <input type="number" class="form-control" name="productStock[]" value="" placeholder="Enter stock" min="1" required>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger remove-size-stock">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        `;
+        sizeStockContainer.appendChild(newPair);
+        
+        // Add event listener for the new remove button
+        newPair.querySelector('.remove-size-stock').addEventListener('click', function() {
+            sizeStockContainer.removeChild(newPair);
+        });
+        
+        });
+        }else{
+        const newPair = document.createElement('div');
+        newPair.className = 'row align-items-center size-stock-pair mt-2';
+        newPair.innerHTML = `
+            <div class="col-md-5">
+                <input type="number" class="form-control" name="productSize[]" value="${sizeStock.size}" placeholder="Enter size" required>
+            </div>
+            <div class="col-md-5">
+                <input type="number" class="form-control" name="productStock[]" value="${sizeStock.stock}" placeholder="Enter stock" min="1" required>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger remove-size-stock">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        `;
+        sizeStockContainer.appendChild(newPair);
+
+        // Add event listener for the new remove button
+        newPair.querySelector('.remove-size-stock').addEventListener('click', function() {
+            sizeStockContainer.removeChild(newPair);
+        });}
+    });
 
     // Clear existing images
     let imagesContainer = document.getElementById('editProductImageView');
@@ -97,9 +131,16 @@ function appendImage(container, url) {
     img.classList.add('img-fluid');
 
     const deleteButton = document.createElement('button');
-    deleteButton.innerText = 'Delete';
-    deleteButton.classList.add('btn', 'btn-danger', 'delete-button');
+    deleteButton.classList.add('btn', 'btn-danger', 'btn-sm', 'delete-button', 'mt-2');
     deleteButton.style.display = 'none'; // Hidden by default
+    deleteButton.style.zIndex = '100';
+    
+    // Create the icon element
+    const deleteIcon = document.createElement('i');
+    deleteIcon.classList.add('fas', 'fa-trash'); // Font Awesome trash icon
+    
+    // Append the icon to the button
+    deleteButton.appendChild(deleteIcon);
 
     // Show the delete button on hover
     imageWrapper.onmouseenter = () => {
@@ -114,6 +155,7 @@ function appendImage(container, url) {
         imageWrapper.remove(); // Remove the image wrapper
         // Add additional logic to handle removal from the product data if needed
     };
+    
 
     imageWrapper.appendChild(img);
     imageWrapper.appendChild(deleteButton);
@@ -138,7 +180,6 @@ document.getElementById('editProductImage').addEventListener('change', function(
 
         reader.readAsDataURL(file);
     }
-
     // Reset the file input to allow the same files to be selected again
     event.target.value = '';
 });
@@ -247,7 +288,18 @@ document.getElementById('addProductButton').addEventListener('click', function (
     formData.append('productDescription', document.getElementById('productDescription').value);
     formData.append('productCategory', document.getElementById('productCategory').value);
     formData.append('productPrice', document.getElementById('productPrice').value);
-    formData.append('productStock', document.getElementById('productStock').value);
+    // formData.append('productStock', document.getElementById('productStock').value);
+      // Get all size and stock inputs
+      const sizes = document.querySelectorAll('input[name="productSize[]"]');
+      const stocks = document.querySelectorAll('input[name="productStock[]"]');
+  
+      // Append sizes and stocks to FormData
+      sizes.forEach(sizeInput => {
+          formData.append('productSize[]', sizeInput.value);
+      });
+      stocks.forEach(stockInput => {
+          formData.append('productStock[]', stockInput.value);
+      });
 
     // Upload to your backend
     fetch('/admin/products/add', {
