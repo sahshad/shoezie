@@ -7,6 +7,7 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="/styles/user/partials/navbar.css">
 
     <style>
@@ -170,6 +171,10 @@
         .scroll-right {
             right: 80px;
         }
+        .selected {
+        background-color: black; /* Black background */
+        color: white; /* White text */
+    }
     </style>
 </head>
 <body>
@@ -197,27 +202,36 @@
             <div>
                 <span class="text-warning">★★★★☆ (4.0)</span>
             </div>
-            <p class="price">₹ <%= product.price %></p>
+            <p class="price">₹ <%= product.price %>.00</p>
             <div class="line"></div>
-            <label>Select Color:</label>
+            <label>Stock:</label>
             <div>
-                <span class="badge badge-primary" style="cursor: pointer;">Blue</span>
+                <p id="product-stock" class="font-weight-bold"></p>
+                <!-- <span class="badge badge-primary" style="cursor: pointer;">Blue</span>
                 <span class="badge badge-danger" style="cursor: pointer;">Red</span>
-                <span class="badge badge-success" style="cursor: pointer;">Green</span>
+                <span class="badge badge-success" style="cursor: pointer;">Green</span> -->
             </div>
             <div class="line"></div>
             <label>Available Sizes:</label>
-            <div>
-                <button class="btn btn-outline-secondary size-button">UK 8</button>
-                <button class="btn btn-outline-secondary size-button">UK 8.5</button>
-                <button class="btn btn-outline-secondary size-button">UK 9</button>
-            </div>
+      <div id="size-selection">
+    <% product.sizes.forEach(size => { %>
+        <button 
+            class="btn btn-outline-secondary size-button" 
+            data-size="UK<%= size.size %>"
+            onclick="selectSize(this,'<%=size.stock %>','<%=size._id %>')">
+            UK<%= size.size %>
+        </button>
+    <% }) %>
+
+</div>
+
+<input type="hidden" id="selected-size" name="size" />
             <div class="line"></div>
             <p class="description"><%= product.description %></p>
             <div class="line"></div>
             <div>
-                <button class="btn btn-primary">Add To Cart</button>
-                <button class="btn btn-secondary">Add To Fav</button>
+                <button onclick="addToCart('<%= product._id %>')" id="addToCart"  class="btn btn-primary" >Add To Cart</button>
+                <button id="addToFav" class="btn btn-secondary " >Add To Fav</button>
             </div>
         </div>
     <%} %>  
@@ -266,7 +280,7 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
     function changeMainImage(imageUrl) {
         const mainImage = document.getElementById('mainImage');
@@ -310,6 +324,84 @@
         const wrapper = document.querySelector('.related-products-wrapper');
         wrapper.scrollBy({ left: 160, behavior: 'smooth' });
     }
+
+
+let sizeId=''
+    function selectSize(button,stock,id) {
+        // Deselect all buttons
+        sizeId=id
+        const buttons = document.querySelectorAll('.size-button');
+        buttons.forEach(btn => {
+            btn.classList.remove('selected');
+            btn.classList.remove('btn-secondary'); // Remove the secondary style
+            btn.classList.add('btn-outline-secondary'); // Add outline style back
+        });
+
+        // Select the clicked button
+        button.classList.add('selected');
+        button.classList.remove('btn-outline-secondary'); // Remove outline style
+        button.classList.add('btn-selected'); // Add the custom selected style
+
+        // Update the hidden input with the selected size
+        // document.getElementById('selected-size').value = button.getAttribute('data-size');
+        const stockElement=document.getElementById('product-stock')
+        const addToCart = document.getElementById('addToCart')
+        const addToFav = document.getElementById('addToFav')
+        if(stock > 10){
+            stockElement.innerText='In Stock'
+            stockElement.style.color='Black'
+            addToCart.disabled = false; 
+            addToFav.disabled = false;
+        }else if(stock <= 5 && stock > 0){
+            stockElement.innerText= `Only ${stock} Left`
+            stockElement.style.color='Red'
+            addToCart.disabled = false; 
+            addToFav.disabled = false;
+        }else if(stock == 0){
+            stockElement.innerText= `Out Of Stock`
+            stockElement.style.color='Red'
+            addToCart.disabled = true; // Disable the button
+            addToFav.disabled = true; // Disable the button
+        }
+    }
+
+    function addToCart(productId) {
+    fetch(`/user/cart/add/${productId}/${sizeId}`, {
+        method: 'POST', // Ensure this is POST
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + error.message);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message) {
+            Toastify({
+                text: data.message,
+                duration: 3000,
+                close: true,
+                gravity: "bottom",
+                position: 'center',
+                backgroundColor: "#4CAF50",
+            }).showToast();
+        }
+    })
+    .catch(error => {
+        Toastify({
+            text: 'Error adding to cart:'+ error.message,
+            duration: 3000,
+            close: true,
+            gravity: "bottom",
+            position: 'center',
+            backgroundColor: "#f44336",
+        }).showToast();
+        console.error('Error:', error);
+    });
+}
 </script>
 </body>
 </html>

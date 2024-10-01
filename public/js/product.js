@@ -343,6 +343,7 @@ document.getElementById('addProductButton').addEventListener('click', function (
       stocks.forEach(stockInput => {
           formData.append('productStock[]', stockInput.value);
       });
+console.log(formData);
 
     // Upload to your backend
     fetch('/admin/products/add', {

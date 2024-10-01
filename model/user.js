@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
   lastname:{type: String,required:true},
   email: {type:String,reuired:true,unique:true},
   password:{type:String},
-  isBlock: { type: Boolean, default: false },
+  status: { type: Boolean, default: true },
   cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' }
 },{ timestamps: true });
 

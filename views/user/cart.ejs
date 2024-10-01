@@ -13,7 +13,7 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-      
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="/styles/user/partials/navbar.css">
     <style>
 
@@ -48,7 +48,8 @@
     }
 
     .quantity-input {
-        width: 60px;
+        height: 30px;
+        width: 65px;
         margin-top: 5px; /* Adjusted margin for spacing */
     }
     </style>
@@ -61,32 +62,33 @@
 <main class="container mt-5">
     
     <div class="row">
+        <% let subtotal = 0; %> 
+        <% if (cart.length > 0) {%>
         <div class="col-md-8">
             <h4>Products</h4>
-            <% let subtotal = 0; %> 
-            <% if (cart) {%>
                 <% cart.forEach(cart => {%>
                     <div class="product-card">
-                        <img src="<%= cart.productId.imageUrls[0] %>" class="img-fluid" alt="Stylish Sneakers" style="width: 80px;">
+                        <img src="<%= cart.productId.imageUrls[0] %>" class="img-fluid" alt="Stylish Sneakers" style="width: 75px; border-radius: 10px; margin-right: 20px;">
                         <div class="product-info">
                             <P class="font-weight-bold"><%= cart.productId.name %></P>
-                            <p>Size: 10</p>
+                            <p>Size: <%= cart.sizeDetails.size %></p>
                             <p >₹ <%= cart.productId.price %></p>
                         </div>
                         <div>
-                            <span class="delete-icon" onclick="removeProduct(3)">
+                            <span class="delete-icon" onclick="removeProduct('<%= cart._id %>')">
                                 <i class="fas fa-trash"></i>
                             </span>
-                            <input type="number" value="<%= cart.quantity %>" min="1" class="form-control quantity-input">
+                            <input type="number" value="<%= cart.quantity %>" min="1" class="form-control quantity-input" oninput="debounceUpdateQuantity('<%= cart._id %>', this.value)">
                         </div>
                     </div>
                     <% subtotal += cart.productId.price * cart.quantity; %>
-                <% }); %>
-               
-           <% } %>
-            
+                <% }); %>    
         </div>
+        <% }else{ %>
+            <p class="text-center">there is no items in your cart  <a href="/user/shop">shop</a> now</p>
+                       <% } %>
 
+        <% if(cart.length>0){ %>
         <div class="col-md-4">
             <h4>Order Summary</h4>
             <ul class="list-group">
@@ -111,6 +113,7 @@
                 <a href="/user/cart/checkout" class="btn btn-success">Go to Checkout <i class="fas fa-arrow-right"></i></a>
             </div>
         </div>
+        <% } %>
     </div>
 </main>
 
@@ -118,13 +121,84 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
 <script>
-    function removeProduct(productId) {
-        // Logic to remove the product from the cart
-        console.log(`Remove product with ID: ${productId}`);
-        // You can send an AJAX request to remove the product
+    function removeProduct(productId) {    
+        console.log(productId);
+          
+        fetch(`/user/cart/remove/${productId}`,{
+            method:'DELETE',
+            headers:{
+                'Content-Type':'application/json'
+            }
+        }).then(response => {
+            if(response.ok){
+                console.log('successfully deleted');
+              location.reload()
+            }
+        }).catch(err =>{
+            console.log(`error : ${err}`);
+            
+        })
     }
+
+
+    // Debounce function to limit the rate at which updateQuantity is called
+let debounceTimer;
+
+function debounceUpdateQuantity(cartId, newQuantity) {
+    clearTimeout(debounceTimer);  // Clear the previous timer
+    debounceTimer = setTimeout(() => {
+        updateQuantity(cartId, newQuantity);  // Call the update function after 300ms
+    }, 2000);  // 300ms delay
+}
+
+// Function to send AJAX request to update the quantity
+function updateQuantity(cartId, newQuantity) {
+    // Ensure newQuantity is valid (i.e., > 0)
+    if (newQuantity < 1) {
+        alert("Quantity cannot be less than 1");
+        return;
+    }
+  
+    // Create the data payload
+    const data = { quantity: newQuantity };
+
+    console.log(data,cartId);
+    
+    // Send the AJAX request using fetch API
+    fetch(`/user/cart/update/${cartId}`, {
+        method: 'PUT',  // Use PUT or PATCH method for updates
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),  // Send quantity in the request body
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            Toastify({
+                text: data.message,
+                duration: 3000,
+                close: true,
+                gravity: "bottom",
+                position: 'center',
+                backgroundColor: "#4CAF50",
+            }).showToast();
+        }
+    })
+    .catch(error => 
+    Toastify({
+            text: 'Error adding to cart:'+ error.message,
+            duration: 3000,
+            close: true,
+            gravity: "bottom",
+            position: 'center',
+            backgroundColor: "#f44336",
+        }).showToast(),
+    console.error("Error:", error));
+}
 </script>
 
 </body>

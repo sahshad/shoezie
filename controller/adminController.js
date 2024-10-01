@@ -37,12 +37,11 @@ async function getUsers(req, res) {
 }
 
 async function changeUserStatus(req,res){
-
 const { action, id } = req.params;
     
     try {
         const newStatus = action === 'list'; // Set status based on action
-        const result=await User.findByIdAndUpdate(id, { isBlock: newStatus });
+        const result=await User.findByIdAndUpdate(id, { status: newStatus });
         if(result)
         res.status(200).json({ message: `User ${action === 'list' ? 'listed' : 'unlisted'} successfully.` });
     } catch (error) {

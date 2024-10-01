@@ -63,7 +63,7 @@ async function userLogIn(req,res){
             return res.redirect('/user/login') 
         }
         const isMatch = await bcrypt.compare(password, user.password);
-        if(user.isBlock===false){
+        if(user.status===true){
         if (isMatch) {
             req.session.user = user.id;
             return res.redirect('/user/profile');
@@ -95,7 +95,7 @@ const saltRounds = 10;
          });
         await newUser.save();
         req.session.error='User registered successfully'
-        return res.redirect('/user/login')
+        return res.redirect(201,'/user/login')
         res.status(201).send('User registered successfully');
     } catch (error) {
         console.error(error);

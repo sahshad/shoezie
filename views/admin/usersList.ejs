@@ -43,18 +43,10 @@
                                     <td><%= user.firstname %> <%= user.lastname %></td>
                                     <td><%= user.email %></td>
                                     <td>
-                                        <!-- <% if (user.isBlock) { %>
-                                            <button class="btn btn-success btn-sm" onclick="toggleUserStatus('<%= user._id %>', 'unblock')">
-                                                <i class="fas fa-user-check icon-spacing"></i>Unblock</button>
-                                        <% } else { %>
-                                            <button class="btn btn-danger btn-sm" onclick="toggleUserStatus('<%= user._id %>', 'block')">
-                                                 <i class="fas fa-trash-alt icon-spacing"></i>Block</button>
-                                        <% } %> -->
-
-                                        <button class="btn <%= user.isBlock ? 'btn-danger' : 'btn-success' %> btn-sm" 
-                                            onclick="toggleUserStatus('<%= user._id %>', this)">
-                                            <%= user.isBlock ? 'Unlist' : 'List' %>
-                                           </button>
+                                    <button class="btn <%= user.status ? 'btn-danger' : 'btn-success' %> btn-sm" 
+                                    onclick="toggleUserStatus('<%= user._id %>', this)">
+                                    <%= user.status ? 'Unlist' : 'List' %>
+                                    </button>
                                     </td>
                                 </tr>
                             <% }) %>

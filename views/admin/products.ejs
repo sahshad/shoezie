@@ -151,8 +151,11 @@
                                 <label for="productImage">Image</label>
                                 <input type="file" class="form-control" name="productImage[]" id="productImage" accept="image/*" multiple>
                             </div>
-                            <img id="imagePreview" style="display: none;" />
-                            <button type="button" class="btn btn-primary" id="cropImageButton" style="display: none;">Crop Image</button>
+                            <div style="height: 340px; margin-top: 20px;">
+                                <img id="imagePreview" style="display: none;" />
+                                <button type="button" class="btn btn-primary btn-sm mt-3" id="cropImageButton" style="display: none;">Crop Image</button>
+                            </div>
+                          
                         </div>
                     </div>
              
@@ -242,10 +245,9 @@
                                 <label for="editProductImage">Update Image</label>
                                 <input type="file" class="form-control" id="editProductImage" accept="image/*" multiple>
                             </div>
-                            <div id="cropperContainer" style="display: none; margin-top: 20px;">
-                                <h5>Crop Image</h5>
+                            <div id="cropperContainer" style="display: none; margin-top: 20px; height: 340px;">
                                 <img id="cropImage" src="" style="max-width: 100%;" />
-                                <button type="button" class="btn btn-primary" id="editCropImageButton">Crop Image</button>
+                                <button type="button" class="btn btn-primary btn-sm mt-3" id="editCropImageButton">Crop Image</button>
                             </div>
                             <!-- <img id="editImagePreview" style="display: none; max-width: 100%;" />
                             <button type="button" id="editCropImageButton" style="display: none;">Crop Image</button> -->

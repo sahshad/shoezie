@@ -300,5 +300,5 @@ async function changeProductStatus (req, res){
 }
 
 module.exports = {
-    getProducts,addProduct, upload: upload.array('editProductImage[]'),editProduct,changeProductStatus
+    getProducts,addProduct, editUpload: upload.array('editProductImage[]'),addUpload:upload.array('productImage[]'),editProduct,changeProductStatus
 }

@@ -6,7 +6,8 @@ const {addUser,getSignup,getLogin,getHome,getShop,getProduct
 
 const { userAuthenticated} = require('../middleware/authMiddleware')
 
-const {getCart,getCheckout,addProductToCart} = require('../controller/cartController')
+const {getCart,getCheckout,addProductToCart,
+    removeProductFromCart,updateProductQuantity} = require('../controller/cartController')
 
 router.get('/login',getLogin)
 router.post('/login',userLogIn)
@@ -26,7 +27,9 @@ router.get('/shop/:id',getProduct)
 
 router.get('/cart',userAuthenticated,getCart)
 router.get('/cart/checkout',getCheckout)
-router.post('/cart/add/:productId',addProductToCart)
+router.post('/cart/add/:productId/:sizeId',addProductToCart)
+router.delete('/cart/remove/:productId',removeProductFromCart)
+router.put('/cart/update/:productId',updateProductQuantity)
 
 router.get('/logout',userLogOut)
 module.exports = router
