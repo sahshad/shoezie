@@ -13,7 +13,7 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="/styles/user/partials/navbar.css">
     <link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
     
@@ -62,7 +62,11 @@
                             </tr>
                             <tr>
                                 <th>Phone Number</th>
-                                <td id="phoneNumber">(123) 456-7890</td>
+                                <td id="phoneNumber"><% if(user.phone){ %>
+                                    <%= user.phone %>
+                               <% }else{ %>
+                                <span style="color: red;">Update Your phoneNumber</span>
+                               <% } %></td>
                             </tr>
                             <tr>
                                 <th>Email</th>
@@ -93,19 +97,19 @@
                 <form id="editForm">
                     <div class="form-group">
                         <label for="editFirstName">First Name</label>
-                        <input type="text" class="form-control" id="editFirstName" value="John">
+                        <input type="text" class="form-control" id="editFirstName" placeholder="Enter Firstname">
                     </div>
                     <div class="form-group">
                         <label for="editLastName">Last Name</label>
-                        <input type="text" class="form-control" id="editLastName" value="Doe">
+                        <input type="text" class="form-control" id="editLastName" placeholder="Enter Lastname">
                     </div>
                     <div class="form-group">
                         <label for="editPhoneNumber">Phone Number</label>
-                        <input type="text" class="form-control" id="editPhoneNumber" value="(123) 456-7890">
+                        <input type="text" class="form-control" id="editPhoneNumber" placeholder="Enter Phonenumber">
                     </div>
                     <div class="form-group">
                         <label for="editEmail">Email</label>
-                        <input type="email" class="form-control" id="editEmail" value="john.doe@example.com">
+                        <input type="email" class="form-control" id="editEmail" placeholder="Enter Email">
                     </div>
                 </form>
             </div>
@@ -121,24 +125,70 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
-    // JavaScript to handle the edit modal and save changes
-    document.getElementById('saveChanges').addEventListener('click', function() {
-        // Get values from the modal inputs
-        const firstName = document.getElementById('editFirstName').value;
-        const lastName = document.getElementById('editLastName').value;
-        const phoneNumber = document.getElementById('editPhoneNumber').value;
-        const email = document.getElementById('editEmail').value;
 
-        // Update the displayed values
-        document.getElementById('firstName').innerText = firstName;
-        document.getElementById('lastName').innerText = lastName;
-        document.getElementById('phoneNumber').innerText = phoneNumber;
-        document.getElementById('email').innerText = email;
 
-        // Close the modal
-        $('#editModal').modal('hide');
+    document.addEventListener('DOMContentLoaded', function () {
+    // Find the "Edit" button and attach an event listener
+    const editButton = document.querySelector('.btn-primary');
+    
+    if (editButton) {
+      editButton.addEventListener('click', function () {
+        // Get the current user information from the table
+        const firstName = document.getElementById('firstName').textContent.trim();
+        const lastName = document.getElementById('lastName').textContent.trim();
+        const email = document.getElementById('email').textContent.trim();
+        
+        // Handle the phone number, check if it contains a valid phone number or "Update Your phoneNumber"
+        const phoneNumberElement = document.getElementById('phoneNumber');
+        const phoneNumber = phoneNumberElement.textContent.trim();
+        const isPhoneValid = !phoneNumber.includes("Update Your phoneNumber");
+
+        // Populate the edit form fields with the current values
+        document.getElementById('editFirstName').value = firstName;
+        document.getElementById('editLastName').value = lastName;
+        document.getElementById('editEmail').value = email;
+
+        // If the phone number is valid, populate it; otherwise, set the field to empty
+        document.getElementById('editPhoneNumber').value = isPhoneValid ? phoneNumber : '';
+      });
+    }
+  });
+
+   // Save changes button logic
+   const saveButton = document.getElementById('saveChanges');
+    saveButton.addEventListener('click', async function () {
+      // Get values from the modal input fields
+      const updatedFirstName = document.getElementById('editFirstName').value.trim();
+      const updatedLastName = document.getElementById('editLastName').value.trim();
+      const updatedPhoneNumber = document.getElementById('editPhoneNumber').value.trim();
+      const updatedEmail = document.getElementById('editEmail').value.trim();
+
+      // Create the request payload
+      const updatedData = {
+        firstname: updatedFirstName,
+        lastname: updatedLastName,
+        phone: updatedPhoneNumber || null,  // Optional: set to null if no phone is provided
+        email: updatedEmail
+      };
+
+      fetch('/user/profile/update', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedData)
+        }).then(respose => {
+         return respose.json()
+        }).then(data => {
+         console.log(data);
+         location.reload()
+        }).catch(err =>{
+            console.log(err);    
+        })
     });
+
 </script>
 </body>
 </html>

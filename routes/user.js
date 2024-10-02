@@ -1,8 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const {addUser,getSignup,getLogin,getHome,getShop,getProduct
-    ,getProfile,userLogIn,userLogOut,getAddress,
-    getOrderDetails,getOrders} = require('../controller/userController')
+const {addUser,getSignup,getLogin,getHome,getShop,getProduct,
+userLogIn} = require('../controller/userController')
+
+ const{    getProfile,userLogOut,
+    getAddress,getOrders,getOrderDetails,updateUserDetails,
+    addAddress,updateAddress}= require('../controller/userProfileController')   
 
 const { userAuthenticated} = require('../middleware/authMiddleware')
 
@@ -13,9 +16,15 @@ router.get('/login',getLogin)
 router.post('/login',userLogIn)
 
 router.get('/profile',userAuthenticated,getProfile)
+router.put('/profile/update',updateUserDetails)
+
 router.get('/profile/address',getAddress)
+router.post('/profile/address/add',addAddress)
+router.post('/profile/address/update',updateAddress)
+
 router.get('/profile/orders',getOrders)
 router.get('/profile/orders/orderdetails',getOrderDetails)
+
 
 router.get('/signup',getSignup)
 router.post('/register',addUser)

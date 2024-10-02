@@ -29,6 +29,8 @@ app.use(passport.session());
 
 db()
 
+
+
 app.use('/user',userRoute)
 app.use('/admin',adminRoute)
 app.use('/auth',require('./routes/auth'))

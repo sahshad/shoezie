@@ -1,5 +1,6 @@
 const Cart = require('../model/cart')
 const User = require('../model/user')
+const Address = require('../model/address')
 const Product = require('../model/product')
 
 async function getCart(req, res) {
@@ -54,7 +55,7 @@ async function getCart(req, res) {
 }
 
 
-function getCheckout(req,res){
+async function getCheckout(req,res){
  res.render('user/checkout')
 }
 async function addProductToCart(req, res) {
@@ -220,67 +221,6 @@ async function updateProductQuantity(req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 }
-
-
-
-// async function updateProductQuantity(req,res){
-//     const {productId} = req.params
-//     const {quantity} = req.body
-//     const userId = req.session.user;
-//     try {
-//         const user = await User.findById(userId).populate('cart');
-//         const cartItem =user.cart.products.find(size => size._id.toString() === productId)
-
-//         const product = await Product.findById(cartItem.productId)
-//         const productSize = product.sizes.find(size => size._id.toString() === cartItem.sizeId.toString())
-
-//         if(quantity > productSize.stock){
-//            return  res.status(400).json({message:'product stock limit reached'})
-//         }
-
-//         cartItem.stock = quantity
-//         console.log(cartItem.stock);
-        
-//        await user.cart.save()
-        
-//         res.status(201)
-        
-//     } catch (error) {
-        
-//     }
-    
-// }
-// async function addProductToCart(req,res){
-//     const {productId}=req.params
-//     const userId = req.session.user
-//     const quantity=1
-//     try {
-//         const user = await User.findById(userId);      
-//         if (!user) {
-//             throw new Error('User not found');
-//         }
-//         let cart;
-//         if (user.cart) {
-//             cart = await Cart.findById(user.cart);
-//         } else {
-//             cart = new Cart();
-//             await cart.save();
-//             user.cart = cart._id;
-//             await user.save();
-//         }
-//         const productIndex = cart.products.findIndex(p => p.productId.toString() === productId);
-
-//         if (productIndex > -1) {
-//             cart.products[productIndex].quantity += quantity;
-//         } else {
-//             cart.products.push({ productId, quantity });
-//         }
-//         await cart.save();
-//         console.log(`Product added to cart: ${productId}`);
-//     } catch (error) {
-//         console.error('Error adding product to user cart:', error);
-//     }     
-// }
 
 module.exports = {
     getCart,getCheckout,addProductToCart,

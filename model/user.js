@@ -40,9 +40,10 @@ const userSchema = new mongoose.Schema({
   firstname: {type:String,require:true},
   lastname:{type: String,required:true},
   email: {type:String,reuired:true,unique:true},
+  phone:{type:Number, minlength: 10},
   password:{type:String},
   status: { type: Boolean, default: true },
-  cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' }
+  cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
 },{ timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

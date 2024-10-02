@@ -25,34 +25,6 @@ function getSignup(req,res){
     res.render('user/signup',{error})
 }
 
-async function getProfile(req,res){
-    const _id = req.session.user
-
- const user=await User.findOne({_id})
- console.log(user);
- 
-   res.render('user/profile',{user})
-}
-function getAddress(req,res){
-    res.render('user/address')
-}
-
-function getOrders(req,res){
-    res.render('user/order')
-}
-
-function getOrderDetails(req,res){
-  res.render('user/orderDetails')
-}
-
-function userLogOut(req,res){
-        req.session.destroy(err => {
-            if (err) {
-                return res.redirect('/user/profile'); // Redirect to profile on error
-            }
-           return res.redirect('/user/login'); // Redirect to login on success
-        });
-}
 
 async function userLogIn(req,res){
     const { email, password } = req.body;
@@ -129,7 +101,5 @@ async function getProduct(req,res){
 
 module.exports ={
     getLogin,getSignup,addUser,getHome,getShop,
-    getProduct,getProfile,userLogIn,userLogOut,
-    getAddress,getOrders,getOrderDetails
-
+    getProduct,userLogIn
 }

@@ -17,6 +17,17 @@
     <link rel="stylesheet" href="/styles/user/partials/navbar.css">
     <link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
     
+    <style>
+        .form-group {
+            margin: 0;
+        }
+        .is-invalid {
+            border-color: #dc3545;
+        }
+        .text-danger {
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
 
@@ -51,30 +62,26 @@
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <tbody>
-                            <tr>
-                                <td>
-                                    <div> John Doe</div>
-                                    <div> (123) 456-7890</div>
-                                    <div>123456</div>
-                                    <div> 123 Main St, Springfield, IL</div>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-warning btn-sm" onclick="populateEditModal('John Doe', '(123) 456-7890', '123456', '123 Main St, Springfield, IL')">Edit</button>
-                                    <button class="btn btn-danger btn-sm" onclick="confirmDelete('John Doe')">Delete</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div>Jane Smith</div>
-                                    <div>(987) 654-3210</div>
-                                    <div> 654321</div>
-                                    <div>456 Elm St, Springfield, IL</div>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-warning btn-sm" onclick="populateEditModal('Jane Smith', '(987) 654-3210', '654321', '456 Elm St, Springfield, IL')">Edit</button>
-                                    <button class="btn btn-danger btn-sm" onclick="confirmDelete('Jane Smith')">Delete</button>
-                                </td>
-                            </tr>
+                        <% if(address){ %>
+                            <% address.forEach(ad =>{ %>
+                                <tr>
+                                    <td>
+                                        <div> <%= ad.fullname %></div>
+                                        <div> <%= ad.phoneNumber %></div>
+                                        <div><%= ad.pincode %></div>
+                                        <div><%= ad.address %>,<%= ad.city %>,<br><%= ad.district %>,
+                                            <%= ad.state %>,<%= ad.country %></div>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-warning btn-sm" onclick="populateEditModal(' <%= ad.fullname %>',
+                                            '<%= ad.phoneNumber %>','<%= ad.pincode %>','<%= ad.address %>','<%= ad.city %>',
+                                            '<%= ad.district %>','<%= ad.state %>','<%= ad.country %>','<%= ad.type %>','<%=ad._id %>'
+                                        )">Edit</button>
+                                        <button class="btn btn-danger btn-sm" onclick="confirmDelete('John Doe')">Delete</button>
+                                    </td>
+                                </tr>
+                           <% }) %>
+                       <% } %>
                         </tbody>
                     </table>
                 </div>
@@ -94,32 +101,63 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="addAddressForm">
+                <form id="addAddressForm" action="/user/profile/address/add" method="post">
+
                     <div class="form-group">
-                        <label for="newUsername">Username</label>
-                        <input type="text" class="form-control" id="newUsername" required>
+                        <label for="fullName">Fullname</label>
+                        <input type="text" class="form-control" id="fullName" name="fullname" required>
+                        <span class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label for="newPhoneNumber">Phone Number</label>
-                        <input type="text" class="form-control" id="newPhoneNumber" required>
+                        <input type="text" class="form-control" id="newPhoneNumber" name="phoneNumber" required>
+                        <span class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label for="newPincode">Pincode</label>
-                        <input type="text" class="form-control" id="newPincode" required>
+                        <input type="text" class="form-control" id="newPincode" name="pincode" required>
+                        <span class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label for="newAddress">Address</label>
-                        <textarea class="form-control" id="newAddress" rows="3" required></textarea>
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="newCity">City</label>
+                        <input type="text" class="form-control" id="newCity" name="city" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="newDistrict">District</label>
+                        <input type="text" class="form-control" id="newDistrict" name="district" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="newState">State</label>
+                        <input type="text" class="form-control" id="newState" name="state" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="newCountry">Country</label>
+                        <input type="text" class="form-control" id="newCountry" name="country" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="newAddressLabel">Type</label>
+                        <input type="text" class="form-control" id="newAddressLabel" name="type" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="saveAddress">Save Address</button>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveAddress">Save Address</button>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Edit Address Modal -->
 <div class="modal fade" id="editAddressModal" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel" aria-hidden="true">
@@ -132,32 +170,64 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="editAddressForm">
+                <form id="editAddressForm" action="/user/profile/address/update" method="post">
                     <div class="form-group">
-                        <label for="editUsername">Username</label>
-                        <input type="text" class="form-control" id="editUsername" required>
+                        <label for="editFullName">Fullname</label>
+                        <input type="text" class="form-control" id="editFullName" name="fullname" required>
+                        <span class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label for="editPhoneNumber">Phone Number</label>
-                        <input type="text" class="form-control" id="editPhoneNumber" required>
+                        <input type="text" class="form-control" id="editPhoneNumber" name="phoneNumber" required>
+                        <span class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label for="editPincode">Pincode</label>
-                        <input type="text" class="form-control" id="editPincode" required>
+                        <input type="text" class="form-control" id="editPincode" name="pincode" required>
+                        <span class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label for="editAddress">Address</label>
-                        <textarea class="form-control" id="editAddress" rows="3" required></textarea>
+                        <input type="text" class="form-control" id="editAddress" name="address" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCity">City</label>
+                        <input type="text" class="form-control" id="editCity" name="city" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDistrict">District</label>
+                        <input type="text" class="form-control" id="editDistrict" name="district" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="editState">State</label>
+                        <input type="text" class="form-control" id="editState" name="state" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCountry">Country</label>
+                        <input type="text" class="form-control" id="editCountry" name="country" required>
+                        <span class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="editType">Label</label>
+                        <input type="text" class="form-control" id="editType" name="type" required>
+                        <input type="hidden" id="addressId" name="addressId">
+                        <span class="text-danger"></span>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="updateAddress">Update Address</button>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="updateAddress">Update Address</button>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Confirm Delete Modal -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
@@ -185,37 +255,111 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    // JavaScript to handle the add address modal
+    // JavaScript for real-time validation
+    function validateInput(input) {
+        const value = input.value.trim();
+        let isValid = true;
+        let message = '';
+
+        // Example validation logic
+        if (!value) {
+            isValid = false;
+            message = 'This field is required.';
+        } else if (input.id === 'newPhoneNumber' || input.id === 'editPhoneNumber') {
+            const phonePattern = /^[0-9]{10}$/;
+            if (!phonePattern.test(value)) {
+                isValid = false;
+                message = 'Phone number must be 10 digits.';
+            }
+        } else if (input.id === 'newPincode' || input.id === 'editPincode') {
+            const pincodePattern = /^[0-9]{6}$/;
+            if (!pincodePattern.test(value)) {
+                isValid = false;
+                message = 'Pincode must be 6 digits.';
+            }
+        } else if (input.id !== 'address' && input.id !== 'editAddress' && value.length < 3) {
+            isValid = false;
+            message = 'Must be at least 3 characters long.';
+        }
+
+        // Show error message or clear it
+        const errorMessageElement = input.nextElementSibling;
+        if (isValid) {
+            errorMessageElement.textContent = '';
+            input.classList.remove('is-invalid');
+        } else {
+            errorMessageElement.textContent = message;
+            input.classList.add('is-invalid');
+        }
+    }
+
+    // Event listeners for Add Address inputs
+    document.querySelectorAll('#addAddressModal input').forEach(input => {
+        input.addEventListener('input', () => validateInput(input));
+    });
+
+    // Event listeners for Edit Address inputs
+    document.querySelectorAll('#editAddressModal input').forEach(input => {
+        input.addEventListener('input', () => validateInput(input));
+    });
+
+    // Handle save address functionality
     document.getElementById('saveAddress').addEventListener('click', function() {
-        const address = document.getElementById('newAddress').value;
-        console.log('Address added:', address);
-        $('#addAddressModal').modal('hide');
+        const inputs = document.querySelectorAll('#addAddressModal input');
+        let allValid = true;
+
+        inputs.forEach(input => {
+            validateInput(input);
+            if (input.classList.contains('is-invalid')) {
+                allValid = false;
+            }
+        });
+
+        if (allValid) {
+            console.log('Address added:', Array.from(inputs).map(input => input.value));
+            $('#addAddressModal').modal('hide');
+        }
     });
 
     // Function to populate the edit address modal
-    function populateEditModal(username, phone, pincode, address) {
-        document.getElementById('editUsername').value = username;
+    function populateEditModal(name, phone, pincode, address,
+              city,district,state,country,type,id) {
+
+        document.getElementById('editFullName').value = name;
         document.getElementById('editPhoneNumber').value = phone;
         document.getElementById('editPincode').value = pincode;
         document.getElementById('editAddress').value = address;
+        document.getElementById('editCity').value = city;
+        document.getElementById('editDistrict').value = district;
+        document.getElementById('editState').value = state;
+        document.getElementById('editCountry').value = country;
+        document.getElementById('editType').value = type;
+        document.getElementById('addressId').value = id;
         $('#editAddressModal').modal('show');
     }
 
     // Handle update address functionality
     document.getElementById('updateAddress').addEventListener('click', function() {
-        const updatedUsername = document.getElementById('editUsername').value;
-        const updatedPhone = document.getElementById('editPhoneNumber').value;
-        const updatedPincode = document.getElementById('editPincode').value;
-        const updatedAddress = document.getElementById('editAddress').value;
+        const inputs = document.querySelectorAll('#editAddressModal input');
+        let allValid = true;
 
-        console.log('Address updated:', { updatedUsername, updatedPhone, updatedPincode, updatedAddress });
-        $('#editAddressModal').modal('hide');
+        inputs.forEach(input => {
+            validateInput(input);
+            if (input.classList.contains('is-invalid')) {
+                allValid = false;
+            }
+        });
+
+        if (allValid) {
+            console.log('Address updated:', Array.from(inputs).map(input => input.value));
+            $('#editAddressModal').modal('hide');
+        }
     });
 
     // Function to confirm delete
-    function confirmDelete(username) {
+    function confirmDelete(name) {
         document.getElementById('deleteAddress').onclick = function() {
-            console.log('Address deleted:', username);
+            console.log('Address deleted:', name);
             $('#confirmDeleteModal').modal('hide');
         };
         $('#confirmDeleteModal').modal('show');
