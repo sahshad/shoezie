@@ -12,7 +12,9 @@ const {getCategory,addCategory,uploadCategory,changeCategoryStatus} = require('.
 
 const { isAuthenticated } = require('../middleware/authMiddleware');
 
-const {getAllOrders,cancelOrder} = require('../controller/orderController')
+const {getAllOrders,changeOrderStatus,viewOrder} = require('../controller/orderController')
+
+
 
 router.get('/login', getLogin);
 router.post('/login', getHome);
@@ -23,7 +25,7 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
 router.get('/users', isAuthenticated, getUsers);
 router.patch('/users/:action/:id',changeUserStatus)
 
-router.get('/products',  getProducts);
+router.get('/products',isAuthenticated,  getProducts);
 router.post('/products/add',addUpload,addProduct)
 router.post('/products/edit',editUpload,editProduct)
 router.patch('/products/:action/:id',changeProductStatus)
@@ -32,8 +34,10 @@ router.get('/category', isAuthenticated, getCategory);
 router.post('/category/add',uploadCategory,addCategory)
 router.patch('/category/:action/:id',changeCategoryStatus)
 
-router.get('/orders',getAllOrders)
-router.patch('/orders/cancel/:orderId',cancelOrder)
+router.get('/orders',isAuthenticated,getAllOrders)
+router.get('/orders/view/:orderId',isAuthenticated,viewOrder)
+router.patch('/orders/status/:orderId',changeOrderStatus)
+
 router.get('/logout',getLogout)
 
 module.exports = router;

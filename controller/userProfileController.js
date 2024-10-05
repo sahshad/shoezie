@@ -34,13 +34,13 @@ async function getOrders(req,res){
 
 async function getOrderDetails(req, res) {
   const { orderId} = req.params; // Access orderId from req.body
-
   try {
       const order = await Order.findById(orderId).populate('items.productId')
 
       if (!order) {
           return res.status(404).json({ message: 'Order not found' });
       }
+      
       res.render('user/orderDetails', { order });
   } catch (error) {
       console.log(error);
@@ -130,13 +130,29 @@ try {
     } catch (error) {
     console.log(error); 
     return res.status(500).json({ message: 'Error editing address', error });  
+    }       
+}
+
+async function deleteAddress(req, res) {
+  const { addressId } = req.params;
+  
+  try {
+    const result = await Address.findByIdAndDelete(addressId);
+    
+    if (!result) {
+      return res.status(404).json({ message: 'Address not found' });
     }
     
-        
+    res.status(200).json({ message: 'Address deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
 }
+
 
 module.exports = {
     getProfile,userLogOut,
     getAddress,getOrders,getOrderDetails,
-    updateUserDetails,addAddress,updateAddress
+    updateUserDetails,addAddress,updateAddress,deleteAddress
 }

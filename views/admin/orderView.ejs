@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - SHOEZIE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .card-body{
+    padding: 10px;
+        }
+    body{
+        font-family:poppins;
+    }
+    </style>
+</head>
+<body>
+    <div class="container mt-5 mb-5">
+        <div class="row d-flex justify-content-between">
+            <h5 class="mb-4">Order Details</h5>
+            <div>
+                <a href="/admin/orders" class="mr-3">Back to Orders</a>
+            </div>           
+        </div>
+       
+        <% if(order){ %>
+        <div class="card">
+            
+            <div class="card-header">
+                <h6>Order #<%= order._id %></h6>
+                <p class="m-0">Order Date : <%= order.orderDate.toLocaleDateString() %></p>
+                <p class="">Order Time : <%= order.orderDate.toLocaleTimeString() %></p>
+                <p>Status: <span class="badge <%= 
+                    order.orderStatus === 'Pending' ? 'badge-warning' :
+                    order.orderStatus === 'Processing' ? 'badge-info' :
+                    order.orderStatus === 'Shipped' ? 'badge-primary' :
+                    order.orderStatus === 'Delivered' ? 'badge-success' :
+                    order.orderStatus === 'Cancelled' ? 'badge-danger' :
+                    '' // fallback class if needed
+                %>">
+                    <%= order.orderStatus %>
+                </span></p>
+            </div>
+            <div class="card-body">
+                <h6>Ordered Address</h6>
+                <p><%= order.shippingAddress.fullname %><br><%= order.shippingAddress.address %><br><%= order.shippingAddress.phone %></p>
+                
+                <h6>Ordered Products</h6>
+
+                <div class="row">
+                    <% order.items.forEach(order =>{ %>
+                    <div class="col-md-2">
+                        <div class="card mb-3">
+                            <img src="<%= order.productId.imageUrls[0] %>" class="card-img-top" alt="Item 1">
+                            <div class="card-body ">
+                                <p class="card-title m-0 "><small class="font-weight-bold"><%= order.productId.name %></small></p>
+                                <p class="card-text m-0"><small>Price: ₹ <%= order.price %>.00</small></p>
+                                <p class="card-text m-0"><small>Quantity: <%= order.quantity %></small></p>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <div class="row d-flex justify-content-between mt-3">
+                    <h6 class="ml-3">Total Price: ₹ <%= order.totalAmount %>.00</h6>
+                </div>
+               
+            </div>
+        </div>
+        <% } %>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

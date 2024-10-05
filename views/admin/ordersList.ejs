@@ -47,7 +47,7 @@
                                     <td><%= index+1 %></td>
                                     <td><%= order._id %></td>
                                     <td><%= order.userId.firstname %></td>
-                                    <td>
+                                    <td class="d-flex justify-content-between align-items-center">
                                         <span id="orderStatus" class="badge <%= 
                                             order.orderStatus === 'Pending' ? 'badge-warning' :
                                             order.orderStatus === 'Processing' ? 'badge-info' :
@@ -58,18 +58,18 @@
                                         %>">
                                             <%= order.orderStatus %>
                                         </span>
+                                        <div >
+                                            <button class="btn" onclick="openChangeStatusModal('<%= order._id %>')">
+                                                <i class="fa-solid fa-arrow-right-arrow-left" style="color: black;"></i>
+                                            </button>
+
+                                        </div>
                                     </td>
                                     <td>₹ <%= order.totalAmount.toFixed(2) %></td>
                                     <td>
-                                        <button class="btn btn-info btn-sm" onclick="viewOrder('<%= order._id %>',' <%= JSON.stringify(order.items) %>')">
+                                        <button class="btn btn-info btn-sm" onclick="location.href='/admin/orders/view/<%= order._id %>'">
                                             <i class="fas fa-eye"></i> View
-                                        </button>
-                                        <% if(order.orderStatus !== 'Cancelled'){ %>
-                                            <button class="btn btn-danger btn-sm" onclick="cancelOrder('<%= order._id %>')">
-                                                <i class="fas fa-times"></i> 
-                                            </button>
-                                        <% } %>
-                                       
+                                        </button>                                    
                                     </td>
                                 </tr>
                             <% }); %>
@@ -136,6 +136,35 @@
         </div>
     </div>
 </div>
+
+<!-- Modal for Changing Order Status -->
+<div class="modal fade" id="changeStatusModal" tabindex="-1" role="dialog" aria-labelledby="changeStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeStatusModalLabel">Change Order Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6>Order ID: <span id="changeOrderId"></span></h6>
+                <select class="form-control" id="changeOrderStatusSelect">
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitChangeStatus()">Change Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- Bootstrap and jQuery Scripts -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
@@ -147,39 +176,8 @@
             $('#viewOrderModal').modal('show');
         }
 
-        function cancelOrder(orderId) {
-            // Implement the AJAX call to cancel the order
-            console.log(`Cancelling order ${orderId}`);
-
-            fetch(`/admin/orders/cancel/${orderId}`,{
-                method:'PATCH',
-                headers: {
-            'Content-Type': 'application/json'}
-            })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json(); // Parse JSON response
-            
-        })
-        .then(data => {
-            // Handle success (e.g., notify the user, update the UI)
-            console.log('Order canceled successfully:', data);
-           const orderStatus= document.getElementById('orderStatus')
-            orderStatus.innerText='Cancelled'
-            orderStatus.classList.add('badge-danger')
-            location.reload()
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
-            // Optionally, notify the user about the error
-        });
-        }
-
         function changeOrderStatus() {
             const newStatus = document.getElementById('orderStatusSelect').value;
-            // Implement the AJAX call to change the order status
             console.log(`Changing order status to ${newStatus}`);
         }
 
@@ -187,6 +185,41 @@
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('page-content-wrapper').classList.toggle('toggled');
         });
+
+
+        function openChangeStatusModal(orderId) {
+    document.getElementById('changeOrderId').innerText = orderId;
+    $('#changeStatusModal').modal('show');
+}
+
+function submitChangeStatus() {
+    const orderId = document.getElementById('changeOrderId').innerText;
+    const newStatus = document.getElementById('changeOrderStatusSelect').value;
+    
+    console.log(`Changing order ${orderId} status to ${newStatus}`);
+
+    fetch(`/admin/orders/status/${orderId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ orderStatus: newStatus })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Order status changed successfully:', data);
+        location.reload();
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+}
+
     </script>
 </body>
 

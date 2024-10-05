@@ -34,32 +34,29 @@ async function createOrder(req,res){
         for (const item of items) {
             const productId = item.productId;
             const sizeId = item.sizeId;
-        
-            // Update the stock of the specified size
+
             const updateResult = await Product.updateOne(
-                { _id: productId, 'sizes._id': sizeId },  // Use updateOne for array element update
+                { _id: productId, 'sizes._id': sizeId },  
                 { $inc: { 'sizes.$.stock': -item.quantity } }
             );
         
         }
         
-
         const newOrder = new Order({
-            userId, // This should be the logged-in user's ID
-            items, // Array of products with productId, quantity, and price
-            shippingAddress, // Full name, address, pincode, and phone
+            userId, 
+            items, 
+            shippingAddress,
             totalAmount,
-            paymentMethod // Calculated total amount of the order
+            paymentMethod 
         });
-        // Save the order to the database
          await newOrder.save();
 
          const cartUpdateResult = await Cart.findOneAndUpdate(
-            { user: userId }, // Use findOneAndUpdate instead of findByIdAndUpdate
+            { user: userId },
             { $set: { products: [] } },
             { new: true }
         );
-        // Respond with success
+
         res.status(201).json({ message: 'Order placed successfully!', orderId: newOrder._id });
     } catch (error) {
         console.error(error);
@@ -83,11 +80,10 @@ async function cancelOrder(req,res){
     const {orderId} = req.params
 
     try {
-        // Find the order by ID and update the status
         const updatedOrder = await Order.findByIdAndUpdate(
             orderId,
             { orderStatus: 'Cancelled' },
-            { new: true } // Return the updated document
+            { new: true } 
         );
 
         if (!updatedOrder) {
@@ -102,6 +98,50 @@ async function cancelOrder(req,res){
     
 }
 
+async function changeOrderStatus(req, res) {
+    const { orderId } = req.params;
+    const { orderStatus } = req.body;
+  
+    try {
+      const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+      if (!validStatuses.includes(orderStatus)) {
+        return res.status(400).json({ message: 'Invalid order status' });
+      }
+
+      const updatedOrder = await Order.findByIdAndUpdate(
+        orderId,
+        { orderStatus },
+        { new: true } 
+      );
+  
+      if (!updatedOrder) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+  
+      return res.status(200).json({ message: 'Order status updated successfully', order: updatedOrder });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+async function viewOrder(req,res) {
+    const { orderId} = req.params; // Access orderId from req.body
+    try {
+        const order = await Order.findById(orderId).populate('items.productId')
+  
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        
+        res.render('admin/orderView', { order });
+    } catch (error) {
+        console.log(error);
+        // Return an error response if something goes wrong
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
 module.exports = {
-    createOrder,getAllOrders,cancelOrder
+    createOrder,getAllOrders,cancelOrder,changeOrderStatus,viewOrder
 }

@@ -61,6 +61,7 @@
                 <% product.forEach(product =>{%>
                     <% if(product.status){%>
                         <div class="col-md-3">
+                            <a href="shop/<%= product.id %>" class="card-link">
                             <div class="card">
                                 <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
                                 <div class="card-body" style="text-align: left;">
@@ -80,6 +81,7 @@
                                     </div>
                                 </div>
                             </div>
+                        </a>
                         </div>                
                     <% } %>
                 <%}) %>
@@ -99,6 +101,7 @@
                 <% product.forEach(product =>{%>
                     <% if(product.status){%>
                         <div class="col-md-3">
+                            <a href="shop/<%= product.id %>" class="card-link">
                             <div class="card">
                                 <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
                                 <div class="card-body" style="text-align: left;">
@@ -118,6 +121,7 @@
                                     </div>
                                 </div>
                             </div>
+                            </a>
                         </div>                
                     <% } %>
                 <%}) %>

@@ -5,7 +5,7 @@ userLogIn} = require('../controller/userController')
 
  const{    getProfile,userLogOut,
     getAddress,getOrders,getOrderDetails,updateUserDetails,
-    addAddress,updateAddress}= require('../controller/userProfileController')   
+    addAddress,updateAddress,deleteAddress}= require('../controller/userProfileController')   
 
 const { userAuthenticated} = require('../middleware/authMiddleware')
 
@@ -20,12 +20,13 @@ router.post('/login',userLogIn)
 router.get('/profile',userAuthenticated,getProfile)
 router.put('/profile/update',updateUserDetails)
 
-router.get('/profile/address',getAddress)
+router.get('/profile/address',userAuthenticated,getAddress)
 router.post('/profile/address/add',addAddress)
 router.post('/profile/address/update',updateAddress)
+router.delete('/profile/address/delete/:addressId',deleteAddress)
 
-router.get('/profile/orders',getOrders)
-router.get('/profile/orders/:orderId',getOrderDetails)
+router.get('/profile/orders',userAuthenticated,getOrders)
+router.get('/profile/orders/:orderId',userAuthenticated,getOrderDetails)
 router.patch('/profile/orders/cancel/:orderId',cancelOrder)
 
 router.get('/signup',getSignup)
@@ -37,7 +38,7 @@ router.get('/shop',getShop)
 router.get('/shop/:id',getProduct)
 
 router.get('/cart',userAuthenticated,getCart)
-router.get('/cart/checkout',getCheckout)
+router.get('/cart/checkout',userAuthenticated,getCheckout)
 router.post('/cart/checkout/confirm-order',createOrder)
 
 router.post('/cart/add/:productId/:sizeId',addProductToCart)

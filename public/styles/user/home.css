@@ -417,3 +417,13 @@ height: 100%; /* Full height */
     margin: 15px 60px;
 
 }
+
+.card-link {
+    text-decoration: none; /* Remove underline from the link */
+    color: inherit; /* Use inherited color for text */
+}
+
+.card-link:hover {
+    text-decoration: none; /* Keep it consistent on hover */
+    color: inherit; /* Ensure text color remains the same */
+}

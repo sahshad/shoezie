@@ -62,7 +62,7 @@
                                             '<%= ad.phoneNumber %>','<%= ad.pincode %>','<%= ad.address %>','<%= ad.city %>',
                                             '<%= ad.district %>','<%= ad.state %>','<%= ad.country %>','<%= ad.type %>','<%=ad._id %>'
                                         )">Edit</button>
-                                        <button class="btn btn-danger btn-sm" onclick="confirmDelete('John Doe')">Delete</button>
+                                        <button class="btn btn-danger btn-sm" onclick="confirmDelete('<%=ad._id %>')">Delete</button>
                                     </td>
                                 </tr>
                            <% }) %>
@@ -342,9 +342,25 @@
     });
 
     // Function to confirm delete
-    function confirmDelete(name) {
+    function confirmDelete(addressId) {
         document.getElementById('deleteAddress').onclick = function() {
-            console.log('Address deleted:', name);
+            fetch(`/user/profile/address/delete/${addressId}`, {
+                 method: 'DELETE',
+                 headers: {
+                 'Content-Type': 'application/json' 
+                    }
+            }).then(response => {
+                     if (!response.ok) {
+                    throw new Error('Network response was not ok'); 
+                }
+                return response.json(); 
+            }).then(data => {
+                console.log(data.message);
+                location.reload()
+            }).catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+
             $('#confirmDeleteModal').modal('hide');
         };
         $('#confirmDeleteModal').modal('show');
