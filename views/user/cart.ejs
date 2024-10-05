@@ -63,15 +63,20 @@
     
     <div class="row">
         <% let subtotal = 0; %> 
-        <% if (cart.length > 0) {%>
+        <% if (cart.products.length > 0) {%>
+
         <div class="col-md-8">
             <h4>Products</h4>
-                <% cart.forEach(cart => {%>
+                <% cart.products.forEach(cart => {%>
                     <div class="product-card">
                         <img src="<%= cart.productId.imageUrls[0] %>" class="img-fluid" alt="Stylish Sneakers" style="width: 75px; border-radius: 10px; margin-right: 20px;">
                         <div class="product-info">
                             <P class="font-weight-bold"><%= cart.productId.name %></P>
-                            <p>Size: <%= cart.sizeDetails.size %></p>
+
+                           <%   const size = cart.productId.sizes.find(size =>
+                             size._id.toString() === cart.sizeId.toString())   %>
+
+                            <p>Size: <%= size.size %></p>
                             <p >₹ <%= cart.productId.price %></p>
                         </div>
                         <div>
@@ -88,7 +93,7 @@
             <p class="text-center">there is no items in your cart  <a href="/user/shop">shop</a> now</p>
                        <% } %>
 
-        <% if(cart.length>0){ %>
+        <% if(cart.products.length > 0){ %>
         <div class="col-md-4">
             <h4>Order Summary</h4>
             <ul class="list-group">
@@ -98,15 +103,15 @@
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
                     <span>Discount:</span>
-                    <span>₹ 500</span>
+                    <span>₹ 0</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
                     <span>Delivery Fee:</span>
-                    <span>₹ 100</span>
+                    <span>₹ 0</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
                     <strong>Total:</strong>
-                    <strong>₹ <%= subtotal-500+100 %></strong>
+                    <strong>₹ <%= subtotal %></strong>
                 </li>
             </ul>
             <div class="text-center mt-4">
@@ -144,8 +149,7 @@
     }
 
 
-    // Debounce function to limit the rate at which updateQuantity is called
-let debounceTimer;
+ let debounceTimer;
 
 function debounceUpdateQuantity(cartId, newQuantity) {
     clearTimeout(debounceTimer);  // Clear the previous timer
@@ -154,7 +158,6 @@ function debounceUpdateQuantity(cartId, newQuantity) {
     }, 2000);  // 300ms delay
 }
 
-// Function to send AJAX request to update the quantity
 function updateQuantity(cartId, newQuantity) {
     // Ensure newQuantity is valid (i.e., > 0)
     if (newQuantity < 1) {

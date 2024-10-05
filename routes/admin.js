@@ -12,6 +12,7 @@ const {getCategory,addCategory,uploadCategory,changeCategoryStatus} = require('.
 
 const { isAuthenticated } = require('../middleware/authMiddleware');
 
+const {getAllOrders,cancelOrder} = require('../controller/orderController')
 
 router.get('/login', getLogin);
 router.post('/login', getHome);
@@ -31,6 +32,8 @@ router.get('/category', isAuthenticated, getCategory);
 router.post('/category/add',uploadCategory,addCategory)
 router.patch('/category/:action/:id',changeCategoryStatus)
 
+router.get('/orders',getAllOrders)
+router.patch('/orders/cancel/:orderId',cancelOrder)
 router.get('/logout',getLogout)
 
 module.exports = router;

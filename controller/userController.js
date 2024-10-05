@@ -78,7 +78,7 @@ const saltRounds = 10;
 }
 
 async function getHome(req,res){
-  const product = await Product.find({}).limit(4)
+  const product = await Product.find({}).limit(5)
   const category = await Category.find({})
     res.render('user/home',{product,category})
 }

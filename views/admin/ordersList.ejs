@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - Admin Dashboard - SHOEZIE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles/admin/dashboard.css">
+    <link rel="stylesheet" href="/styles/admin/products.css"> <!-- Add custom styles for the orders page -->
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <%- include('partials/sidebar.ejs') %>
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <!-- Navbar -->
+            <%- include('partials/navbar.ejs') %>
+            <!-- Content Area -->
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="mb-0">Orders</h5>
+                </div>
+                <!-- Order Table -->
+                <% if(orders.length > 0){ %>
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">No</th>
+                                <th scope="col">Order ID</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Order Status</th>
+                                <th scope="col">Total Amount</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.forEach((order,index) => { %>
+                                <tr>
+                                    <td><%= index+1 %></td>
+                                    <td><%= order._id %></td>
+                                    <td><%= order.userId.firstname %></td>
+                                    <td>
+                                        <span id="orderStatus" class="badge <%= 
+                                            order.orderStatus === 'Pending' ? 'badge-warning' :
+                                            order.orderStatus === 'Processing' ? 'badge-info' :
+                                            order.orderStatus === 'Shipped' ? 'badge-primary' :
+                                            order.orderStatus === 'Delivered' ? 'badge-success' :
+                                            order.orderStatus === 'Cancelled' ? 'badge-danger' :
+                                            '' // fallback class if needed
+                                        %>">
+                                            <%= order.orderStatus %>
+                                        </span>
+                                    </td>
+                                    <td>₹ <%= order.totalAmount.toFixed(2) %></td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" onclick="viewOrder('<%= order._id %>',' <%= JSON.stringify(order.items) %>')">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                        <% if(order.orderStatus !== 'Cancelled'){ %>
+                                            <button class="btn btn-danger btn-sm" onclick="cancelOrder('<%= order._id %>')">
+                                                <i class="fas fa-times"></i> 
+                                            </button>
+                                        <% } %>
+                                       
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <div>No orders found</div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+   <!-- Modal for Viewing Order Details -->
+<div class="modal fade" id="viewOrderModal" tabindex="-1" role="dialog" aria-labelledby="viewOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewOrderModalLabel">Order Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <h6>Order ID: <span id="orderId">12345</span></h6>
+                    <h6>Order Date: <span id="orderDate">2023-10-04</span></h6>
+                    <h6>Order Status: <span id="orderStatusDisplay">Pending</span></h6>
+                    <button class="btn btn-primary btn-sm" id="changeStatusButton" onclick="showChangeStatusOptions()">Change Status</button>
+                    <select class="form-control mt-2" id="orderStatusSelect" style="display: none;" onchange="changeOrderStatus()">
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                <h6>Products in this order:</h6>
+                <div class="row mb-3" id="orderProductsList">
+                    <!-- Example of a static product card -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card" style="width: 150px;"> <!-- Reduced card width -->
+                            <img src="path/to/product-image.jpg" class="card-img-top" alt="Product Name" style="height: 70px; object-fit: cover;"> <!-- Reduced image height -->
+                            <div class="card-body p-1"> <!-- Reduced padding -->
+                                <h6 class="card-title" style="font-size: 0.9rem;">Product Name</h6> <!-- Reduced font size -->
+                                <p class="card-text" style="font-size: 0.8rem;">₹499.99</p> <!-- Reduced font size -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- You can add more static cards similarly -->
+                </div>
+
+                <div>
+                    <h6>Total Price: ₹<span id="totalPrice">499.99</span></h6>
+                </div>
+                <div class="mt-3">
+                    <h6>Order Address:</h6>
+                    <p id="orderAddress" style="font-size: 0.9rem;">123 Main St, City, State, 12345</p> <!-- Reduced font size -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Bootstrap and jQuery Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function viewOrder(orderId, products) {
+            
+            document.getElementById('orderId').innerText=orderId
+            $('#viewOrderModal').modal('show');
+        }
+
+        function cancelOrder(orderId) {
+            // Implement the AJAX call to cancel the order
+            console.log(`Cancelling order ${orderId}`);
+
+            fetch(`/admin/orders/cancel/${orderId}`,{
+                method:'PATCH',
+                headers: {
+            'Content-Type': 'application/json'}
+            })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Parse JSON response
+            
+        })
+        .then(data => {
+            // Handle success (e.g., notify the user, update the UI)
+            console.log('Order canceled successfully:', data);
+           const orderStatus= document.getElementById('orderStatus')
+            orderStatus.innerText='Cancelled'
+            orderStatus.classList.add('badge-danger')
+            location.reload()
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+            // Optionally, notify the user about the error
+        });
+        }
+
+        function changeOrderStatus() {
+            const newStatus = document.getElementById('orderStatusSelect').value;
+            // Implement the AJAX call to change the order status
+            console.log(`Changing order status to ${newStatus}`);
+        }
+
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('page-content-wrapper').classList.toggle('toggled');
+        });
+    </script>
+</body>
+
+</html>

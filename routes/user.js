@@ -12,6 +12,8 @@ const { userAuthenticated} = require('../middleware/authMiddleware')
 const {getCart,getCheckout,addProductToCart,
     removeProductFromCart,updateProductQuantity} = require('../controller/cartController')
 
+const { createOrder,cancelOrder} = require('../controller/orderController')
+
 router.get('/login',getLogin)
 router.post('/login',userLogIn)
 
@@ -23,8 +25,8 @@ router.post('/profile/address/add',addAddress)
 router.post('/profile/address/update',updateAddress)
 
 router.get('/profile/orders',getOrders)
-router.get('/profile/orders/orderdetails',getOrderDetails)
-
+router.get('/profile/orders/:orderId',getOrderDetails)
+router.patch('/profile/orders/cancel/:orderId',cancelOrder)
 
 router.get('/signup',getSignup)
 router.post('/register',addUser)
@@ -36,6 +38,8 @@ router.get('/shop/:id',getProduct)
 
 router.get('/cart',userAuthenticated,getCart)
 router.get('/cart/checkout',getCheckout)
+router.post('/cart/checkout/confirm-order',createOrder)
+
 router.post('/cart/add/:productId/:sizeId',addProductToCart)
 router.delete('/cart/remove/:productId',removeProductFromCart)
 router.put('/cart/update/:productId',updateProductQuantity)

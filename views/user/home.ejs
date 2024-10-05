@@ -75,12 +75,12 @@
                                     </div>
                                     <p class="price">₹ <%= product.price %></p>
                                     <div class="button-group">
-                                        <a href="shop/<%= product.id %>" class="btn shop-btn btn-white">Buy Now</a>
-                                        <button onclick="addToCart('<%= product._id %>')" class="btn cart-btn btn-black">Add to Cart</button>
+                                        <a href="shop/<%= product.id %>" class="btn shop-btn btn-white">View Product</a>
+                                        <a class="ml-4 mt-1 mr-2"><i class="fa-regular fa-heart" style="color: #000000;"></i></a>
                                     </div>
                                 </div>
                             </div>
-                        </div>               
+                        </div>                
                     <% } %>
                 <%}) %>
             <% } %>
@@ -101,8 +101,8 @@
                         <div class="col-md-3">
                             <div class="card">
                                 <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
-                                <div class="card-body">
-                                    <h5 class="card-title"><%= product.name %></h5>
+                                <div class="card-body" style="text-align: left;">
+                                    <p class="card-title"><%= product.name %></p>
                                     <div class="star-rating">
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
@@ -113,12 +113,12 @@
                                     </div>
                                     <p class="price">₹ <%= product.price %></p>
                                     <div class="button-group">
-                                        <a href="shop/<%= product.id %>" class="btn shop-btn  btn-white">Buy Now</a>
-                                        <button onclick="addToCart('<%= product._id %>')" class="btn cart-btn btn-black">Add to Cart</button>
+                                        <a href="shop/<%= product.id %>" class="btn shop-btn btn-white">View Product</a>
+                                        <a class="ml-4 mt-1 mr-2"><i class="fa-regular fa-heart" style="color: #000000;"></i></a>
                                     </div>
                                 </div>
                             </div>
-                        </div>               
+                        </div>                
                     <% } %>
                 <%}) %>
             <% } %>

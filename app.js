@@ -9,7 +9,6 @@ const passport = require('passport')
 require('./passport');
 require('dotenv').config()
 
-
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -23,18 +22,14 @@ app.use(session({
     cookie:{secure:false}
 }))
 
-
 app.use(passport.initialize());
 app.use(passport.session());
 
 db()
 
-
-
 app.use('/user',userRoute)
 app.use('/admin',adminRoute)
 app.use('/auth',require('./routes/auth'))
-
 
 
 const PORT = process.env.PORT

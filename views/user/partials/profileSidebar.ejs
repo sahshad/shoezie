@@ -1,0 +1,32 @@
+<aside class="col-md-3" >
+    <div class="sidebar">
+        <div class="profile-photo">
+            <img src="/images/profile_photo.png" alt="Profile Photo" class="rounded-circle" style="width: 100px; height: 100px;">
+        </div>
+        <% if(user){ %>
+        <h5 class="username text-center "><%= user.firstname %> <br> <%= user.lastname %></h5>
+        <% } %>
+        <ul class="list-unstyled mt-5">
+            <li><a class="links" href="/user/profile"><i class="fas fa-user"></i> My Details</a></li>
+            <li><a class="links" href="/user/profile/address"><i class="fas fa-map-marker-alt"></i> Address</a></li>
+            <li><a class="links" href="/user/profile/orders"><i class="fas fa-box"></i> Orders</a></li>
+            <li><a class="links" href="/user/profile/wishlist"><i class="fas fa-heart"></i> Wishlist</a></li>
+        </ul>
+        <a href="/user/logout" class="btn btn-logout rounded-pill btn-sm btn-danger "><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+    
+</aside>
+
+<style>
+    .sidebar {
+    position: fixed;
+    top: 90px; /* Adjust as necessary */
+    left: 50px; /* Adjust to your layout */
+    width: 250px;
+  
+  
+    
+}
+
+
+</style>

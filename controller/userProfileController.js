@@ -1,28 +1,54 @@
 const User = require('../model/user')
 const Address = require('../model/address')
+const Order = require('../model/order')
 
 async function getProfile(req,res){
     const _id = req.session.user
 
  const user=await User.findOne({_id})
- console.log(user);
  
    res.render('user/profile',{user})
 }
 async function getAddress(req,res){
     const userId = req.session.user
+    const user = await User.findById(userId)
     const address = await Address.find({user:userId})
   
-    res.render('user/address',{address})
+    res.render('user/address',{address,user})
 }
 
-function getOrders(req,res){
-    res.render('user/order')
+async function getOrders(req,res){
+  const userId = req.session.user
+  try { 
+    const user = await User.findById(userId) 
+    const order = await Order.find({userId}).populate('items.productId')
+    if(!order){
+      throw new Error('Order not found')
+    }
+    res.render('user/order',{order,user})
+  } catch (error) {
+    console.log(error)
+  }
+    
 }
 
-function getOrderDetails(req,res){
-  res.render('user/orderDetails')
+async function getOrderDetails(req, res) {
+  const { orderId} = req.params; // Access orderId from req.body
+
+  try {
+      const order = await Order.findById(orderId).populate('items.productId')
+
+      if (!order) {
+          return res.status(404).json({ message: 'Order not found' });
+      }
+      res.render('user/orderDetails', { order });
+  } catch (error) {
+      console.log(error);
+      // Return an error response if something goes wrong
+      res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
 }
+
 
 function userLogOut(req,res){
         req.session.destroy(err => {

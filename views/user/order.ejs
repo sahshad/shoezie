@@ -27,25 +27,11 @@
 <main>
     <div class="container mt-5">
         <div class="row">
-            <aside class="col-md-3">
-                <div class="sidebar">
-                    <div class="profile-photo">
-                        <img src="/images/profile_photo.png" alt="Profile Photo" class="rounded-circle" style="width: 100px; height: 100px;">
-                    </div>
-                    <h5 class="username text-center">Username</h5>
-                    <ul class="list-unstyled mt-5">
-                        <li><a class="links" href="/user/profile"><i class="fas fa-user"></i> My Details</a></li>
-                        <li><a class="links" href="/user/profile/address"><i class="fas fa-map-marker-alt"></i> Address</a></li>
-                        <li><a class="links" href="/user/profile/orders"><i class="fas fa-box"></i> Orders</a></li>
-                        <li><a class="links" href="/user/profile/wishlist"><i class="fas fa-heart"></i> Wishlist</a></li>
-                    </ul>
-                    <a href="/logout" class="btn btn-logout rounded-pill btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                </div>
-            </aside>
-           
+            <%- include('partials/profileSidebar')  %>
             <div class="col-md-9 pl-5 mt-4">
                 <h5 class="mb-4">My Orders</h5>
                 <div class="table-responsive">
+                    <% if(order){ %>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -57,40 +43,45 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>2024-09-20</td>
-                                <td><span class="badge badge-success">Completed</span></td>
-                                <td>$150.00</td>
-                                <td>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex">
-                                            <img src="/images/item1.jpg" alt="Item 1" class="img-thumbnail" style="width: 50px; height: 50px;">
-                                            <img src="/images/item2.jpg" alt="Item 2" class="img-thumbnail" style="width: 50px; height: 50px;">
-                                            <img src="/images/item3.jpg" alt="Item 3" class="img-thumbnail" style="width: 50px; height: 50px;">
+                            <% order.forEach((order,index) =>{ %>
+                                <tr>
+                                    <td><%= index+1%></td>
+                                    <td><%= order.orderDate.toLocaleDateString() %></td>
+                                    <td>
+                                        <span class="badge <%= 
+                                            order.orderStatus === 'Pending' ? 'badge-warning' :
+                                            order.orderStatus === 'Processing' ? 'badge-info' :
+                                            order.orderStatus === 'Shipped' ? 'badge-primary' :
+                                            order.orderStatus === 'Delivered' ? 'badge-success' :
+                                            order.orderStatus === 'Cancelled' ? 'badge-danger' :
+                                            '' // fallback class if needed
+                                        %>">
+                                            <%= order.orderStatus %>
+                                        </span>
+                                    </td>
+                                    <td>₹ <%= order.totalAmount %>.00</td>
+                                    <td>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex">
+                                                <% order.items.forEach((item, index) => { %>
+                                                    <% if (index < 3) { %>
+                                                        <img src="<%= item.productId.imageUrls[0] %>" alt="Item <%= index + 1 %>" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 3px;">
+                                                    <% } %>
+                                                <% }) %>
+                                                
+                                                <% if (order.items.length > 3) { %>
+                                                    <span class="mt-2 ml-2">+<%= order.items.length -3 %></span>
+                                                <% } %>
+                                            </div>
+                                            <a href="/user/profile/orders/<%= order._id %>" class="btn btn-info  btn-sm ml-2"><i class="fa-regular fa-eye" style="color: #ffffff;"></i> View</a>
                                         </div>
-                                        <a href="/user/profile/orders/orderdetails" class="btn btn-primary btn-sm ml-2">View Order</a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>2024-09-15</td>
-                                <td><span class="badge badge-warning">Pending</span></td>
-                                <td>$75.00</td>
-                                <td>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="d-flex">
-                                            <img src="/images/item4.jpg" alt="Item 4" class="img-thumbnail" style="width: 50px; height: 50px;">
-                                            <img src="/images/item5.jpg" alt="Item 5" class="img-thumbnail" style="width: 50px; height: 50px;">
-                                        </div>
-                                        <a href="/user/profile/orders/orderdetails" class="btn btn-primary btn-sm ml-2">View Order</a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- Add more orders as needed -->
+                                    </td>
+                                </tr>
+                           <% }) %>
+                            
                         </tbody>
                     </table>
+                    <% } %>
                 </div>
             </div>
         </div>
