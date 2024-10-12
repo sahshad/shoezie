@@ -10,7 +10,8 @@
     });
  let deletedImages = [];
  let originalData={}
- let newImages = []; 
+ let newImages = [];
+ let croppedImages = [] 
  let deletedSizes = [];
 //populate edit fields with existing data
 function populateEditModal(name, description,category, price, sizes, imageUrl,id) {
@@ -221,7 +222,10 @@ function openCropper(imageUrl, imageWrapper) {
             // Replace the original image
             const imgElement = currentImageWrapper.querySelector('img');
             imgElement.src = croppedImageUrl; // Update the image source
-
+            const index =newImages.indexOf(imageUrl)
+            newImages.splice(index,1)
+            newImages.push(croppedImageUrl)
+            
             cropper.destroy(); // Clean up
             cropper = null;
             cropperContainer.style.display = 'none'; // Hide cropping container
@@ -498,6 +502,7 @@ document.getElementById('editProductButton').addEventListener('click', function(
                 return response.json().then(err => {
                     console.error('Error details:', err);
                 });
+                
             }
             return response.json(); // Assuming you expect a JSON response
         })

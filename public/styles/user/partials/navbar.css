@@ -7,7 +7,7 @@ html, body {
 }
 
 body {
-    background-color: #f4f4f4;
+    background-color: #ffffff;
 }
 
 /* Ensure hero section takes full height of viewport without scrolling */
@@ -19,50 +19,50 @@ body {
 
 /* Header Styles */
 .navbar {
-    background-color: #FFFBEA !important; /* Light yellowish */
+    background-color: #f0f0f0 !important; 
 }
 
 .navbar-brand {
-    color: #000 !important; /* Brand name color to black */
+    color: #000 !important; 
     font-weight: 600;
 }
 
-/* Add spacing between navigation links */
 .navbar-nav .nav-item {
     margin-right: 15px;
 }
 
 .navbar-nav .nav-link {
-    color: #000 !important;
+    color: #000 !important;  
 }
 
 .navbar-nav .nav-link:hover {
-    background-color: #F3EACB !important; /* Slightly darker yellow */
-    border-radius: 5px;
+    color: #818181 !important;
 }
 
-/* Move search bar slightly left */
 .search-container {
-    margin-right: 50px; /* Move search container 50px to the left */
+    margin-right: 50px; 
 }
 
 .search-container input {
-    background-color: #FFFBEA;
+    background-color: #ffffff;
 }
-
+.search-container input:focus{
+    border-color:rgb(171, 171, 171) ;
+    box-shadow: none;
+}
 .search-container button {
-    background-color: #000; /* Black */
+    background-color: #000; 
     color: #fff;
 }
 
 .search-container button:hover {
-    background-color: #F5BF25; /* Yellow */
+    background-color: #5e5e5e; 
+    color: white;
+}
+.icons a {
+    color: #000 !important;
 }
 
 .icons a:hover {
-    color: #F5BF25 !important;
-}
-
-.icons a {
-    color: #000 !important;
+    color: #818181 !important;
 }

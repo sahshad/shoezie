@@ -11,11 +11,11 @@
             <li class="nav-item"><a class="nav-link" href="/user/login">Sign In</a></li>
         </ul>
         <form class="form-inline ml-auto search-container">
-            <input class="form-control mr-2" type="search" placeholder="Search">
+            <input id="searchInput" class="form-control mr-2" type="search" placeholder="Search" oninput="filterProducts()">
             <button class="btn" type="submit"><i class="fas fa-search"></i></button>
         </form>
         <div class="ml-3 icons">
-            <a href="#" class="icon pr-3"><i class="fas fa-heart"></i></a>
+            <a href="/user/wishlist" class="icon pr-3"><i class="fas fa-heart"></i></a>
             <a href="/user/cart" class="icon pr-3"><i class="fas fa-shopping-cart"></i></a>
             <a href="/user/profile" class="icon"><i class="fas fa-user"></i></a>
         </div>

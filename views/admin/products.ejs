@@ -17,6 +17,12 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/styles/admin/dashboard.css"> <!-- Point to your custom CSS -->
     <link rel="stylesheet" href="/styles/admin/products.css"> <!-- Add custom styles for the products page -->
+    <style>
+        .is-invalid {
+    border-color: red;
+}
+
+    </style>
 </head>
 
 <body>
@@ -100,7 +106,7 @@
                 </button>
             </div>
             <div class="modal-body p-3">
-                <form id="addProductForm" action="/admin/product" method="POST" enctype="multipart/form-data">
+                <form id="addProductForm" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -208,7 +214,7 @@
                 </button>
             </div>
             <div class="modal-body p-3">
-                <form id="editProductForm" action="/admin/produ" method="POST" enctype="multipart/form-data">
+                <form id="editProductForm"  enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -270,7 +276,100 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- Cropper.js JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
+    <script>
+        // Function to validate the product name
+        // function validateProductName() {
+        //     const nameInput = document.getElementById('productName');
+        //     const nameValue = nameInput.value.trim();
+        //     const isValid = nameValue.length >= 3; // Minimum length of 3 characters
+        //     nameInput.classList.toggle('is-invalid', !isValid);
+        //     return isValid;
+        // }
+    
+        // // Function to validate the product price
+        // function validateProductPrice() {
+        //     const priceInput = document.getElementById('productPrice');
+        //     const priceValue = priceInput.value.trim();
+        //     const isValid = priceValue > 0; // Price must be greater than 0
+        //     priceInput.classList.toggle('is-invalid', !isValid);
+        //     return isValid;
+        // }
+    
+        // // Function to validate the product size and stock inputs
+        // function validateSizeStock() {
+        //     const sizeInputs = document.querySelectorAll('input[name="productSize[]"]');
+        //     const stockInputs = document.querySelectorAll('input[name="productStock[]"]');
+        //     let isValid = true;
+    
+        //     sizeInputs.forEach((input, index) => {
+        //         if (input.value.trim() === '' || stockInputs[index].value <= 0) {
+        //             input.classList.add('is-invalid');
+        //             stockInputs[index].classList.add('is-invalid');
+        //             isValid = false;
+        //         } else {
+        //             input.classList.remove('is-invalid');
+        //             stockInputs[index].classList.remove('is-invalid');
+        //         }
+        //     });
+    
+        //     return isValid;
+        // }
+    
+        // // Add event listeners for real-time validation on Add Product Modal
+        // document.getElementById('productName').addEventListener('input', validateProductName);
+        // document.getElementById('productPrice').addEventListener('input', validateProductPrice);
+        // document.querySelectorAll('input[name="productSize[]"], input[name="productStock[]"]').forEach(input => {
+        //     input.addEventListener('input', validateSizeStock);
+        // });
+    
+        // // Similar functions for Edit Product Modal
+        // function validateEditProductName() {
+        //     const nameInput = document.getElementById('editProductName');
+        //     const nameValue = nameInput.value.trim();
+        //     const isValid = nameValue.length >= 3; // Minimum length of 3 characters
+        //     nameInput.classList.toggle('is-invalid', !isValid);
+        //     return isValid;
+        // }
+    
+        // function validateEditProductPrice() {
+        //     const priceInput = document.getElementById('editProductPrice');
+        //     const priceValue = priceInput.value.trim();
+        //     const isValid = priceValue > 0; // Price must be greater than 0
+        //     priceInput.classList.toggle('is-invalid', !isValid);
+        //     return isValid;
+        // }
+    
+        // // Add event listeners for real-time validation on Edit Product Modal
+        // document.getElementById('editProductName').addEventListener('input', validateEditProductName);
+        // document.getElementById('editProductPrice').addEventListener('input', validateEditProductPrice);
+    
+        // // Validate on form submission
+        // document.getElementById('addProductButton').addEventListener('click', function(event) {
+        //     const isNameValid = validateProductName();
+        //     const isPriceValid = validateProductPrice();
+        //     const isSizeStockValid = validateSizeStock();
+    
+        //     if (!isNameValid || !isPriceValid || !isSizeStockValid) {
+        //         event.preventDefault(); // Prevent form submission if validation fails
+        //         alert('Please correct the highlighted fields.');
+        //     } else {
+        //         document.getElementById('addProductForm').submit(); // Submit the form if valid
+        //     }
+        // });
+    
+        // document.getElementById('editProductButton').addEventListener('click', function(event) {
+        //     const isNameValid = validateEditProductName();
+        //     const isPriceValid = validateEditProductPrice();
+    
+        //     if (!isNameValid || !isPriceValid) {
+        //         event.preventDefault(); // Prevent form submission if validation fails
+        //         alert('Please correct the highlighted fields.');
+        //     } else {
+        //         document.getElementById('editProductForm').submit(); // Submit the form if valid
+        //     }
+        // });
+    </script>
+    
 </body>
 </html>
 

@@ -273,9 +273,12 @@ if (deletedImages && deletedImages.length > 0) {
     updates.imageUrls = product.imageUrls; // Assign updated imageUrls to updates
 }
         // Update the product
-        await Product.findByIdAndUpdate(id, updates, { new: true });
-
+        const result = await Product.findByIdAndUpdate(id, updates, { new: true });
+        
+      if(result){
         res.status(200).json({ message: 'Product updated successfully' });
+
+      }
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error updating product', error });

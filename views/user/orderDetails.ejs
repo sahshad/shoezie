@@ -54,7 +54,7 @@ main{
                     order.orderStatus === 'Shipped' ? 'badge-primary' :
                     order.orderStatus === 'Delivered' ? 'badge-success' :
                     order.orderStatus === 'Cancelled' ? 'badge-danger' :
-                    '' // fallback class if needed
+                    '' 
                 %>">
                     <%= order.orderStatus %>
                 </span></p>
@@ -82,7 +82,9 @@ main{
                 <div class="row d-flex justify-content-between mt-3">
                     <h6 class="ml-3">Total Price: ₹ <%= order.totalAmount %>.00</h6>
                     <% if(order.orderStatus !== 'Cancelled'){ %>
-                        <button class="btn btn-danger mr-3" onclick="cancelOrder('<%= order._id %>')">Cancel Order</button>
+                        <% if(order.orderStatus !== 'Delivered'){ %>
+                            <button class="btn btn-danger mr-3" onclick="cancelOrder('<%= order._id %>')">Cancel Order</button>
+                        <% } %>
                    <% } %>
                  
                 </div>

@@ -21,6 +21,9 @@
                 <img src="/images/Nike_Blazer_-removebg-preview.png" alt="Brand Image" class="img-fluid mt-3 w-75">
             </div>
             <div class="input-section">
+                <% if(error.length > 0){ %>
+                    <p id="error-message" class="text-center" style="color: red;"><small><%= error %></small></p>
+                       <% } %>
             <h5 class="text-center mb-3"><small>Admin Login</small></h5>
                 <form id="loginForm" class="pr-2" action="/admin/login" method="post">
                     <div class="form-group">
@@ -54,5 +57,13 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+            setTimeout(function() {
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage) {
+                errorMessage.style.display = 'none';
+            }
+        }, 5000);
+    </script>
 </body>
 </html>

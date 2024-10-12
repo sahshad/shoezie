@@ -3,63 +3,61 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: 'Poppins', sans-serif; /* Apply Poppins font globally */
+    font-family: 'Poppins', sans-serif;
 }
 
 body {
-    background-color: #f4f4f4;
+    background-color: #ffffff;
 }
 
-/* Ensure hero section takes full height of viewport without scrolling */
 main {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-/* Header Styles */
 .navbar {
-    background-color: #FFFBEA !important; /* Light yellowish */
+    background-color: #f0f0f0 !important; 
 }
 
 .navbar-brand {
-    color: #000 !important; /* Brand name color to black */
+    color: #000 !important; 
     font-weight: 600;
 }
 
-/* Add spacing between navigation links */
 .navbar-nav .nav-item {
     margin-right: 15px;
 }
 
 .navbar-nav .nav-link {
-    color: #000 !important;
+    color: #000 !important;  
 }
 
 .navbar-nav .nav-link:hover {
-    background-color: #F3EACB !important; /* Slightly darker yellow */
-    border-radius: 5px;
+    color: #818181 !important;
 }
 
-/* Move search bar slightly left */
 .search-container {
-    margin-right: 50px; /* Move search container 50px to the left */
+    margin-right: 50px; 
 }
 
 .search-container input {
-    background-color: #FFFBEA;
+    background-color: #ffffff;
 }
-
+.search-container input:focus{
+    border-color:rgb(171, 171, 171) ;
+    box-shadow: none;
+}
 .search-container button {
-    background-color: #000; /* Black */
+    background-color: #000; 
     color: #fff;
 }
 
 .search-container button:hover {
-    background-color: #F5BF25; /* Yellow */
+    background-color: #5e5e5e; 
+    color: white;
 }
 
-/* Hero Section */
 .hero-section {
     background-color: #fff; /* Set to white */
     padding: 50px 0;
@@ -85,12 +83,13 @@ main {
     padding: 10px 20px;
     text-decoration: none;
     font-size: 1.2em;
+    transition: all 0.2s ease;
 }
 
 .shop-button:hover {
-    background-color: white;
-    color: black;
-    border: 1px solid black;
+    background-color: #818181;
+    color: white;
+    text-decoration: none;
 }
 
 /* Statistics */
@@ -110,7 +109,7 @@ main {
 }
 
 .icons a:hover {
-    color: #F5BF25 !important;
+    color: #818181 !important;
 }
 .new-arrivals {
 padding: 50px 0;
@@ -118,22 +117,28 @@ text-align: center;
 }
 
 .card {
-margin: 20px;
 border: none; /* Remove border */
 transition: transform 0.2s;
 }
 
 .card:hover {
-transform: scale(1.05); /* Slight zoom effect */
+transform: scale(1.01); /* Slight zoom effect */
 }
 
+.card-body{
+    display: flex;
+    justify-content: space-between;
+}
 .star-rating {
 color: #F5BF25; /* Gold color for stars */
+font-size: x-small;
 }
 
-.price {
-font-weight: bold;
-color: #000;
+.category{
+ font-size:12px;
+ margin: 0;
+ margin-top: 2px;
+ color: #a4a4a4;
 }
 
 .top-selling {
@@ -141,24 +146,6 @@ padding: 50px 0;
 text-align: center;
 }
 
-.card {
-margin: 20px;
-border: none; /* Remove border */
-transition: transform 0.2s;
-}
-
-.card:hover {
-transform: scale(1.05); /* Slight zoom effect */
-}
-
-.star-rating {
-color: #F5BF25; /* Gold color for stars */
-}
-
-.price {
-font-weight: bold;
-color: #000;
-}
 
 .categories {
 padding: 50px 0;
@@ -370,12 +357,6 @@ height: 100%; /* Full height */
     text-align: center;
     font-size: 14px; /* Adjust font size */
     color: #555;
-}
-
-.fixed-height {
-    height: 200px; /* Set your desired height */
-    object-fit: cover; /* This maintains the aspect ratio */
-    width: 100%; /* Ensure it takes the full width of the card */
 }
 
 .button-group {

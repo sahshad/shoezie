@@ -62,22 +62,18 @@
                     <% if(product.status){%>
                         <div class="col-md-3">
                             <a href="shop/<%= product.id %>" class="card-link">
-                            <div class="card">
+                            <div class="card my-4">
                                 <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
-                                <div class="card-body" style="text-align: left;">
-                                    <p class="card-title"><%= product.name %></p>
-                                    <div class="star-rating">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star-half-alt"></i>
-                                        <span>(4.5)</span>
+                                <div class="card-body p-0 " style="text-align: left;">
+                                    <div>
+                                        <p class="card-title font-weight-bold my-2"><%= product.name %></p>
+                                        <p class="category"><%= product.category.name %> Shoe</p>
+                                        <p class="price">₹ <%= product.price %></p>
                                     </div>
-                                    <p class="price">₹ <%= product.price %></p>
+                       
                                     <div class="button-group">
-                                        <a href="shop/<%= product.id %>" class="btn shop-btn btn-white">View Product</a>
-                                        <a class="ml-4 mt-1 mr-2"><i class="fa-regular fa-heart" style="color: #000000;"></i></a>
+                                        <!-- <a href="shop/<%= product.id %>" class="btn shop-btn btn-white">View Product</a> -->
+                                        <!-- <a class="mr-2"><i class="fa-regular fa-heart" style="color: #000000;"></i></a> -->
                                     </div>
                                 </div>
                             </div>
@@ -98,30 +94,29 @@
         <div class="row">
             <!-- Card 1 -->
             <% if(product){%>
-                <% product.forEach(product =>{%>
+                <% product.forEach(product =>{%> 
                     <% if(product.status){%>
-                        <div class="col-md-3">
+                       <div class="col-md-3">
                             <a href="shop/<%= product.id %>" class="card-link">
-                            <div class="card">
+                            <div class="card my-4">
                                 <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
-                                <div class="card-body" style="text-align: left;">
-                                    <p class="card-title"><%= product.name %></p>
-                                    <div class="star-rating">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star-half-alt"></i>
-                                        <span>(4.5)</span>
-                                    </div>
-                                    <p class="price">₹ <%= product.price %></p>
-                                    <div class="button-group">
-                                        <a href="shop/<%= product.id %>" class="btn shop-btn btn-white">View Product</a>
-                                        <a class="ml-4 mt-1 mr-2"><i class="fa-regular fa-heart" style="color: #000000;"></i></a>
+                                <div class="card-body p-0 " style="text-align: left;">
+                                    <div>
+                                        <p class="card-title font-weight-bold my-2"><%= product.name %></p>
+                                        <div class="star-rating">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                            <span>(4.5)</span>
+                                        </div>
+                                        <p class="category"><%= product.category.name %> Shoe</p>
+                                        <p class="price">₹ <%= product.price %></p>
                                     </div>
                                 </div>
                             </div>
-                            </a>
+                        </a>
                         </div>                
                     <% } %>
                 <%}) %>
@@ -137,12 +132,14 @@
             <div class="row">
                 <!-- Vertical Category -->
                  <% category.forEach(category =>{%>
+                    <% if(category.status){ %>  
                     <div class="col-md-4">
                         <div class="category-card vertical">
                             <h5 class="category-title"><%= category.name %></h5>
                             <img src="<%= category.imageUrl %>" class="category-img" alt="Men's Fashion">
                         </div>
                     </div>
+                    <% } %>
                  <%}) %>
                     </div>
                 </div>

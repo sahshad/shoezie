@@ -69,7 +69,55 @@ async function changeCategoryStatus(req,res) {
     
 }
 
+async function editCategory(req, res) {
+    const { id } = req.params; // Get the category ID from the URL parameters
+    const { categoryName } = req.body; // Get the new category name from the request body
+    const imageFile = req.file; // Get the uploaded file
+
+    try {
+        // Find the category by ID
+        const category = await Category.findById(id);
+        
+        // If category not found, return an error
+        if (!category) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        if(category.name !== categoryName){
+            category.name = categoryName;
+        }
+
+        if (imageFile) {
+
+            const stream = streamifier.createReadStream(imageFile.buffer);
+            const uploadPromise = new Promise((resolve, reject) => {
+                streamifier.createReadStream(imageFile.buffer)
+                    .pipe(cloudinary.uploader.upload_stream(
+                        { folder: 'Category' }, 
+                        (error, result) => {
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(result.secure_url);
+                            }
+                        }
+                    ));
+            });
+
+            const secureUrl = await uploadPromise;
+            category.imageUrl = secureUrl;
+        }
+        await category.save();
+
+        return res.status(200).json({ message: 'Category updated successfully', category });
+    } catch (error) {
+        console.error('Error updating category:', error);
+        return res.status(500).json({ message: 'Server error', error });
+    }
+}
+
+
 module.exports = {getCategory,addCategory, 
     uploadCategory:upload.single('categoryImage'),
-    changeCategoryStatus
+    changeCategoryStatus,editCategory
 }

@@ -59,9 +59,17 @@
                                             <%= order.orderStatus %>
                                         </span>
                                         <div >
-                                            <button class="btn" onclick="openChangeStatusModal('<%= order._id %>')">
-                                                <i class="fa-solid fa-arrow-right-arrow-left" style="color: black;"></i>
-                                            </button>
+                                            <% if(order.orderStatus === 'Cancelled'){ %>
+                                                <button class="btn" onclick="openChangeStatusModal('<%= order._id %>')" disabled
+                                                    >
+                                                    <i class="fa-solid fa-arrow-right-arrow-left" style="color: black;"></i>
+                                                </button>
+                                            <%}else{ %>
+                                                <button class="btn" onclick="openChangeStatusModal('<%= order._id %>')">
+                                                    <i class="fa-solid fa-arrow-right-arrow-left" style="color: black;"></i>
+                                                </button>
+                                           <%  } %>
+                                            
 
                                         </div>
                                     </td>

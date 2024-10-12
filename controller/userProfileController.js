@@ -21,7 +21,7 @@ async function getOrders(req,res){
   const userId = req.session.user
   try { 
     const user = await User.findById(userId) 
-    const order = await Order.find({userId}).populate('items.productId')
+    const order = await Order.find({userId}).sort({createdAt:-1}).populate('items.productId')
     if(!order){
       throw new Error('Order not found')
     }
@@ -89,7 +89,8 @@ async function updateUserDetails(req,res){
 
 async function addAddress(req,res){
  const {fullname, phoneNumber, pincode, address,
-     city, district, state, country, type  } = req.body;
+     city, district, state, country, type  } = req.body
+
      const userId = req.session.user
      try {  
         // Create a new address instance

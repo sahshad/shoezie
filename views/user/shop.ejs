@@ -12,37 +12,184 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f4f4f4;
-        }
-
-        .card {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .price {
-            font-weight: bold;
-            font-size: 1.2em;
+            background-color: #ffffff;
         }
 
         .form-range {
             width: 100%;
         }
+        .card {
+        border: none; 
 
-        .fixed-height {
-    height: 220px; /* Set your desired height */
-    object-fit: cover; /* This maintains the aspect ratio */
-    width: 100%; /* Ensure it takes the full width of the card */
-}
+        }
 
-.card-link {
-    text-decoration: none; /* Remove underline from the link */
-    color: inherit; /* Use inherited color for text */
-}
+        .category{
+        font-size:12px;
+        margin: 0;
+        margin-top: 2px;
+        margin-bottom: 4px;
+        color: #a4a4a4;
+        }
 
-.card-link:hover {
-    text-decoration: none; /* Keep it consistent on hover */
-    color: inherit; /* Ensure text color remains the same */
-}
+        .card-body{
+            display: flex;
+            justify-content: space-between;
+        }
+        .star-rating {
+        color: #F5BF25; /* Gold color for stars */
+        font-size: x-small;
+        }
+
+        .card-link {
+            text-decoration: none; /* Remove underline from the link */
+            color: inherit; /* Use inherited color for text */
+        }
+
+        .card-link:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .sort-dropdown {
+            margin-left: auto;
+            margin-bottom: 15px
+        }
+        .sort-dropdown :hover {
+            cursor: pointer;
+        }
+
+        #sortOptions {
+            border: none;
+            background: transparent;
+        }
+
+        #sortOptions:focus {
+            outline: none; 
+            box-shadow: none;
+            border-color: inherit;
+        }
+        .filter-options {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .breadcrumb {
+            font-size: 0.8rem;
+            background: transparent;
+        }
+
+        .breadcrumb-item a {
+            color: #007bff; 
+        }
+
+        .breadcrumb-item.active {
+            color: #6c757d;
+        }
+
+        .filter {
+            text-decoration: none; 
+            color: rgb(0, 0, 0);
+        }
+
+        .filter:hover {
+            text-decoration: none; 
+            color: rgb(0, 0, 0);
+            cursor: pointer;
+         }
+    
+         .size-buttons button{
+            width: 65px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid rgb(212, 212, 212);
+            margin-right: 10px;
+            color: black;
+            transition: all 0.3s ease;
+         }
+         .size-buttons button:hover{
+            border: 1px solid black;
+         }
+
+         .filter-options {
+            position: sticky;
+            top: 80px; 
+            left: 30px;
+            padding: 15px; 
+            z-index: 12;
+            height: fit-content;
+
+        }
+        .sort-options{
+            position: sticky;
+            top: 0px;
+            z-index: 11;
+            background-color: #ffffff;
+        }
+      
+        .custom-checkbox {
+            display: flex;
+            align-items: center;
+            cursor: pointer; 
+            margin-bottom: 10px; 
+        }
+
+        .custom-checkbox input {
+            display: none; 
+        }
+
+        .checkmark {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #000000;
+            border-radius: 3px; 
+            margin-right: 10px; 
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .custom-checkbox input:checked + .checkmark {
+            background-color: #000000;
+        }
+
+        .custom-checkbox input:checked + .checkmark::after {
+            content: ''; 
+            position: absolute;
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px; 
+            border: solid white; 
+            border-width: 0 2px 2px 0; 
+            transform: rotate(45deg);
+        }
+
+        .filter-btn{
+            border: 1px solid black;
+            border-radius: 5px;
+            color: rgb(0, 0, 0);
+            background-color: white;
+            transition: all 0.3s ease;  
+        }
+        .filter-btn:hover{
+            background-color: #000000;
+            color: rgb(255, 255, 255);
+        }
+
+        .size-buttons button {
+            width: 65px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid rgb(212, 212, 212);
+            margin-right: 10px;
+            color: black;
+            background-color: #f7f7f7;
+            transition: all 0.3s ease;
+        }
+
+        .size-buttons button.selected {
+            background-color: #000000; /* Change background color when selected */
+            color: #ffffff; /* Change text color when selected */
+        }
 
     </style>
 </head>
@@ -50,71 +197,122 @@
 
 <!-- Navbar -->
 <%- include('partials/navbar') %>
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="#">Home</a></li>
-      <li class="breadcrumb-item"><a href="#">Library</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Data</li>
-    </ol>
-  </nav>
+
 <!-- Filter and Products Section -->
 <div class="container mt-4">
     <div class="row">
-        <!-- Filter Section -->
-        <div class="col-md-3">
-            <div class="row mt-3" id="filterOptions">
-                <div class="col-12">
-                    <h5>Filter by Category</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item">Men</li>
-                        <li class="list-group-item">Women</li>
-                        <li class="list-group-item">Kids</li>
-                    </ul>
-                </div>
-                <div class="col-12">
-                    <h5>Filter by Price</h5>
-                    <input type="range" min="0" max="50000" value="25000" class="form-range" id="priceRange">
-                    <div class="d-flex justify-content-between">
-                        <span>0</span>
-                        <span>50000</span>
-                    </div>
-                </div>
+        <!-- Sort Dropdown -->
+        <div class="col-md-12 d-flex sort-options">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Shop</li>
+                </ol>
+            </nav>
+
+            <div class="sort-dropdown">
+                <select id="sortOptions" class="form-control" onchange="sortProducts()">
+                    <option value="">Sort By</option>
+                    <option value="popularity">Popularity</option>
+                    <option value="priceLowToHigh">Price: Low to High</option>
+                    <option value="priceHighToLow">Price: High to Low</option>
+                    <option value="averageRating">Average Ratings</option>
+                    <option value="featured">Featured</option>
+                    <option value="newArrivals">New Arrivals</option>
+                    <option value="aToz">A - Z</option>
+                    <option value="zToa">Z - A</option>
+                </select>
             </div>
+
+            <!-- Filter Toggle Button -->
+            <a id="filterToggle " class="mt-2 ml-2 mr-2 filter" onclick="toggleFilter()">
+                <i class="fas fa-filter"></i> filter
+            </a>
         </div>
 
+        <!-- Filter Options -->
+        <div id="filterOptions" class="filter-options col-md-3 mt-0 pt-0">
+            <% if(category){ %> 
+            <h5 class="mb-3">Filter by Category</h5>
+            <div id="categoryFilter">
+            <% category.forEach(category =>{  %>
+                <% if(category.status){  %>
+                    <label class="custom-checkbox">
+                        <input type="checkbox" value="<%= category._id %>" onchange="toggleCategory(this)">
+                        <span class="checkmark"></span>
+                        <%= category.name %>
+                    </label>
+                    <%} %>
+                <% }) %>
+            </div>
+            <% } %>
+            <h5 class="my-3">Filter by Size</h5>
+            <div id="sizeFilter" class="size-buttons">
+                <button value="3" onclick="toggleSize(this)">3</button>
+                <button value="3.5" onclick="toggleSize(this)">3.5</button>
+                <button value="4" onclick="toggleSize(this)">4</button>
+                
+                <button value="4.5" onclick="toggleSize(this)">4.5</button>
+                <button value="5" onclick="toggleSize(this)">5</button>
+                <button value="5.5" onclick="toggleSize(this)">5.5</button>
+                
+                <button value="6" onclick="toggleSize(this)">6</button>
+                <button value="6.5" onclick="toggleSize(this)">6.5</button>
+                <button value="7" onclick="toggleSize(this)">7</button>
+                
+                <button value="7.5" onclick="toggleSize(this)">7.5</button>
+                <button value="8" onclick="toggleSize(this)">8</button>
+                <button value="8.5" onclick="toggleSize(this)">8.5</button>
+                
+                <button value="9" onclick="toggleSize(this)">9</button>
+                <button value="9.5" onclick="toggleSize(this)">9.5</button>
+                <button value="10" onclick="toggleSize(this)">10</button>
+                
+                <button value="10.5" onclick="toggleSize(this)">10.5</button>
+                <button value="11" onclick="toggleSize(this)">11</button>
+                <button value="11.5" onclick="toggleSize(this)">11.5</button>
+                
+                <button value="12" onclick="toggleSize(this)">12</button>
+            </div>
+        
+            <!-- Filter Button -->
+            <button id="filterButton" class=" btn-block filter-btn mt-2" onclick="applyFilters()">Filter</button>
+        </div>
+        
+        
+        
+
         <!-- Products Section -->
-        <div class="col-md-9">
+        <div id="productContainer" class="col-md-12">
             <div class="row">
                 <% if(product){%>
-            <% product.forEach(product =>{%>
-              <% if(product.status){%>
-                   <div class="col-md-4 mb-5">
-                            <a href="shop/<%= product.id %>" class="card-link">
-                            <div class="card">
-                                <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
-                                <div class="card-body" style="text-align: left;">
-                                    <p class="card-title"><%= product.name %></p>
-                                    <div class="star-rating">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star-half-alt"></i>
-                                        <span>(4.5)</span>
+                    <% product.forEach(product =>{%>
+                        <% if(product.status){%>
+                            <div id="productCard" class="col-md-3 mb-4 productCard">
+                                <a href="/user/shop/<%= product.id %>" class="card-link">
+                                    <div class="card">
+                                        <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
+                                        <div class="card-body p-0 " style="text-align: left;">
+                                            <div>
+                                                <p class="card-title font-weight-bold my-2"><%= product.name %></p>
+                                                <div class="star-rating">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                    <span>(4.5)</span>
+                                                </div>
+                                                <p class="category"><%= product.category.name %> Shoe</p>
+                                                <p class="price">₹ <%= product.price %></p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p class="price">₹ <%= product.price %></p>
-                                    <div class="button-group">
-                                        <a href="shop/<%= product.id %>" class="btn shop-btn btn-white">View Product</a>
-                                        <a class="ml-4 mt-1 mr-2"><i class="fa-regular fa-heart" style="color: #000000;"></i></a>
-                                    </div>
-                                </div>
+                                </a>
                             </div>
-                            </a>
-                        </div>
-              <%} %>
-            <%}) %>
-               <% } %>
-               
+                        <% } %>
+                    <% }) %>
+                <% } %>
             </div>
         </div>
     </div>
@@ -124,5 +322,167 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+
+let selectedCategories = [];
+let selectedSizes = [];
+
+    function setSelectedSortOption() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sortedBy = urlParams.get('sortedby');
+        if (sortedBy) {
+            document.getElementById('sortOptions').value = sortedBy; 
+        }
+    }
+    window.onload = setSelectedSortOption;
+
+    function sortProducts() {
+        const sortOption = document.getElementById('sortOptions').value;
+        const categoryFilter = document.getElementById('categoryFilter').value;
+
+        const queryParams = new URLSearchParams(window.location.search);
+        queryParams.delete('sortedby')
+        if (sortOption) queryParams.append('sortedby', sortOption);
+
+        window.location.href = `/user/shop/filter?${queryParams.toString()}`;
+    }
+
+    function toggleFilter() {
+        const productContainer = document.getElementById('productContainer')
+        const productCard = document.querySelectorAll('.productCard')
+
+        const filterOptions = document.getElementById('filterOptions');
+        if (filterOptions.style.display === 'none' || filterOptions.style.display === '') {
+            filterOptions.style.display = 'block';
+
+           productCard.forEach(card =>{
+            card.classList.remove('col-md-3')
+            card.classList.add('col-md-4')
+           })
+            productContainer.classList.remove('col-md-12')
+            productContainer.classList.add('col-md-9')
+            // productContainer.style='margin-left:285px'
+        } else {
+            productCard.forEach(card =>{
+            card.classList.remove('col-md-4')
+            card.classList.add('col-md-3')
+
+           })
+            productContainer.classList.remove('col-md-9')
+            productContainer.classList.add('col-md-12')
+            // productContainer.style='margin-left:0px'
+            filterOptions.style.display = 'none';
+        }
+    }
+
+    function filterProducts() {
+        sortProducts();
+    }
+
+    function toggleSize(button) {
+    const buttons = document.querySelectorAll('.size-buttons button');
+
+    if (button.classList.contains('selected')) {
+       button.classList.remove('selected')
+       const valueIndex = selectedSizes.indexOf(button.value);
+        if (valueIndex > -1) {
+            selectedSizes.splice(valueIndex, 1);
+        }
+    } else {
+        button.classList.add('selected');
+        selectedSizes.push(button.value)
+    }
+    console.log(selectedSizes);
+}
+
+function toggleCategory(checkbox) {
+    if (checkbox.checked) {
+        selectedCategories.push(checkbox.value);
+    } else {
+        selectedCategories = selectedCategories.filter(category => category !== checkbox.value);
+    }
+
+    console.log(selectedCategories);  
+}
+
+function applyFilters() {
+
+    const queryParams = new URLSearchParams(window.location.search);
+    queryParams.delete('sizes');
+    queryParams.delete('categories');
+
+    if (selectedSizes.length > 0) {
+        queryParams.append('sizes', JSON.stringify(selectedSizes));
+    }
+
+    // Add selected categories to the query
+    if (selectedCategories.length > 0) {
+        queryParams.append('categories', JSON.stringify(selectedCategories));
+    }
+
+    // Redirect to the filtered products page with the query parameters
+    window.location.href = `/user/shop/filter?${queryParams.toString()}`;
+}
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Function to get query parameters from the URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                sizes: params.get('sizes') ? JSON.parse(params.get('sizes')) : [],
+                categories: params.get('categories') ? JSON.parse(params.get('categories')) : []
+            };
+        }
+
+        // Function to highlight selected filters
+        function highlightSelectedFilters() {
+            const { sizes, categories } = getQueryParams();
+
+            // Highlight selected categories
+            categories.forEach(categoryId => {
+                const checkbox = document.querySelector(`input[type="checkbox"][value="${categoryId}"]`);
+                if (checkbox) {
+                    checkbox.checked = true; // Check the checkbox
+                    selectedCategories.push(checkbox.value)
+                }
+            });
+
+            // Highlight selected sizes
+            sizes.forEach(size => {
+                const sizeButton = document.querySelector(`.size-buttons button[value="${size}"]`);
+                if (sizeButton) {
+                    sizeButton.classList.add('selected'); 
+                    selectedSizes.push(sizeButton.value)
+                }
+            });
+        }
+
+        // Call the function to highlight selected filters
+        highlightSelectedFilters();
+    });
+
+ function filterProducts() {
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const productCards = document.querySelectorAll('.productCard');
+
+        productCards.forEach(card => {
+            const productName = card.querySelector('.card-title').textContent.toLowerCase();
+            if (productName.includes(searchInput)) {
+                card.style.display = ''; // Show the card
+            } else {
+                card.style.display = 'none'; // Hide the card
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterProducts);
+        }
+    });
+</script>
+
 </body>
 </html>

@@ -66,7 +66,7 @@ async function createOrder(req,res){
 
 async function getAllOrders(rq,res){
     try {      
-        const orders = await Order.find().populate('userId').populate('items.productId')
+const orders = await Order.find({}).populate('userId').populate('items.productId').sort({createdAt:-1})
         if(!orders){
          
         }
