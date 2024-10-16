@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupons - Admin Dashboard - SHOEZIE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles/admin/products.css"> <!-- Custom styles for coupons -->
+    <link rel="stylesheet" href="/styles/admin/dashboard.css"> <!-- Dashboard styles -->
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <%- include('partials/sidebar') %>
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <!-- Navbar -->
+            <%- include('partials/navbar') %>
+            <!-- Content Area -->
+            <div class="container">
+                <h5 class="mb-4">Coupons</h5>
+                <button id="createCouponBtn" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createCouponModal">Create Coupon</button>
+                
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Code</th>
+                            <th>Discount Amount</th>
+                            <th>Discount Type</th>
+                            <th>Max Discount</th>
+                            <th>Min Order Value</th>
+                            <th>Expires At</th>
+                            <th>Usage Limit</th>
+                            <th>Used Count</th>
+                        </tr>
+                    </thead>
+                    <tbody> 
+                        <% if(coupons.length > 0) { %>
+                            <% coupons.forEach((coupon, index) => { %>
+                                <tr>
+                                    <td><%= index + 1 %></td>
+                                    <td><%= coupon.code %></td>
+                                    <td><%= coupon.discountAmount %></td>
+                                    <td><%= coupon.discountType %></td>
+                                    <td><%= coupon.maxDiscount %></td>
+                                    <td><%= coupon.minOrderValue %></td>
+                                    <td><%= coupon.expiresAt.toLocaleString() %></td>
+                                    <td><%= coupon.usageLimit %></td>
+                                    <td><%= coupon.usedCount %></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="9" class="text-center">No Coupons Found</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Coupon Modal -->
+    <div class="modal fade" id="createCouponModal" tabindex="-1" aria-labelledby="createCouponModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createCouponModalLabel">Create Coupon</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="createCouponForm">
+                        <div class="form-group">
+                            <label for="code">Coupon Code:</label>
+                            <input type="text" class="form-control" id="code" name="code" required maxlength="20">
+                        </div>
+                        <div class="form-group">
+                            <label for="discountAmount">Discount Amount:</label>
+                            <input type="number" class="form-control" id="discountAmount" name="discountAmount" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="discountType">Discount Type:</label>
+                            <select class="form-control" id="discountType" name="discountType">
+                                <option value="flat">Flat</option>
+                                <option value="percentage">Percentage</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxDiscount">Max Discount:</label>
+                            <input type="number" class="form-control" id="maxDiscount" name="maxDiscount" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="minOrderValue">Minimum Order Value:</label>
+                            <input type="number" class="form-control" id="minOrderValue" name="minOrderValue" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="expiresAt">Expires At:</label>
+                            <input type="datetime-local" class="form-control" id="expiresAt" name="expiresAt" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="usageLimit">Usage Limit:</label>
+                            <input type="number" class="form-control" id="usageLimit" name="usageLimit" min="1" value="1">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Coupon</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap and jQuery Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.getElementById('createCouponForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            
+            // Create a new FormData object
+            const formData = new FormData();
+            formData.code = document.getElementById('code').value
+            formData.discountAmount= document.getElementById('discountAmount').value
+            formData.discountType= document.getElementById('discountType').value
+            formData.maxDiscount= document.getElementById('maxDiscount').value
+            formData.minOrderValue= document.getElementById('minOrderValue').value
+            formData.expiresAt= document.getElementById('expiresAt').value
+            formData.usageLimit= document.getElementById('usageLimit').value
+            // Send the request using Fetch API
+            fetch('/admin/coupons/create', {
+                method: 'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify({formData})
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Show SweetAlert based on the response
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Coupon Created!',
+                        text: 'Your coupon has been created successfully.',
+                    }).then(() => {
+                        location.reload(); // Reload the page to see the new coupon
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: data.message || 'An error occurred. Please try again.',
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An error occurred while creating the coupon.',
+                });
+            });
+        });
+    </script>
+</body>
+</html>

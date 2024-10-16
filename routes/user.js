@@ -13,7 +13,9 @@ const { userAuthenticated,preventCache} = require('../middleware/authMiddleware'
 const {getCart,getCheckout,addProductToCart,
     removeProductFromCart,updateProductQuantity} = require('../controller/cartController')
 
-const { createOrder,cancelOrder} = require('../controller/orderController')
+const { createOrder,cancelOrder,createRazorpayOrder} = require('../controller/orderController')
+
+const {validateCoupon} = require('../controller/coupon')
 
 const {
 getWishlist,
@@ -51,6 +53,8 @@ router.post('/cart/checkout/confirm-order',createOrder)
 router.post('/cart/add/:productId/:sizeId',addProductToCart)
 router.delete('/cart/remove/:productId',removeProductFromCart)
 router.put('/cart/update/:productId',updateProductQuantity)
+router.post('/cart/coupon/validate',validateCoupon)
+// router.post('/cart/create-razorpay-order',createRazorpayOrder)
 
 router.get('/wishlist',userAuthenticated,getWishlist)
 router.post('/wishlist/add',addProductToWishlist)

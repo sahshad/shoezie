@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offers - Admin Dashboard - SHOEZIE</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="/styles/admin/products.css">
+    <link rel="stylesheet" href="/styles/admin/dashboard.css">
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <%- include('partials/sidebar') %>
+
+        <div id="page-content-wrapper">
+            <%- include('partials/navbar') %>
+
+            <div class="container">
+                <h5 class="mb-4">Offers</h5>
+                <button id="createOfferBtn" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createOfferModal">Create Offer</button>
+
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Offer For</th>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Expires At</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    
+                        <!-- <tr>
+                            <td>1</td>
+                            <td>123</td>
+                            <td>Product</td>
+                            <td>Percentage</td>
+                            <td>10%</td>
+                            <td>2024-12-31 23:59</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="toggleOfferStatus('123', false)">Unlist</button>
+                            </td>
+                        </tr> -->
+                        <% if (offers.length > 0) { %>
+                            <% offers.forEach((offer, index) => { %>
+                                <tr data-offer-id="<%= offer.id %>">
+                                    <td><%= index + 1 %></td>
+                                    <td><%= offer.targetId.name %></td>
+                                    <td><%= offer.offerFor %></td>
+                                    <td><%= offer.offerType.charAt(0).toUpperCase() + offer.offerType.slice(1) %></td>
+                                    <td>
+                                        <%= offer.type === 'percentage' ? offer.value + '%' : '₹' + offer.value %>
+                                    </td>
+                                    <td><%= new Date(offer.expiresAt).toLocaleString() %></td>
+                                    <td>
+                                        <span class="badge <%= offer.isActive ? 'badge-success' : 'badge-danger' %>">
+                                            <%= offer.isActive ? 'Active' : 'Inactive' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm" 
+                                            onclick="toggleOfferStatus('<%= offer.id %>',this)">
+                                            <%= offer.isActive ? 'Unlist' : 'Activate' %>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                    
+                        <% } else { %>
+                            <tr>
+                                <td colspan="6" class="text-center">No Category Offers Found</td>
+                            </tr>
+                        <% } %>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Offer Modal -->
+    <div class="modal fade" id="createOfferModal" tabindex="-1" aria-labelledby="createOfferModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createOfferModalLabel">Create Offer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="createOfferForm">
+                        <div class="form-group">
+                            <label for="targetName">Product/Category Name:</label>
+                            <input type="text" class="form-control" id="targetName" name="targetName" required placeholder="Enter product or category name">
+                        </div>
+                        <div class="form-group">
+                            <label for="offerFor">Offer For:</label>
+                            <select class="form-control" id="offerFor" name="offerFor">
+                                <option value="Product">Product</option>
+                                <option value="Category">Category</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="offerType">Offer Type:</label>
+                            <select class="form-control" id="offerType" name="offerType">
+                                <option value="flat">Flat Discount</option>
+                                <option value="percentage">Percentage Discount</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="value">Value:</label>
+                            <input type="number" class="form-control" id="value" name="value" required min="0" placeholder="Discount value">
+                        </div>
+                        <div class="form-group" style="display: none;">
+                            <label for="maxDiscount">Max Discount (Optional):</label>
+                            <input type="number" class="form-control" id="maxDiscount" name="maxDiscount" min="0" placeholder="Maximum discount amount">
+                        </div>
+                        <div class="form-group">
+                            <label for="expiresAt">Expires At:</label>
+                            <input type="datetime-local" class="form-control" id="expiresAt" name="expiresAt" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Offer</button>
+                    </form>                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+       document.getElementById('createOfferForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const offerData = {
+        targetName: document.getElementById('targetName').value,
+        offerFor: document.getElementById('offerFor').value,
+        offerType: document.getElementById('offerType').value,
+        value: parseFloat(document.getElementById('value').value),
+        maxDiscount: parseFloat(document.getElementById('maxDiscount').value) || null,
+        expiresAt: document.getElementById('expiresAt').value,
+    };
+
+    fetch('/admin/offers/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(offerData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Success!', 'Offer created successfully.', 'success').then(() => location.reload());
+        } else {
+            Swal.fire('Error!', data.message || 'Failed to create offer.', 'error');
+        }
+    })
+    .catch(error => Swal.fire('Error!', 'An error occurred.', 'error'));
+});
+
+
+        function toggleOfferStatus(offerId, button) {
+    console.log(button.innerText);
+    if(button.innerText==='Unlist'){
+        isActive=true
+    }else{
+        isActive=false
+    }
+    const row = button.closest('tr');
+    const badge = row.querySelector('.badge');
+
+    badge.className = `badge ${isActive ? 'badge-danger' : 'badge-success'}`;
+    badge.textContent = isActive ? 'Inactive' : 'Active';
+    button.textContent = isActive ? 'Activate' : 'Unlist';
+    button.setAttribute('data-active', isActive);
+
+    fetch(`/admin/offers/${!isActive}/${offerId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            badge.className = `badge ${isActive ? 'badge-success' : 'badge-danger'}`;
+            badge.textContent = isActive ? 'Active' : 'Inactive';
+            button.textContent = isActive ? 'Unlist' : 'Activate';
+            button.setAttribute('data-active', isActive); 
+            
+            Swal.fire('Error!', data.message || 'Failed to update offer status.', 'error');
+        } else {
+            Swal.fire('Success!', `Offer ${isActive ? 'unlisted' : 'activated'} successfully.`, 'success');
+        }
+    })
+    .catch(error => {
+        badge.className = `badge ${isActive ? 'badge-success' : 'badge-danger'}`;
+        badge.textContent = isActive ? 'Active' : 'Inactive';
+        button.textContent = isActive ? 'Unlist' : 'Activate';
+        button.setAttribute('data-active', isActive); 
+        
+        Swal.fire('Error!', 'An error occurred.', 'error');
+    });
+}
+
+
+
+        document.getElementById('offerType').addEventListener('change', function () {
+    const maxDiscountField = document.getElementById('maxDiscount').parentElement;
+    maxDiscountField.style.display = this.value === 'percentage' ? 'block' : 'none';
+});
+
+    </script>
+</body>
+</html>

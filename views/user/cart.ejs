@@ -43,6 +43,8 @@
         width: 65px;
         margin-top: 5px; 
     }
+
+
     </style>
 </head>
 <body>
@@ -91,7 +93,7 @@
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
                     <span>Discount:</span>
-                    <span>₹ 0</span>
+                    <span id="discount">₹ 0</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
                     <span>Delivery Fee:</span>
@@ -102,6 +104,8 @@
                     <strong id="total">₹ <%= subtotal %></strong>
                 </li>
             </ul>
+
+            
             <div class="text-center mt-4">
                 <a href="/user/cart/checkout" class="btn btn-success">Go to Checkout <i class="fas fa-arrow-right"></i></a>
             </div>
@@ -172,11 +176,12 @@
 }
 
  let debounceTimer;
-
+ let currentStockValue;
 function debounceUpdateQuantity(cartId, newQuantity) {
     clearTimeout(debounceTimer); 
     debounceTimer = setTimeout(() => {
         updateQuantity(cartId, newQuantity); 
+        
     }, 2000);  
 }
 
@@ -245,6 +250,8 @@ function updateOrderSummary() {
         document.getElementById('subtotal').innerText = subtotal.toFixed(2);
         document.getElementById('total').innerText = subtotal.toFixed(2);
     }
+
+   
 </script>
 </body>
 </html>

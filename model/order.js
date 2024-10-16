@@ -33,7 +33,7 @@ const orderSchema = new mongoose.Schema({
     },
     orderStatus: {
         type: String,
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+        enum: ['Pending', 'Returned', 'Shipped', 'Delivered', 'Cancelled'],
         default: 'Pending'
     },
     shippingAddress: {
@@ -45,6 +45,10 @@ const orderSchema = new mongoose.Schema({
     paymentMethod :{
         type:String,
         required:true
+    },
+    paymentStatus:{
+        type:String,
+        required:true  
     },
     orderDate:{
         type:Date,
