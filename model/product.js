@@ -5,13 +5,13 @@ const sizeStockSchema = new mongoose.Schema({
     stock: { type: Number, required: true, min: 0 }, // Ensure stock is a non-negative number
 });
 
-const offerDetailsSchema = new mongoose.Schema({
-    offerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Offer' },
-    offerType: { type: String, enum: ['percentage', 'flat'], required: true },
-    discountAmount: { type: Number, required: true }, // Discount amount calculated
-    offerPrice: { type: Number, required: true }, // Final price after discount
-    expiresAt: { type: Date, required: true },
-});
+// const offerDetailsSchema = new mongoose.Schema({
+//     offerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Offer' },
+//     offerType: { type: String, enum: ['percentage', 'flat'], required: true },
+//     discountAmount: { type: Number, required: true }, // Discount amount calculated
+//     offerPrice: { type: Number, required: true }, // Final price after discount
+//     expiresAt: { type: Date, required: true },
+// });
 
 const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -20,10 +20,8 @@ const productSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     sizes: { type: [sizeStockSchema], required: true }, // Use the size-stock subdocument
     imageUrls: { type: [String], required: true },
-    productOfferDetails: offerDetailsSchema,
-    categoryOfferDetails: offerDetailsSchema,
-    appliedOfferDetails: offerDetailsSchema,
-    status: { type: Boolean, default: true }
+    status: { type: Boolean, default: true },
+    offers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Offer' }]
 }, {
     timestamps: true,
 });

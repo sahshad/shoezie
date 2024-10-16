@@ -285,14 +285,14 @@
         <!-- Products Section -->
         <div id="productContainer" class="col-md-12">
             <div class="row">
-                <% if(product){%>
-                    <% product.forEach(product =>{%>
-                        <% if(product.status){%>
+                <% if (product) { %>
+                    <% product.forEach(product => { %>
+                        <% if (product.status) { %>
                             <div id="productCard" class="col-md-3 mb-4 productCard">
-                                <a href="/user/shop/<%= product.id %>" class="card-link">
+                                <a href="/user/shop/<%= product._id %>" class="card-link">
                                     <div class="card">
                                         <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
-                                        <div class="card-body p-0 " style="text-align: left;">
+                                        <div class="card-body p-0" style="text-align: left;">
                                             <div>
                                                 <p class="card-title font-weight-bold my-2"><%= product.name %></p>
                                                 <div class="star-rating">
@@ -304,7 +304,16 @@
                                                     <span>(4.5)</span>
                                                 </div>
                                                 <p class="category"><%= product.category.name %> Shoe</p>
-                                                <p class="price">₹ <%= product.price %></p>
+                                                <p class="price">
+                                                    <% if (product.bestOffer) { %>
+                                                        <span style="text-decoration: line-through;">₹ <%= product.price %></span> 
+                                                        ₹ <%= (product.price - (product.bestOffer.offerType === 'percentage' ? 
+                                                            (product.price * product.bestOffer.value / 100) : 
+                                                            product.bestOffer.value)).toFixed(2) %>
+                                                    <% } else { %>
+                                                        ₹ <%= product.price %>
+                                                    <% } %>
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -313,7 +322,7 @@
                         <% } %>
                     <% }) %>
                 <% } %>
-            </div>
+                            </div>
         </div>
     </div>
 </div>

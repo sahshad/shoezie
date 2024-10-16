@@ -86,11 +86,67 @@ async function getHome(req,res){
     res.render('user/home',{product,category})
 }
 
-async function getShop(req,res){
-    const category = await Category.find({})
-    const product = await Product.find({}).populate('category')
-    res.render('user/shop',{product,category})
+// async function getShop(req,res){
+//     const category = await Category.find({})
+//     const product = await Product.find({}).populate('category')
+//     res.render('user/shop',{product,category})
+// }
+
+async function getShop(req, res) {
+    try {
+        const category = await Category.find({});
+        const product = await Product.find({})
+            .populate('category')
+            .populate('offers');
+
+        // Use Promise.all to handle asynchronous processing for each product
+        const productsWithBestOffers = await Promise.all(product.map(async product => {
+            const bestOffer = await getBestOffer(product.offers, product.price);
+            // Attach the best offer to the product
+            return {
+                ...product.toObject(), // Convert to plain object
+                bestOffer // Add best offer property
+            };
+        }));
+console.log(productsWithBestOffers);
+
+        res.render('user/shop', { product: productsWithBestOffers, category });
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send('Server error');
+    }
 }
+
+
+async function getBestOffer(offers, productPrice) {
+    if (!offers || offers.length === 0) return null; // No offers available
+
+    const effectiveOffers = offers.map(offer => {
+        let effectiveDiscount = 0;
+
+        if (offer.offerType === 'percentage') {
+            effectiveDiscount = (offer.value / 100) * productPrice;
+            if (offer.maxDiscount) {
+                effectiveDiscount = Math.min(effectiveDiscount, offer.maxDiscount);
+            }
+        } else if (offer.offerType === 'flat') {
+            effectiveDiscount = offer.value;
+        }
+
+        return {
+            offer,
+            effectiveDiscount
+        };
+    });
+
+    // Find the offer with the highest effective discount
+    const bestOffer = effectiveOffers.reduce((best, current) => {
+        return (best.effectiveDiscount > current.effectiveDiscount) ? best : current;
+    });
+
+    return bestOffer ? bestOffer.offer : null; // Return the original offer document
+}
+
 
 async function getProduct(req,res){
     const productId = req.params.id // Get the ID from the route parameters

@@ -66,12 +66,12 @@ async function addProductToCart(req, res) {
         );
 
         if (productInCart) {
-            if (size.stock <= productInCart.quantity) {
+            if (size.stock < productInCart.quantity) {
                 return res.status(400).json({success:false, message: `Only ${size.stock} items left` });
             }
             productInCart.quantity += quantity;
         } else {
-            if (size.stock <= quantity) {
+            if (size.stock < quantity) {
                 return res.status(400).json({success:false, message: `Only ${size.stock} items left` });
             }
             cart.products.push({ productId, sizeId, quantity });
