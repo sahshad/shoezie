@@ -203,7 +203,27 @@
             <div>
                 <span class="text-warning">★★★★☆ (4.0)</span>
             </div>
-            <p class="price">₹ <%= product.price %>.00</p>
+            <p class="price"> <% if (product.bestOffer) { %>
+
+                <span style="text-decoration: line-through; color: rgb(175, 175, 175); margin-right: 5px;">₹ <%= product.price %></span> 
+
+                    <% if(product.bestOffer.offerType === 'percentage' ){ %>
+                            <% if(product.bestOffer.maxDiscount){ %>
+<% if((product.price * product.bestOffer.value / 100) > product.bestOffer.maxDiscount){ %>
+₹ <%=(product.price-product.bestOffer.maxDiscount).toFixed(2)  %>
+<%}else{ %>
+₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
+<%}%>
+                            <% }else{ %>
+                                ₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
+                           <% } %>
+                       
+                    <% }else{ %>
+                        ₹ <%=(product.price-product.bestOffer.value ).toFixed(2) %>
+                    <% } %>
+            <% } else { %>
+                ₹ <%= (product.price).toFixed(2) %>
+            <% } %></p>
             <div class="line"></div>
             <label>Stock:</label>
             <div>

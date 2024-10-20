@@ -37,7 +37,8 @@ const couponSchema = new mongoose.Schema({
     usedCount: {
         type: Number, // Track how many times it has been used
         default: 0
-    }
+    },
+    isActive: { type: Boolean, default: true }
 });
 
 module.exports = mongoose.model('Coupon', couponSchema);

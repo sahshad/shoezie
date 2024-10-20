@@ -2,12 +2,40 @@ const Cart = require('../model/cart')
 const User = require('../model/user')
 const Address = require('../model/address')
 const Product = require('../model/product')
+const Category = require('../model/category')
+const { getBestOffer } = require('../utils/offerUtils')
+
+// async function getCart(req, res) {
+//     const userId = req.session.user;
+
+//     try {
+//         let cart = await Cart.findOne({ user: userId }).populate({path:'products.productId',populate:{path:'offers'}})     
+
+//         if (!cart) {
+//             const newCart = new Cart({
+//                 user: userId,
+//                 products: [],
+//             });
+//             await newCart.save();
+//             cart = newCart; 
+//         }
+
+//         res.render('user/cart', { cart });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send({ message: 'Server error' });
+//     }
+// }
 
 async function getCart(req, res) {
     const userId = req.session.user;
 
     try {
-        let cart = await Cart.findOne({ user: userId }).populate('products.productId')
+        let cart = await Cart.findOne({ user: userId })
+            .populate({
+                path: 'products.productId',
+                populate: { path: 'offers' }, 
+            });
 
         if (!cart) {
             const newCart = new Cart({
@@ -15,12 +43,43 @@ async function getCart(req, res) {
                 products: [],
             });
             await newCart.save();
-            cart = newCart; 
+            cart = newCart;
         }
 
-        res.render('user/cart', { cart });
+        const productsWithBestOffers = await Promise.all(
+            cart.products.map(async (item) => {
+                const product = item.productId;
+
+                const category = await Category.findById(product.category).populate('offers')
+                const categoryOffers = category ? category.offers : [];
+
+                const combinedOffers = [...product.offers, ...categoryOffers];       
+                const validOffers = combinedOffers.filter(offer => {
+                    if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
+                        return false; // Exclude this offer
+                    }
+                    return true; // Include this offer
+                });
+            
+                const hasValidOffer = validOffers.some(offer => {
+                    return offer.minProductPrice && offer.minProductPrice >= product.price;
+                });
+            
+                let bestOffer = null;
+            
+                if (!hasValidOffer) {
+                    bestOffer = await getBestOffer(validOffers, product.price);
+                }
+
+                return {
+                    ...item.toObject(),
+                    bestOffer, 
+                };
+            })
+        );
+        res.render('user/cart', { cart: { ...cart.toObject(), products: productsWithBestOffers}});
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching cart:', error);
         res.status(500).send({ message: 'Server error' });
     }
 }
@@ -28,9 +87,53 @@ async function getCart(req, res) {
 async function getCheckout(req,res){
     const userId = req.session.user 
     const address = await Address.find({user:userId})
-    const cart = await Cart.findOne({user:userId}).populate('products.productId')
- res.render('user/checkout',{address,cart})
+const cart = await Cart.findOne({user:userId})
+.populate({path:'products.productId',
+    populate:{path :'offers'}
+})
+
+const productsWithBestOffers = await Promise.all(
+    cart.products.map(async (item) => {
+        const product = item.productId;
+        
+        const category = await Category.findById(product.category).populate('offers')
+        const categoryOffers = category ? category.offers : [];
+
+        const combinedOffers = [...product.offers, ...categoryOffers];       
+        // const hasValidOffer = combinedOffers.some(offer => offer.minProductPrice >= product.price);
+
+        //     let bestOffer = null;
+
+        //     if (!hasValidOffer) {
+        //         bestOffer = await getBestOffer(combinedOffers, product.price);
+        //     }
+
+        const validOffers = combinedOffers.filter(offer => {
+                if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
+                    return false; // Exclude this offer
+                }
+                return true; // Include this offer
+            });
+        
+            const hasValidOffer = validOffers.some(offer => {
+                return offer.minProductPrice && offer.minProductPrice >= product.price;
+            });
+        
+            let bestOffer = null;
+        
+            if (!hasValidOffer) {
+                bestOffer = await getBestOffer(validOffers, product.price);
+            }
+        return {
+            ...item.toObject(),
+            bestOffer, 
+        };
+    })
+);
+
+ res.render('user/checkout',{address,cart: { ...cart.toObject(), products: productsWithBestOffers }})
 }
+
 
 async function addProductToCart(req, res) {
     const { productId, sizeId } = req.params;

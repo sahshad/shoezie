@@ -61,14 +61,34 @@
                 <% product.forEach(product =>{%>
                     <% if(product.status){%>
                         <div class="col-md-3">
-                            <a href="shop/<%= product.id %>" class="card-link">
+                            <a href="shop/<%= product._id %>" class="card-link">
                             <div class="card my-4">
                                 <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
                                 <div class="card-body p-0 " style="text-align: left;">
                                     <div>
                                         <p class="card-title font-weight-bold my-2"><%= product.name %></p>
                                         <p class="category"><%= product.category.name %> Shoe</p>
-                                        <p class="price">₹ <%= product.price %></p>
+                                        <p class="price"> <% if (product.bestOffer) { %>
+
+                                            <span style="text-decoration: line-through; color: rgb(175, 175, 175); margin-right: 5px;">₹ <%= product.price %></span> 
+
+                                                <% if(product.bestOffer.offerType === 'percentage' ){ %>
+                                                        <% if(product.bestOffer.maxDiscount){ %>
+<% if((product.price * product.bestOffer.value / 100) > product.bestOffer.maxDiscount){ %>
+₹ <%=(product.price-product.bestOffer.maxDiscount).toFixed(2)  %>
+<%}else{ %>
+₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
+<%}%>
+                                                        <% }else{ %>
+                                                            ₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
+                                                       <% } %>
+                                                   
+                                                <% }else{ %>
+                                                    ₹ <%=(product.price-product.bestOffer.value ).toFixed(2) %>
+                                                <% } %>
+                                        <% } else { %>
+                                            ₹ <%= (product.price).toFixed(2) %>
+                                        <% } %></p>
                                     </div>
                        
                                     <div class="button-group">
@@ -97,7 +117,7 @@
                 <% product.forEach(product =>{%> 
                     <% if(product.status){%>
                        <div class="col-md-3">
-                            <a href="shop/<%= product.id %>" class="card-link">
+                            <a href="shop/<%= product._id %>" class="card-link">
                             <div class="card my-4">
                                 <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
                                 <div class="card-body p-0 " style="text-align: left;">
@@ -112,7 +132,27 @@
                                             <span>(4.5)</span>
                                         </div>
                                         <p class="category"><%= product.category.name %> Shoe</p>
-                                        <p class="price">₹ <%= product.price %></p>
+                                        <p class="price"> <% if (product.bestOffer) { %>
+
+                                            <span style="text-decoration: line-through; color: rgb(175, 175, 175); margin-right: 5px;">₹ <%= product.price %></span> 
+
+                                                <% if(product.bestOffer.offerType === 'percentage' ){ %>
+                                                        <% if(product.bestOffer.maxDiscount){ %>
+<% if((product.price * product.bestOffer.value / 100) > product.bestOffer.maxDiscount){ %>
+₹ <%=(product.price-product.bestOffer.maxDiscount).toFixed(2)  %>
+<%}else{ %>
+₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
+<%}%>
+                                                        <% }else{ %>
+                                                            ₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
+                                                       <% } %>
+                                                   
+                                                <% }else{ %>
+                                                    ₹ <%=(product.price-product.bestOffer.value ).toFixed(2) %>
+                                                <% } %>
+                                        <% } else { %>
+                                            ₹ <%= (product.price).toFixed(2) %>
+                                        <% } %></p>
                                     </div>
                                 </div>
                             </div>

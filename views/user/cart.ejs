@@ -52,48 +52,84 @@
 
 <main class="container mt-5">
     <div class="row">
-        <% let subtotal = 0; %> 
-        <% if (cart.products.length > 0) {%>
-
+        <% let subtotal = 0; let totalDiscount = 0; %> 
+        <% if (cart.products.length > 0) { %>
+    
         <div class="col-md-8">
             <h4>Products</h4>
-                <% cart.products.forEach(cart => {%>
-                    <div class="product-card">
-                        <img src="<%= cart.productId.imageUrls[0] %>" class="img-fluid" alt="Stylish Sneakers" style="width: 75px; border-radius: 10px; margin-right: 20px;">
-                        <div class="product-info">
-                            <P class="font-weight-bold"><%= cart.productId.name %></P>
-
-                           <%   const size = cart.productId.sizes.find(size =>
-                             size._id.toString() === cart.sizeId.toString())   %>
-
-                            <p>Size: <%= size.size %></p>
-                            <p >₹ <%= cart.productId.price %></p>
-                        </div>
-                        <div>
-                            <span class="delete-icon" onclick="removeProduct('<%= cart._id %>')">
-                                <i class="fas fa-trash"></i>
-                            </span>
-                            <input type="number" value="<%= cart.quantity %>" min="1" class="form-control quantity-input" oninput="debounceUpdateQuantity('<%= cart._id %>', this.value)">
-                        </div>
+            <% cart.products.forEach(cart => { %>
+                <div class="product-card">
+                    <img src="<%= cart.productId.imageUrls[0] %>" class="img-fluid" 
+                         alt="Product Image" style="width: 75px; border-radius: 10px; margin-right: 20px;">
+                    <div class="product-info">
+                        <p class="font-weight-bold"><%= cart.productId.name %></p>
+    
+                        <% const size = cart.productId.sizes.find(size =>
+                             size._id.toString() === cart.sizeId.toString()) %>
+                        <p>Size: <%= size.size %></p>
+    
+                        <p class="price">
+                            <% let originalPrice = cart.productId.price; %>
+                            <% let finalPrice = originalPrice; %>
+                            <% let discountAmount = 0; %>
+    
+                            <% if (cart.bestOffer) { %>
+                                <span style="text-decoration: line-through; color: gray; margin-right: 5px;">
+                                    ₹ <%= originalPrice %>
+                                </span>
+    
+                                <% if (cart.bestOffer.offerType === 'percentage') { %>
+                                    <% 
+                                    discountAmount = Math.min(
+                                        (originalPrice * cart.bestOffer.value) / 100,
+                                        cart.bestOffer.maxDiscount || Infinity
+                                    ); 
+                                    finalPrice = originalPrice - discountAmount;
+                                    %>
+                                <% } else if (cart.bestOffer.offerType === 'flat') { %>
+                                    <% 
+                                    discountAmount = cart.bestOffer.value;
+                                    finalPrice = originalPrice - discountAmount;
+                                    %>
+                                <% } %>
+    
+                                ₹ <%= finalPrice.toFixed(2) %>
+                            <% } else { %>
+                                ₹ <%= originalPrice.toFixed(2) %>
+                            <% } %>
+                        </p>
+    
                     </div>
-                    <% subtotal += cart.productId.price * cart.quantity; %>
-                <% }); %>    
+                    <div>
+                        <span class="delete-icon" onclick="removeProduct('<%= cart._id %>')">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                        <input type="number" value="<%= cart.quantity %>" min="1" 
+                               class="form-control quantity-input" 
+                               oninput="debounceUpdateQuantity('<%= cart._id %>', this.value)">
+                    </div>
+                </div>
+    
+                <% subtotal += finalPrice * cart.quantity; %>
+                <% totalDiscount += discountAmount * cart.quantity; %>
+            <% }); %>    
         </div>
-        <% }else{ %>
-            <p class="text-center">there is no items in your cart  <a href="/user/shop">shop</a> now</p>
-                       <% } %>
-
-        <% if(cart.products.length > 0){ %>
+    
+        <% } else { %>
+            <p class="text-center">There are no items in your cart. <a href="/user/shop">Shop</a> now</p>
+        <% } %>
+    
+        <% if (cart.products.length > 0) { %>
         <div class="col-md-4">
             <h4>Order Summary</h4>
             <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between">
                     <span>Subtotal:</span>
-                    <span id="subtotal">₹ <%= subtotal %></span>
+                    <span id="subtotal">₹ <%= (subtotal+totalDiscount).toFixed(2) %></span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
-                    <span>Discount:</span>
-                    <span id="discount">₹ 0</span>
+                    <span>You Saved:</span>
+                    <span id="discount">₹ <%= totalDiscount.toFixed(2) %></span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
                     <span>Delivery Fee:</span>
@@ -101,17 +137,17 @@
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
                     <strong>Total:</strong>
-                    <strong id="total">₹ <%= subtotal %></strong>
+                    <strong id="total">₹ <%= (subtotal).toFixed(2) %></strong>
                 </li>
             </ul>
-
-            
+    
             <div class="text-center mt-4">
                 <a href="/user/cart/checkout" class="btn btn-success">Go to Checkout <i class="fas fa-arrow-right"></i></a>
             </div>
         </div>
         <% } %>
     </div>
+    
 </main>
 
 <!-- Bootstrap JS and dependencies -->
@@ -251,7 +287,41 @@ function updateOrderSummary() {
         document.getElementById('total').innerText = subtotal.toFixed(2);
     }
 
-   
+//     function calculateSummary() {
+//     let subtotal = 0;
+//     let totalDiscount = 0;
+
+//     document.querySelectorAll('.product-card').forEach((productCard) => {
+//         const priceElement = productCard.querySelector('.price').textContent.trim().replace('₹', '');
+//         const originalPriceElement = productCard.querySelector('span[style*="line-through"]');
+//         const quantity = productCard.querySelector('.quantity-input').value;
+
+//         const price = parseFloat(priceElement);
+//         const originalPrice = originalPriceElement
+//             ? parseFloat(originalPriceElement.textContent.trim().replace('₹', ''))
+//             : price;
+
+//         const discount = originalPrice - price;
+
+//         if (!isNaN(price) && !isNaN(quantity)) {
+//             subtotal += price * quantity;
+//             totalDiscount += discount * quantity;
+//         }
+//     });
+
+//     document.getElementById('subtotal').textContent = `₹ ${subtotal.toFixed(2)}`;
+//     document.getElementById('discount').textContent = `₹ ${totalDiscount.toFixed(2)}`;
+//     document.getElementById('total').textContent = `₹ ${(subtotal - totalDiscount).toFixed(2)}`;
+// }
+
+// // Recalculate summary when quantity changes
+// document.querySelectorAll('.quantity-input').forEach((input) => {
+//     input.addEventListener('input', calculateSummary);
+// });
+
+// // Initial calculation on page load
+// window.addEventListener('DOMContentLoaded', calculateSummary);
+
 </script>
 </body>
 </html>

@@ -51,12 +51,13 @@ async function getOrderDetails(req, res) {
 
 
 function userLogOut(req,res){
-        req.session.destroy(err => {
-            if (err) {
-                return res.redirect('/user/profile'); // Redirect to profile on error
-            }
-           return res.redirect('/user/login'); // Redirect to login on success
-        });
+  
+      if(req.session.user){
+        delete req.session.user
+        return res.redirect('/user/login');
+      }else{
+        return res.redirect('/user/profile');
+      }
 }
 
 async function updateUserDetails(req,res){

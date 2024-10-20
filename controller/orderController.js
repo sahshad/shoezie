@@ -6,6 +6,7 @@ const Order = require('../model/order')
 const Product = require('../model/product')
 const Cart = require('../model/cart')
 const Wallet = require('../model/wallet')
+const Coupon = require('../model/coupon')
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_ID_KEY,
@@ -34,12 +35,13 @@ const razorpay = new Razorpay({
 }
 
   async function createOrder(req, res) {
+
     const userId = req.session.user;
-    const { items, shippingAddress, totalAmount, paymentMethod, razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
-  console.log(req.body);
-  
+    const { items, shippingAddress, totalAmount, paymentMethod,
+       razorpayPaymentId, razorpayOrderId, razorpaySignature,
+       couponCode,couponDiscount,offerDiscount } = req.body;
+
     try {
-      // Validate product stock for all items
       for (const item of items) {
         const product = await Product.findById(item.productId);
         if (!product) throw new Error('Product not found');
@@ -52,7 +54,6 @@ const razorpay = new Razorpay({
         }
       }
   
-      // Reserve stock by updating quantities
       for (const item of items) {
         const updateResult = await Product.updateOne(
           { _id: item.productId, 'sizes._id': item.sizeId },
@@ -73,24 +74,37 @@ const razorpay = new Razorpay({
     //     }
     //   }
   
-      // Create new order in the database
       const newOrder = new Order({
         userId,
         items,
         shippingAddress,
         totalAmount,
+        couponDiscount : couponDiscount || 0,
+        offerDiscount : offerDiscount || 0,
         paymentMethod,
         paymentStatus: paymentMethod === 'razorpay' ? 'Paid' : 'Pending',
       });
       await newOrder.save();
   
-      // Clear the user's cart after placing the order
       await Cart.findOneAndUpdate(
         { user: userId },
         { $set: { products: [] } },
         { new: true }
       );
-  
+
+      if(couponCode){
+
+       const updatedCoupon = await Coupon.findOneAndUpdate(
+        { code: couponCode }, // Find coupon by code
+        { $inc: { usedCount: 1 } }, // Increment usedCount by 1
+        { new: true } // Return the updated document
+      );
+
+      if (!updatedCoupon) {
+        console.log('Coupon not found or already used limit reached.');
+        return;
+      }
+      }
       res.status(201).json({ message: 'Order placed successfully!', orderId: newOrder._id });
     } catch (error) {
       console.error(error);

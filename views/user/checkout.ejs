@@ -120,30 +120,61 @@
         <div class="col-md-6">
             <h5>Order Summary</h5>
             <div class="summary-card">
-                <% let subtotal = 0 %>
+                <% let subtotal = 0; let totalDiscount = 0; %> 
                 <% if(cart) { %>
+                   
                     <div id="cartData" data-cart='<%= JSON.stringify(cart) %>'></div>
-                    <% cart.products.forEach(cartItem => { %>
-                        <% subtotal += cartItem.productId.price * cartItem.quantity%>
+                    <% cart.products.forEach(cart => { %>
+                      
                         <div class="product-summary">
-                            <img src="<%= cartItem.productId.imageUrls[0] %>" alt="product img" width="50">
+                            <img src="<%= cart.productId.imageUrls[0] %>" alt="product img" width="50">
                             <div class="product-details">
-                                <strong><%= cartItem.productId.name %></strong><br>
-                                <% const size = cartItem.productId.sizes.find(size => size._id.toString() === cartItem.sizeId.toString()) %>
+                                <strong><%= cart.productId.name %></strong><br>
+                                <% const size = cart.productId.sizes.find(size => size._id.toString() === cart.sizeId.toString()) %>
                                 <span>Size: <%= size.size %></span>
                             </div>
                             <div class="quantity-details">
-                                <span>x <%= cartItem.quantity %></span>
+                                <span>x <%= cart.quantity %></span>
                             </div>
                             <div class="product-price">
-                                <span>₹ <%= cartItem.productId.price * cartItem.quantity %></span>
+                               <p class="price">
+                            <% let originalPrice = cart.productId.price; %>
+                            <% let finalPrice = originalPrice; %>
+                            <% let discountAmount = 0; %>
+
+                            <% if (cart.bestOffer) { %>
+                                <span style="text-decoration: line-through; color: gray; margin-right: 5px;">
+                                    ₹ <%= (originalPrice).toFixed(2) %>
+                                </span><br>
+                                <% if (cart.bestOffer.offerType === 'percentage') { %>
+                                    <% 
+                                    discountAmount = Math.min(
+                                        (originalPrice * cart.bestOffer.value) / 100,
+                                        cart.bestOffer.maxDiscount || Infinity
+                                    ); 
+                                    finalPrice = originalPrice - discountAmount;
+                                    %>
+                                <% } else if (cart.bestOffer.offerType === 'flat') { %>
+                                    <% 
+                                    discountAmount = cart.bestOffer.value;
+                                    finalPrice = originalPrice - discountAmount;
+                                    %>
+                                <% } %>
+    
+                                ₹ <%= finalPrice.toFixed(2) %>
+                            <% } else { %>
+                                ₹ <%= originalPrice.toFixed(2) %>
+                            <% } %>
+                        </p>
                             </div>
-                        </div>      
+                        </div>    
+                        <% subtotal += finalPrice * cart.quantity; %>
+                        <% totalDiscount += discountAmount * cart.quantity; %>  
                     <% }); %>
                 <% } %>
                 
                 <div class="pricing-summary">
-                    <ul class="list-group">
+                    <!-- <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between">
                             <span>Subtotal:</span>
                             <span id="subtotal">₹ <%= subtotal %></span>
@@ -160,10 +191,32 @@
                             <strong>Total:</strong>
                             <strong id="total">₹ <%= subtotal %></strong>
                         </li>
+                    </ul> -->
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">₹ <%= (subtotal+totalDiscount).toFixed(2) %></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>You Saved:</span>
+                            <span id="offerDiscount">₹ <%= totalDiscount.toFixed(2) %></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Coupon Discount:</span>
+                            <span id="couponDiscount">₹ 0</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Delivery Fee:</span>
+                            <span>₹ 0</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong>Total:</strong>
+                            <strong id="total">₹ <%= (subtotal).toFixed(2) %></strong>
+                        </li>
                     </ul>
                     <div class="mt-3 d-flex " style="gap:10px;">
                         <input type="text" id="couponCode" class="form-control" placeholder="Enter Coupon Code" />
-                        <button class="btn btn-primary " onclick="applyCoupon()">Apply </button>
+                        <button class="btn btn-primary "  onclick="applyCoupon()">Apply </button>
                     </div>
                     <div class="mt-3">
                         <h5 class="mt-3">Payment Method</h5>
@@ -291,9 +344,14 @@ async function placeOrder() {
     const pincode = document.querySelector('input[placeholder="Pincode"]').value;
     const phoneNumber = document.querySelector('input[placeholder="Phone Number"]').value;
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-    let  discount = document.getElementById('discount').innerHTML
-    discount = discount.replace(/[₹\s]/g, '');
-    parseFloat(discount);
+    const couponCode = document.getElementById('couponCode').value || null
+    let  couponDiscount = document.getElementById('couponDiscount').innerHTML || 0
+    let  offerDiscount = document.getElementById('offerDiscount').innerHTML || 0
+    couponDiscount = couponDiscount.replace(/[₹\s]/g, '');
+    parseFloat(couponDiscount);
+
+    offerDiscount = offerDiscount.replace(/[₹\s]/g, '');
+    parseFloat(offerDiscount);
 
     const cartElement = document.getElementById('cartData');
     const cart = JSON.parse(cartElement.getAttribute('data-cart'));
@@ -305,10 +363,10 @@ async function placeOrder() {
         price: item.productId.price
     }));
 
-    console.log(items);
 
     let totalAmount = cart.products.reduce((acc, item) => acc + (item.productId.price * item.quantity), 0);
-     totalAmount-=discount
+     totalAmount-=couponDiscount
+     totalAmount-=offerDiscount
     const shippingAddress = {
         fullname: fullName,
         address,
@@ -316,7 +374,8 @@ async function placeOrder() {
         phone: phoneNumber
     };
 
-    const orderData = { items, totalAmount, shippingAddress, paymentMethod };
+    const orderData = { items, totalAmount, shippingAddress,
+         paymentMethod,couponCode,offerDiscount,couponDiscount };
 
     if (paymentMethod === 'cashOnDelivery') {
         // Place COD order       
@@ -429,7 +488,7 @@ document.getElementById('placeOrderButton').addEventListener('click', function (
 
     function applyCoupon() {
     const couponCode = document.getElementById('couponCode').value.trim();
-    let subtotal = document.getElementById('subtotal').innerText
+    let subtotal = document.getElementById('total').innerText
      subtotal = subtotal.replace(/[₹\s]/g, '');
 parseFloat(subtotal);
 
@@ -452,7 +511,7 @@ console.log(subtotal);
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                document.getElementById('discount').innerText = `₹ ${data.discountAmount.toFixed(2)}`;
+                document.getElementById('couponDiscount').innerText = `₹ ${data.discountAmount.toFixed(2)}`;
                 const total = subtotal - data.discountAmount;
                 document.getElementById('total').innerText = `₹ ${total.toFixed(2)}`;
                 Toastify({

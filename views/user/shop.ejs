@@ -36,13 +36,13 @@
             justify-content: space-between;
         }
         .star-rating {
-        color: #F5BF25; /* Gold color for stars */
+        color: #F5BF25; 
         font-size: x-small;
         }
 
         .card-link {
-            text-decoration: none; /* Remove underline from the link */
-            color: inherit; /* Use inherited color for text */
+            text-decoration: none; 
+            color: inherit;
         }
 
         .card-link:hover {
@@ -187,8 +187,8 @@
         }
 
         .size-buttons button.selected {
-            background-color: #000000; /* Change background color when selected */
-            color: #ffffff; /* Change text color when selected */
+            background-color: #000000; 
+            color: #ffffff; 
         }
 
     </style>
@@ -196,7 +196,32 @@
 <body>
 
 <!-- Navbar -->
-<%- include('partials/navbar') %>
+<nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand font-weight-bold" href="#">SHOEZIE</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="/user/home">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/user/shop">Shop</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+            <li class="nav-item"><a class="nav-link" href="/user/login">Sign In</a></li>
+        </ul>
+        <form class="form-inline ml-auto search-container" onsubmit="return performSearch(event)">
+            <input id="searchInput" class="form-control mr-2" type="search" placeholder="Search for products..." required>
+            <button class="btn" id="searchButton" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+        
+        <div class="ml-3 icons">
+            <a href="/user/wishlist" class="icon pr-3"><i class="fas fa-heart"></i></a>
+            <a href="/user/cart" class="icon pr-3"><i class="fas fa-shopping-cart"></i></a>
+            <a href="/user/profile" class="icon"><i class="fas fa-user"></i></a>
+        </div>
+    </div>
+</nav>
 
 <!-- Filter and Products Section -->
 <div class="container mt-4">
@@ -306,12 +331,25 @@
                                                 <p class="category"><%= product.category.name %> Shoe</p>
                                                 <p class="price">
                                                     <% if (product.bestOffer) { %>
-                                                        <span style="text-decoration: line-through;">₹ <%= product.price %></span> 
-                                                        ₹ <%= (product.price - (product.bestOffer.offerType === 'percentage' ? 
-                                                            (product.price * product.bestOffer.value / 100) : 
-                                                            product.bestOffer.value)).toFixed(2) %>
+
+                                                        <span style="text-decoration: line-through; color: rgb(175, 175, 175); margin-right: 5px;">₹ <%= product.price %></span> 
+
+                                                            <% if(product.bestOffer.offerType === 'percentage' ){ %>
+                                                                    <% if(product.bestOffer.maxDiscount){ %>
+ <% if((product.price * product.bestOffer.value / 100) > product.bestOffer.maxDiscount){ %>
+₹ <%=(product.price-product.bestOffer.maxDiscount).toFixed(2)  %>
+<%}else{ %>
+₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
+<%}%>
+                                                                    <% }else{ %>
+                                                                        ₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
+                                                                   <% } %>
+                                                               
+                                                            <% }else{ %>
+                                                                ₹ <%=(product.price-product.bestOffer.value ).toFixed(2) %>
+                                                            <% } %>
                                                     <% } else { %>
-                                                        ₹ <%= product.price %>
+                                                        ₹ <%= (product.price).toFixed(2) %>
                                                     <% } %>
                                                 </p>
                                             </div>
@@ -327,7 +365,6 @@
     </div>
 </div>
 
-<!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -411,7 +448,6 @@ function toggleCategory(checkbox) {
     } else {
         selectedCategories = selectedCategories.filter(category => category !== checkbox.value);
     }
-
     console.log(selectedCategories);  
 }
 
@@ -425,39 +461,33 @@ function applyFilters() {
         queryParams.append('sizes', JSON.stringify(selectedSizes));
     }
 
-    // Add selected categories to the query
     if (selectedCategories.length > 0) {
         queryParams.append('categories', JSON.stringify(selectedCategories));
     }
 
-    // Redirect to the filtered products page with the query parameters
     window.location.href = `/user/shop/filter?${queryParams.toString()}`;
 }
 
     document.addEventListener("DOMContentLoaded", function() {
-        // Function to get query parameters from the URL
         function getQueryParams() {
             const params = new URLSearchParams(window.location.search);
             return {
                 sizes: params.get('sizes') ? JSON.parse(params.get('sizes')) : [],
-                categories: params.get('categories') ? JSON.parse(params.get('categories')) : []
+                categories: params.get('categories') ? JSON.parse(params.get('categories')) : [],
+                searchValue : params.get('search')
             };
         }
 
-        // Function to highlight selected filters
         function highlightSelectedFilters() {
-            const { sizes, categories } = getQueryParams();
-
-            // Highlight selected categories
+            const { sizes, categories,searchValue } = getQueryParams();
             categories.forEach(categoryId => {
                 const checkbox = document.querySelector(`input[type="checkbox"][value="${categoryId}"]`);
                 if (checkbox) {
-                    checkbox.checked = true; // Check the checkbox
+                    checkbox.checked = true; 
                     selectedCategories.push(checkbox.value)
                 }
             });
 
-            // Highlight selected sizes
             sizes.forEach(size => {
                 const sizeButton = document.querySelector(`.size-buttons button[value="${size}"]`);
                 if (sizeButton) {
@@ -465,32 +495,24 @@ function applyFilters() {
                     selectedSizes.push(sizeButton.value)
                 }
             });
-        }
 
-        // Call the function to highlight selected filters
+            if (searchValue) {
+             document.getElementById('searchInput').value = searchValue;
+            }
+        }
         highlightSelectedFilters();
     });
 
- function filterProducts() {
-        const searchInput = document.getElementById('searchInput').value.toLowerCase();
-        const productCards = document.querySelectorAll('.productCard');
+    function performSearch(event) {
+    event.preventDefault(); 
 
-        productCards.forEach(card => {
-            const productName = card.querySelector('.card-title').textContent.toLowerCase();
-            if (productName.includes(searchInput)) {
-                card.style.display = ''; // Show the card
-            } else {
-                card.style.display = 'none'; // Hide the card
-            }
-        });
+    const searchInput = document.getElementById('searchInput').value.trim();
+    if (searchInput) {
+        const queryParams = new URLSearchParams(window.location.search);
+        queryParams.set('search', searchInput); 
+        window.location.href = `/user/shop/filter?${queryParams.toString()}`; 
     }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', filterProducts);
-        }
-    });
+}
 </script>
 
 </body>

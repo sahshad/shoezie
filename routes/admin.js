@@ -14,9 +14,9 @@ const { isAuthenticated,preventCache } = require('../middleware/authMiddleware')
 
 const {getAllOrders,changeOrderStatus,viewOrder} = require('../controller/orderController')
 
-const {getCoupons,addCoupon} = require('../controller/coupon')
+const { getCoupons,addCoupon, editCoupon,changeCouponStatus } = require('../controller/coupon')
 
-const {getOffers,createOffer,changeOfferStatus} = require('../controller/offers')
+const { getOffers,createOffer,changeOfferStatus,editOffer } = require('../controller/offers')
 
 router.get('/login', getLogin);
 router.post('/login', getHome);
@@ -43,10 +43,13 @@ router.patch('/orders/status/:orderId',changeOrderStatus)
 
 router.get('/coupons',getCoupons)
 router.post('/coupons/create',addCoupon)
+router.patch('/coupons/:status/:id',changeCouponStatus)
+router.put('/coupons/update/:id',editCoupon)
 
 router.get('/offers',getOffers)
 router.post('/offers/create',createOffer)
-router.put('/offers/:status/:id',changeOfferStatus)
+router.patch('/offers/:status/:id',changeOfferStatus)
+router.put('/offers/update/:id',editOffer)
 
 router.get('/logout',getLogout)
 

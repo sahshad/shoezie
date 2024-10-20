@@ -42,6 +42,90 @@ async function addCoupon(req,res){
         }  
 }
 
+async function editCoupon(req, res) {
+    const { id } = req.params; // Assuming you're using route parameters to get the coupon ID
+    const {
+        code,
+        discountAmount,
+        discountType,
+        maxDiscount,
+        minOrderValue,
+        expiresAt,
+        usageLimit,
+        isActive // Allow changing the active status as well
+    } = req.body;
+
+    try {
+        const updatedCoupon = await Coupon.findByIdAndUpdate(
+            id,
+            {
+                code,
+                discountAmount,
+                discountType,
+                maxDiscount,
+                minOrderValue,
+                expiresAt,
+                usageLimit,
+                isActive
+            },
+            { new: true, runValidators: true } // Options: return the updated document and validate on update
+        );
+
+        if (!updatedCoupon) {
+            return res.status(404).json({ success: false, message: 'Coupon not found.' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Coupon updated successfully!', coupon: updatedCoupon });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'Failed to update coupon. Please try again.' });
+    }
+}
+
+
+// async function changeCouponStatus(req, res) {
+//     const { id } = req.params; // Assuming you're using route parameters to get the coupon ID
+    
+//     try {
+//         const coupon = await Coupon.findById(id);
+//         if (!coupon) {
+//             return res.status(404).json({ success: false, message: 'Coupon not found.' });
+//         }
+
+//         coupon.isActive = !coupon.isActive; // Toggle the active status
+//         await coupon.save();
+
+//         return res.status(200).json({ success: true, message: 'Coupon status updated successfully!', active: coupon.isActive });
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ success: false, message: 'Failed to update coupon status. Please try again.' });
+//     }
+// }
+
+async function changeCouponStatus(req, res) {
+    const { id } = req.params; // Get the coupon ID from route parameters
+    
+    try {
+        const coupon = await Coupon.findById(id);
+        if (!coupon) {
+            return res.status(404).json({ success: false, message: 'Coupon not found.' });
+        }
+
+        coupon.isActive = !coupon.isActive; // Toggle the active status
+        await coupon.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Coupon status updated successfully!',
+            active: coupon.isActive,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'Failed to update coupon status. Please try again.' });
+    }
+}
+
+
 
 async function validateCoupon (req, res){
     const { code, subtotal } = req.body;
@@ -82,5 +166,5 @@ async function validateCoupon (req, res){
     }
 }
 module.exports = {
-    getCoupons,addCoupon,validateCoupon
+    getCoupons,addCoupon,validateCoupon,changeCouponStatus,editCoupon
 }

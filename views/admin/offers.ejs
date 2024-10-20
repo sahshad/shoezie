@@ -27,9 +27,9 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>ID</th>
+                            <th>Target</th>
                             <th>Offer For</th>
-                            <th>Type</th>
+                            <!-- <th>Type</th> -->
                             <th>Value</th>
                             <th>Expires At</th>
                             <th>Status</th>
@@ -37,28 +37,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                    
-                        <!-- <tr>
-                            <td>1</td>
-                            <td>123</td>
-                            <td>Product</td>
-                            <td>Percentage</td>
-                            <td>10%</td>
-                            <td>2024-12-31 23:59</td>
-                            <td><span class="badge badge-success">Active</span></td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="toggleOfferStatus('123', false)">Unlist</button>
-                            </td>
-                        </tr> -->
                         <% if (offers.length > 0) { %>
                             <% offers.forEach((offer, index) => { %>
                                 <tr data-offer-id="<%= offer.id %>">
                                     <td><%= index + 1 %></td>
                                     <td><%= offer.targetId.name %></td>
                                     <td><%= offer.offerFor %></td>
-                                    <td><%= offer.offerType.charAt(0).toUpperCase() + offer.offerType.slice(1) %></td>
+                                    <!-- <td><%= offer.offerType.charAt(0).toUpperCase() + offer.offerType.slice(1) %></td> -->
                                     <td>
-                                        <%= offer.type === 'percentage' ? offer.value + '%' : '₹' + offer.value %>
+                                        <%= offer.offerType === 'percentage' ? offer.value + '%' : '₹' + offer.value %>
                                     </td>
                                     <td><%= new Date(offer.expiresAt).toLocaleString() %></td>
                                     <td>
@@ -67,22 +54,21 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <button class="btn btn-warning btn-sm" 
-                                            onclick="toggleOfferStatus('<%= offer.id %>',this)">
+                                        <button class="btn btn-warning btn-sm" onclick="openEditModal('<%= offer.id %>', '<%= offer.offerFor %>', '<%= offer.targetId.name %>', '<%= offer.offerType %>', '<%= offer.value %>', '<%= offer.expiresAt %>', '<%= offer.minProductPrice || 0 %>')">Edit</button>
+                                        <button class="btn btn-warning btn-sm" onclick="toggleOfferStatus('<%= offer.id %>', this)">
                                             <%= offer.isActive ? 'Unlist' : 'Activate' %>
                                         </button>
                                     </td>
                                 </tr>
                             <% }) %>
-                    
                         <% } else { %>
                             <tr>
                                 <td colspan="6" class="text-center">No Category Offers Found</td>
                             </tr>
                         <% } %>
-
                     </tbody>
                 </table>
+                
             </div>
         </div>
     </div>
@@ -100,16 +86,17 @@
                 <div class="modal-body">
                     <form id="createOfferForm">
                         <div class="form-group">
-                            <label for="targetName">Product/Category Name:</label>
-                            <input type="text" class="form-control" id="targetName" name="targetName" required placeholder="Enter product or category name">
-                        </div>
-                        <div class="form-group">
                             <label for="offerFor">Offer For:</label>
                             <select class="form-control" id="offerFor" name="offerFor">
                                 <option value="Product">Product</option>
                                 <option value="Category">Category</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="targetName">Product/Category Name:</label>
+                            <input type="text" class="form-control" id="targetName" name="targetName" required placeholder="Enter product or category name">
+                        </div>
+                        
                         <div class="form-group">
                             <label for="offerType">Offer Type:</label>
                             <select class="form-control" id="offerType" name="offerType">
@@ -121,6 +108,12 @@
                             <label for="value">Value:</label>
                             <input type="number" class="form-control" id="value" name="value" required min="0" placeholder="Discount value">
                         </div>
+
+                        <div class="form-group" id="minProductPriceField" style="display: none;">
+                            <label for="minProductPrice">Minimum Product Price:</label>
+                            <input type="number" class="form-control" id="minProductPrice" name="minProductPrice" min="0" placeholder="Enter minimum product price">
+                        </div>
+
                         <div class="form-group" style="display: none;">
                             <label for="maxDiscount">Max Discount (Optional):</label>
                             <input type="number" class="form-control" id="maxDiscount" name="maxDiscount" min="0" placeholder="Maximum discount amount">
@@ -136,90 +129,337 @@
         </div>
     </div>
 
+    <!-- edit Offer Modal -->
+    <div class="modal fade" id="editOfferModal" tabindex="-1" aria-labelledby="editOfferModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOfferModalLabel">Edit Offer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editOfferForm">
+                        <input type="hidden" id="editOfferId">
+                        <div class="form-group">
+                            <label for="editOfferFor">Offer For:</label>
+                            <select class="form-control" id="editOfferFor" name="offerFor" >
+                                <option value="Product">Product</option>
+                                <option value="Category">Category</option>
+                            </select>
+                           
+                        </div>
+                        <div class="form-group">
+                            <label for="editTargetName">Product/Category Name:</label>
+                            <input type="text" class="form-control" id="editTargetName" name="targetName" required placeholder="Enter product or category name">
+                        </div>
+                        <div class="form-group">
+                            <label for="editOfferType">Offer Type:</label>
+                            <select class="form-control" id="editOfferType" name="offerType">
+                                <option value="flat">Flat Discount</option>
+                                <option value="percentage">Percentage Discount</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editValue">Value:</label>
+                            <input type="number" class="form-control" id="editValue" name="value" required min="0" placeholder="Discount value">
+                        </div>
+                        <div class="form-group" id="editMinProductPriceField" style="display: none;">
+                            <label for="editMinProductPrice">Minimum Product Price:</label>
+                            <input type="number" class="form-control" id="editMinProductPrice" name="minProductPrice" min="0" placeholder="Enter minimum product price">
+                        </div>
+                        <div class="form-group" style="display: none;">
+                            <label for="editMaxDiscount">Max Discount (Optional):</label>
+                            <input type="number" class="form-control" id="editMaxDiscount" name="maxDiscount" min="0" placeholder="Maximum discount amount">
+                        </div>
+                        <div class="form-group">
+                            <label for="editExpiresAt">Expires At:</label>
+                            <input type="datetime-local" class="form-control" id="editExpiresAt" name="expiresAt" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Offer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-       document.getElementById('createOfferForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    const offerData = {
-        targetName: document.getElementById('targetName').value,
-        offerFor: document.getElementById('offerFor').value,
-        offerType: document.getElementById('offerType').value,
-        value: parseFloat(document.getElementById('value').value),
-        maxDiscount: parseFloat(document.getElementById('maxDiscount').value) || null,
-        expiresAt: document.getElementById('expiresAt').value,
-    };
-
-    fetch('/admin/offers/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(offerData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire('Success!', 'Offer created successfully.', 'success').then(() => location.reload());
-        } else {
-            Swal.fire('Error!', data.message || 'Failed to create offer.', 'error');
-        }
-    })
-    .catch(error => Swal.fire('Error!', 'An error occurred.', 'error'));
-});
-
-
+        // Disable the create offer button initially
+        const createOfferButton = document.querySelector('#createOfferForm button[type="submit"]');
+        createOfferButton.disabled = true;
+    
+        document.getElementById('createOfferForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+    
+            const offerData = {
+                targetName: document.getElementById('targetName').value,
+                offerFor: document.getElementById('offerFor').value,
+                offerType: document.getElementById('offerType').value,
+                value: parseFloat(document.getElementById('value').value),
+                minProductPrice: parseFloat(document.getElementById('minProductPrice').value) || null,
+                maxDiscount: parseFloat(document.getElementById('maxDiscount').value) || null,
+                expiresAt: document.getElementById('expiresAt').value,
+            };
+    
+            fetch('/admin/offers/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(offerData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Success!', 'Offer created successfully.', 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('Error!', data.message || 'Failed to create offer.', 'error');
+                }
+            })
+            .catch(error => Swal.fire('Error!', 'An error occurred.', 'error'));
+        });
+    
         function toggleOfferStatus(offerId, button) {
-    console.log(button.innerText);
-    if(button.innerText==='Unlist'){
-        isActive=true
-    }else{
-        isActive=false
-    }
+    const isActive = button.innerText === 'Unlist';
     const row = button.closest('tr');
     const badge = row.querySelector('.badge');
 
-    badge.className = `badge ${isActive ? 'badge-danger' : 'badge-success'}`;
-    badge.textContent = isActive ? 'Inactive' : 'Active';
-    button.textContent = isActive ? 'Activate' : 'Unlist';
-    button.setAttribute('data-active', isActive);
+    // SweetAlert confirmation
+    Swal.fire({
+        title: isActive ? 'Unlist Offer?' : 'Activate Offer?',
+        text: `Are you sure you want to ${isActive ? 'unlist' : 'activate'} this offer?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: isActive ? 'Yes, unlist it!' : 'Yes, activate it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Update badge and button text before the request
+            badge.className = `badge ${isActive ? 'badge-danger' : 'badge-success'}`;
+            badge.textContent = isActive ? 'Inactive' : 'Active';
+            button.textContent = isActive ? 'Activate' : 'Unlist';
+            button.setAttribute('data-active', isActive);
 
-    fetch(`/admin/offers/${!isActive}/${offerId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.success) {
-            badge.className = `badge ${isActive ? 'badge-success' : 'badge-danger'}`;
-            badge.textContent = isActive ? 'Active' : 'Inactive';
-            button.textContent = isActive ? 'Unlist' : 'Activate';
-            button.setAttribute('data-active', isActive); 
-            
-            Swal.fire('Error!', data.message || 'Failed to update offer status.', 'error');
-        } else {
-            Swal.fire('Success!', `Offer ${isActive ? 'unlisted' : 'activated'} successfully.`, 'success');
+            // Make the fetch request
+            fetch(`/admin/offers/${!isActive}/${offerId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    badge.className = `badge ${isActive ? 'badge-success' : 'badge-danger'}`;
+                    badge.textContent = isActive ? 'Active' : 'Inactive';
+                    button.textContent = isActive ? 'Unlist' : 'Activate';
+                    button.setAttribute('data-active', isActive);
+
+                    Swal.fire('Error!', data.message || 'Failed to update offer status.', 'error');
+                } else {
+                    Swal.fire('Success!', `Offer ${isActive ? 'unlisted' : 'activated'} successfully.`, 'success');
+                }
+            })
+            .catch(error => {
+                badge.className = `badge ${isActive ? 'badge-success' : 'badge-danger'}`;
+                badge.textContent = isActive ? 'Active' : 'Inactive';
+                button.textContent = isActive ? 'Unlist' : 'Activate';
+                button.setAttribute('data-active', isActive);
+
+                Swal.fire('Error!', 'An error occurred.', 'error');
+            });
         }
-    })
-    .catch(error => {
-        badge.className = `badge ${isActive ? 'badge-success' : 'badge-danger'}`;
-        badge.textContent = isActive ? 'Active' : 'Inactive';
-        button.textContent = isActive ? 'Unlist' : 'Activate';
-        button.setAttribute('data-active', isActive); 
-        
-        Swal.fire('Error!', 'An error occurred.', 'error');
     });
 }
 
-
-
         document.getElementById('offerType').addEventListener('change', function () {
-    const maxDiscountField = document.getElementById('maxDiscount').parentElement;
-    maxDiscountField.style.display = this.value === 'percentage' ? 'block' : 'none';
-});
+            const maxDiscountField = document.getElementById('maxDiscount').parentElement;
+            const minProductPriceField = document.getElementById('minProductPriceField');
+    
+            maxDiscountField.style.display = this.value === 'percentage' ? 'block' : 'none';
+            
+            if (document.getElementById('offerFor').value === 'Category' && this.value === 'flat') {
+                minProductPriceField.style.display = 'block';
+            } else {
+                minProductPriceField.style.display = 'none';
+            }
+        });
+    
+        document.getElementById('offerFor').addEventListener('change', function () {
+            document.getElementById('offerType').dispatchEvent(new Event('change'));
+        });
+    
+        // Real-time validation
+        const validateInput = (input) => {
+            const value = input.value;
+            let errorMessage = '';
+    
+            if (input.id === 'value' || input.id === 'minProductPrice') {
+                if (value < 0) {
+                    errorMessage = 'Value must be positive';
+                }
+            }
+    
+            // Find or create the error message container
+            let errorContainer = input.nextElementSibling;
+            if (!errorContainer || !errorContainer.classList.contains('error-message')) {
+                errorContainer = document.createElement('div');
+                errorContainer.className = 'error-message text-danger';
+                input.parentNode.insertBefore(errorContainer, input.nextSibling);
+            }
+    
+            // Update error message
+            errorContainer.textContent = errorMessage;
+            input.setCustomValidity(errorMessage ? errorMessage : '');
+    
+            // Check overall form validity and enable/disable the button
+            toggleCreateOfferButton();
+        };
+    
+        const toggleCreateOfferButton = () => {
+            const inputs = document.querySelectorAll('#createOfferForm input');
+            let allValid = true;
+    
+            inputs.forEach(input => {
+                if (input.checkValidity() === false) {
+                    allValid = false;
+                }
+            });
+    
+            createOfferButton.disabled = !allValid;
+        };
+    
+        document.querySelectorAll('#createOfferForm input').forEach(input => {
+            input.addEventListener('input', () => validateInput(input));
+        });
+    
+        // Ensure error messages are cleared on focus
+        document.querySelectorAll('#createOfferForm input').forEach(input => {
+            input.addEventListener('focus', () => {
+                const errorContainer = input.nextElementSibling;
+                if (errorContainer && errorContainer.classList.contains('error-message')) {
+                    errorContainer.textContent = '';
+                }
+            });
+        });
 
+
+        //edit offer
+        const editOfferButton = document.querySelector('#editOfferForm button[type="submit"]');
+    editOfferButton.disabled = true;
+
+    document.getElementById('editOfferForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const offerData = {
+            id: document.getElementById('editOfferId').value,
+            targetName: document.getElementById('editTargetName').value,
+            offerFor: document.getElementById('editOfferFor').value,
+            offerType: document.getElementById('editOfferType').value,
+            value: parseFloat(document.getElementById('editValue').value),
+            minProductPrice: parseFloat(document.getElementById('editMinProductPrice').value) || null,
+            maxDiscount: parseFloat(document.getElementById('editMaxDiscount').value) || null,
+            expiresAt: document.getElementById('editExpiresAt').value,
+        };
+
+        fetch(`/admin/offers/update/${offerData.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(offerData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire('Success!', 'Offer updated successfully.', 'success').then(() => location.reload());
+            } else {
+                Swal.fire('Error!', data.message || 'Failed to update offer.', 'error');
+            }
+        })
+        .catch(error => Swal.fire('Error!', 'An error occurred.', 'error'));
+    });
+
+    const validateEditInput = (input) => {
+        const value = input.value;
+        let errorMessage = '';
+
+        if (input.id === 'editValue' || input.id === 'editMinProductPrice') {
+            if (value < 0) {
+                errorMessage = 'Value must be positive';
+            }
+        }
+
+        // Find or create the error message container
+        let errorContainer = input.nextElementSibling;
+        if (!errorContainer || !errorContainer.classList.contains('error-message')) {
+            errorContainer = document.createElement('div');
+            errorContainer.className = 'error-message text-danger';
+            input.parentNode.insertBefore(errorContainer, input.nextSibling);
+        }
+
+        // Update error message
+        errorContainer.textContent = errorMessage;
+        input.setCustomValidity(errorMessage ? errorMessage : '');
+
+        // Check overall form validity and enable/disable the button
+        toggleEditOfferButton();
+    };
+
+    const toggleEditOfferButton = () => {
+        const inputs = document.querySelectorAll('#editOfferForm input');
+        let allValid = true;
+
+        inputs.forEach(input => {
+            if (input.checkValidity() === false) {
+                allValid = false;
+            }
+        });
+
+        editOfferButton.disabled = !allValid;
+    };
+
+    document.querySelectorAll('#editOfferForm input').forEach(input => {
+        input.addEventListener('input', () => validateEditInput(input));
+    });
+
+    // Ensure error messages are cleared on focus
+    document.querySelectorAll('#editOfferForm input').forEach(input => {
+        input.addEventListener('focus', () => {
+            const errorContainer = input.nextElementSibling;
+            if (errorContainer && errorContainer.classList.contains('error-message')) {
+                errorContainer.textContent = '';
+            }
+        });
+    });
+
+    document.getElementById('editOfferType').addEventListener('change', function () {
+        const editMinProductPriceField = document.getElementById('editMinProductPriceField');
+        editMinProductPriceField.style.display = (document.getElementById('editOfferFor').value === 'Category' && this.value === 'flat') ? 'block' : 'none';
+        toggleEditOfferButton(); // Check validity on change
+    });
+
+    document.getElementById('editOfferFor').addEventListener('change', function () {
+        document.getElementById('editOfferType').dispatchEvent(new Event('change'));
+    });
+
+    // Populate modal fields
+    function openEditModal(offerId, offerFor, targetName, offerType, value, expiresAt, minProductPrice) {
+        document.getElementById('editOfferId').value = offerId;
+        document.getElementById('editOfferFor').value = offerFor;
+        document.getElementById('editTargetName').value = targetName;
+        document.getElementById('editOfferType').value = offerType;
+        document.getElementById('editValue').value = value;
+        document.getElementById('editExpiresAt').value = new Date(expiresAt).toISOString().slice(0, 16);
+        document.getElementById('editMinProductPrice').value = minProductPrice;
+
+        const editMinProductPriceField = document.getElementById('editMinProductPriceField');
+        editMinProductPriceField.style.display = (offerFor === 'Category' && offerType === 'flat') ? 'block' : 'none';
+
+        // Clear validation messages and reset button state
+        toggleEditOfferButton();
+        $('#editOfferModal').modal('show'); // Open the modal
+    }
     </script>
 </body>
 </html>

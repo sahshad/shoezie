@@ -17,6 +17,8 @@ const { createOrder,cancelOrder,createRazorpayOrder} = require('../controller/or
 
 const {validateCoupon} = require('../controller/coupon')
 
+const {getWallet} = require('../controller/wallet')
+
 const {
 getWishlist,
 addProductToWishlist,
@@ -59,6 +61,8 @@ router.post('/cart/coupon/validate',validateCoupon)
 router.get('/wishlist',userAuthenticated,getWishlist)
 router.post('/wishlist/add',addProductToWishlist)
 router.delete('/wishlist/delete',deleteProductFromWishlist)
+
+router.get('/profile/wallet',userAuthenticated,getWallet)
 
 router.get('/logout',userLogOut)
 module.exports = router

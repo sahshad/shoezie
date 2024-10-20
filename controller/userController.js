@@ -2,6 +2,7 @@ const User = require('../model/user')
 const Product = require('../model/product')
 const Category = require('../model/category')
 const bcrypt = require('bcrypt')
+const  { getBestOffer } = require('../utils/offerUtils')
 
 function getLogin(req,res){
     let error
@@ -81,79 +82,167 @@ const saltRounds = 10;
 }
 
 async function getHome(req,res){
-  const product = await Product.find({status:true}).populate('category').sort({createdAt:-1}).limit(4)
-  const category = await Category.find({})
-    res.render('user/home',{product,category})
-}
+  const products = await Product.find({status:true}).populate('category')
+  .populate('offers').sort({createdAt:-1}).limit(4)
 
-// async function getShop(req,res){
-//     const category = await Category.find({})
-//     const product = await Product.find({}).populate('category')
-//     res.render('user/shop',{product,category})
-// }
+  const productsWithBestOffers = await Promise.all(products.map(async product => {
+    const category = await Category.findById(product.category).populate('offers');
+    const categoryOffers = category ? category.offers : [];
+
+    const combinedOffers = [...product.offers, ...categoryOffers];
+
+    const validOffers = combinedOffers.filter(offer => {
+        if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
+            return false; 
+        }
+        return true;
+    });
+
+    const hasValidOffer = validOffers.some(offer => {
+        return offer.minProductPrice && offer.minProductPrice >= product.price;
+    });
+    let bestOffer = null;
+
+    if (!hasValidOffer) {
+        bestOffer = await getBestOffer(validOffers, product.price);
+    }
+
+    return {
+        ...product.toObject(),
+        bestOffer
+    };
+}));
+
+  const category = await Category.find({})
+    res.render('user/home',{product:productsWithBestOffers,category})
+}
 
 async function getShop(req, res) {
     try {
-        const category = await Category.find({});
-        const product = await Product.find({})
+        const categories = await Category.find({});
+        const products = await Product.find({ status: true })
             .populate('category')
             .populate('offers');
 
-        // Use Promise.all to handle asynchronous processing for each product
-        const productsWithBestOffers = await Promise.all(product.map(async product => {
-            const bestOffer = await getBestOffer(product.offers, product.price);
-            // Attach the best offer to the product
+        // const productsWithBestOffers = await Promise.all(products.map(async product => {
+
+        //     const category = await Category.findById(product.category).populate('offers')
+        //     const categoryOffers = category ? category.offers : [];
+
+        //     const combinedOffers = [...product.offers, ...categoryOffers];
+
+
+        //     const validOffers = combinedOffers.filter(offer => {
+        //         if (offer.offerType === 'flat' && offer.value > product.price) {
+        //             return false; // Exclude this offer
+        //         }
+        //         return true; // Include this offer
+        //     });
+
+        //     console.log(validOffers);
+            
+        //     const  hasValidOffer = validOffers .some(offer => {
+        //         if(offer.minProductPrice){
+        //             offer.minProductPrice >= product.price
+        //         }
+        //         });
+
+        //     let bestOffer = null;
+
+        //     if (!hasValidOffer) {
+        //         bestOffer = await getBestOffer(combinedOffers, product.price);
+        //     }
+        //     // const bestOffer = await getBestOffer(combinedOffers, product.price);
+        //     return {
+        //         ...product.toObject(),
+        //         bestOffer
+        //     };
+        // }));
+        const productsWithBestOffers = await Promise.all(products.map(async product => {
+            const category = await Category.findById(product.category).populate('offers');
+            const categoryOffers = category ? category.offers : [];
+        
+            // Combine product offers and category offers
+            const combinedOffers = [...product.offers, ...categoryOffers];
+        
+            // Filter out offers that are "flat" and have a value greater than the product price
+            const validOffers = combinedOffers.filter(offer => {
+                if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
+                    return false; // Exclude this offer
+                }
+                return true; // Include this offer
+            });
+        
+            const hasValidOffer = validOffers.some(offer => {
+                return offer.minProductPrice && offer.minProductPrice >= product.price;
+            });
+        
+            let bestOffer = null;
+        
+            if (!hasValidOffer) {
+                bestOffer = await getBestOffer(validOffers, product.price);
+            }
+        
             return {
-                ...product.toObject(), // Convert to plain object
-                bestOffer // Add best offer property
+                ...product.toObject(),
+                bestOffer
             };
         }));
-console.log(productsWithBestOffers);
-
-        res.render('user/shop', { product: productsWithBestOffers, category });
+        
+        
+        res.render('user/shop', { product: productsWithBestOffers, category: categories });
     } catch (error) {
         console.error('Error fetching products:', error);
         res.status(500).send('Server error');
     }
 }
 
-
-async function getBestOffer(offers, productPrice) {
-    if (!offers || offers.length === 0) return null; // No offers available
-
-    const effectiveOffers = offers.map(offer => {
-        let effectiveDiscount = 0;
-
-        if (offer.offerType === 'percentage') {
-            effectiveDiscount = (offer.value / 100) * productPrice;
-            if (offer.maxDiscount) {
-                effectiveDiscount = Math.min(effectiveDiscount, offer.maxDiscount);
-            }
-        } else if (offer.offerType === 'flat') {
-            effectiveDiscount = offer.value;
-        }
-
-        return {
-            offer,
-            effectiveDiscount
-        };
-    });
-
-    // Find the offer with the highest effective discount
-    const bestOffer = effectiveOffers.reduce((best, current) => {
-        return (best.effectiveDiscount > current.effectiveDiscount) ? best : current;
-    });
-
-    return bestOffer ? bestOffer.offer : null; // Return the original offer document
-}
-
-
 async function getProduct(req,res){
-    const productId = req.params.id // Get the ID from the route parameters
+    const productId = req.params.id 
     const product = await Product.findById(productId)
+    .populate('offers');
 
+    const category = await Category.findById(product.category).populate('offers')
+    const categoryOffers = category ? category.offers : [];
+
+    const combinedOffers = [...product.offers, ...categoryOffers];
+    // const hasValidOffer = combinedOffers.some(offer => offer.minProductPrice >= product.price);
+
+    
+    //         let bestOffer = null;
+
+    //         if (!hasValidOffer) {
+    //             bestOffer = await getBestOffer(combinedOffers, product.price);
+    //         }
+
+    // const productsWithBestOffers={
+    //     ...product.toObject(), 
+    //      bestOffer 
+    //     }
+    const validOffers = combinedOffers.filter(offer => {
+        if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
+            return false; // Exclude this offer
+        }
+        return true; // Include this offer
+    });
+
+    const hasValidOffer = validOffers.some(offer => {
+        return offer.minProductPrice && offer.minProductPrice >= product.price;
+    });
+
+    let bestOffer = null;
+
+    if (!hasValidOffer) {
+        bestOffer = await getBestOffer(validOffers, product.price);
+    }
+
+   const productsWithBestOffers = {
+        ...product.toObject(),
+        bestOffer
+    };
+    
     if (product) {
-        res.render('user/productView', { product });
+        res.render('user/productView', { product:productsWithBestOffers });
     } else {
         res.status(404).send('Product not found'); 
     }
@@ -163,67 +252,92 @@ async function sortProducts(req, res) {
     const sort = req.query.sortedby;
     const sizes = req.query.sizes ? JSON.parse(req.query.sizes) : [];
     const categories = req.query.categories ? JSON.parse(req.query.categories) : [];
-
-    // Log the received values for debugging
-    console.log('Received sizes:', sizes);
-    console.log('Received categories:', categories);
+    const search = req.query.search
     
     let sortOptions
 
-    // Determine sort options based on the sortedby parameter
     switch (sort) {
         case 'popularity':
-            // Assuming you have a field for popularity, e.g., `popularity` in your model
-            sortOptions = { popularity: -1 }; // Sort by popularity descending
+            sortOptions = { popularity: -1 }; 
             break;
         case 'priceLowToHigh':
-            sortOptions = { price: 1 }; // Sort by price ascending
+            sortOptions = { price: 1 }; 
             break;
         case 'priceHighToLow':
-            sortOptions = { price: -1 }; // Sort by price descending
+            sortOptions = { price: -1 }; 
             break;
         case 'averageRating':
-            // Assuming you have a field for average rating
-            sortOptions = { averageRating: -1 }; // Sort by average rating descending
+            sortOptions = { averageRating: -1 }; 
             break;
         case 'newArrivals':
-            sortOptions = { createdAt: -1 }; // Sort by creation date descending
+            sortOptions = { createdAt: -1 }; 
             break;
         case 'featured':
-            // Assuming you have a field for featured products
-            sortOptions = { isFeatured: -1 }; // Sort by featured flag (if applicable)
+            sortOptions = { isFeatured: -1 }; 
             break;
         case 'aToz':
-            sortOptions = { name: 1 }; // Sort by name ascending
+            sortOptions = { name: 1 }; 
             break;
         case 'zToa':
-            sortOptions = { name: -1 }; // Sort by name descending
+            sortOptions = { name: -1 }; 
             break;
         default:
             sortOptions= {name : 1}
-            // return res.status(400).json({ error: 'Invalid sort criteria' });
     }
     const query = {};
 
-        // Filter by category
         if (categories.length > 0) {
-            query.category = { $in: categories }; // Match any of the specified categories
+            query.category = { $in: categories }; 
         }
 
-        // Filter by size
         if (sizes.length > 0) {
             query.sizes = {
                 $elemMatch: {
-                    size: { $in: sizes } // Match any of the specified sizes
+                    size: { $in: sizes } 
                 }
             };
         }
 
+        if (search) {
+            query.name = { $regex: search, $options: 'i' }; 
+        }
+
     try {
-        // Fetch sorted products from the database
-        const product = await Product.find(query).sort(sortOptions);
+        const products = await Product.find(query).sort(sortOptions);
         const category = await Category.find({})
-        res.render('user/shop',{product,category})
+
+        const productsWithBestOffers = await Promise.all(products.map(async product => {
+            const category = await Category.findById(product.category).populate('offers');
+            const categoryOffers = category ? category.offers : [];
+        
+            // Combine product offers and category offers
+            const combinedOffers = [...product.offers, ...categoryOffers];
+        
+            // Filter out offers that are "flat" and have a value greater than the product price
+            const validOffers = combinedOffers.filter(offer => {
+                if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
+                    return false; // Exclude this offer
+                }
+                return true; // Include this offer
+            });
+        
+            const hasValidOffer = validOffers.some(offer => {
+                return offer.minProductPrice && offer.minProductPrice >= product.price;
+            });
+        
+            let bestOffer = null;
+        
+            if (!hasValidOffer) {
+                bestOffer = await getBestOffer(validOffers, product.price);
+            }
+        
+            return {
+                ...product.toObject(),
+                bestOffer
+            };
+        }));
+       
+        res.render('user/shop',{product:productsWithBestOffers,category})
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while fetching products' });
@@ -232,5 +346,5 @@ async function sortProducts(req, res) {
 
 module.exports ={
     getLogin,getSignup,addUser,getHome,getShop,
-    getProduct,userLogIn,sortProducts
+    getProduct,userLogIn,sortProducts,getBestOffer
 }

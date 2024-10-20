@@ -56,6 +56,8 @@ const { action, id } = req.params;
         const user = await User.findById(id)
 
         if(user.status===false){
+            
+            if(req.session.user && req.session.user === id.toString())
             delete req.session.user
         }
 
@@ -70,14 +72,12 @@ const { action, id } = req.params;
 }
 
 function getLogout(req,res){
-    req.session.destroy( err =>{
-        if(err){
-            console.log(err);
-            res.redirect('/')
-        }else{
-            res.redirect('/admin/login')
-        }
-    })
+    if(req.session.admin){
+        delete req.session.admin
+        return res.redirect('/user/login');
+      }else{
+        return res.redirect('/user/profile');
+      }
 }
 
 module.exports = {
