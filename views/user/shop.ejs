@@ -310,7 +310,7 @@
         <!-- Products Section -->
         <div id="productContainer" class="col-md-12">
             <div class="row">
-                <% if (product) { %>
+                <% if (product.length > 0) { %>
                     <% product.forEach(product => { %>
                         <% if (product.status) { %>
                             <div id="productCard" class="col-md-3 mb-4 productCard">
@@ -359,8 +359,10 @@
                             </div>
                         <% } %>
                     <% }) %>
+                <% }else{ %>
+                    <p>no products found</p>
                 <% } %>
-                            </div>
+           </div>
         </div>
     </div>
 </div>

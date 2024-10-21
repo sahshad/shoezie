@@ -338,91 +338,91 @@
         validatePhone();
     }
 
-async function placeOrder() {
-    const fullName = document.querySelector('input[placeholder="Full Name"]').value;
-    const address = document.querySelector('textarea[placeholder="Address"]').value;
-    const pincode = document.querySelector('input[placeholder="Pincode"]').value;
-    const phoneNumber = document.querySelector('input[placeholder="Phone Number"]').value;
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-    const couponCode = document.getElementById('couponCode').value || null
-    let  couponDiscount = document.getElementById('couponDiscount').innerHTML || 0
-    let  offerDiscount = document.getElementById('offerDiscount').innerHTML || 0
-    couponDiscount = couponDiscount.replace(/[₹\s]/g, '');
-    parseFloat(couponDiscount);
+// async function placeOrder() {
+//     const fullName = document.querySelector('input[placeholder="Full Name"]').value;
+//     const address = document.querySelector('textarea[placeholder="Address"]').value;
+//     const pincode = document.querySelector('input[placeholder="Pincode"]').value;
+//     const phoneNumber = document.querySelector('input[placeholder="Phone Number"]').value;
+//     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+//     const couponCode = document.getElementById('couponCode').value || null
+//     let  couponDiscount = document.getElementById('couponDiscount').innerHTML || 0
+//     let  offerDiscount = document.getElementById('offerDiscount').innerHTML || 0
+//     couponDiscount = couponDiscount.replace(/[₹\s]/g, '');
+//     parseFloat(couponDiscount);
 
-    offerDiscount = offerDiscount.replace(/[₹\s]/g, '');
-    parseFloat(offerDiscount);
+//     offerDiscount = offerDiscount.replace(/[₹\s]/g, '');
+//     parseFloat(offerDiscount);
 
-    const cartElement = document.getElementById('cartData');
-    const cart = JSON.parse(cartElement.getAttribute('data-cart'));
+//     const cartElement = document.getElementById('cartData');
+//     const cart = JSON.parse(cartElement.getAttribute('data-cart'));
 
-    const items = cart.products.map(item => ({
-        productId: item.productId._id,
-        sizeId: item.sizeId,
-        quantity: item.quantity,
-        price: item.productId.price
-    }));
+//     const items = cart.products.map(item => ({
+//         productId: item.productId._id,
+//         sizeId: item.sizeId,
+//         quantity: item.quantity,
+//         price: item.productId.price
+//     }));
 
 
-    let totalAmount = cart.products.reduce((acc, item) => acc + (item.productId.price * item.quantity), 0);
-     totalAmount-=couponDiscount
-     totalAmount-=offerDiscount
-    const shippingAddress = {
-        fullname: fullName,
-        address,
-        pincode,
-        phone: phoneNumber
-    };
+//     let totalAmount = cart.products.reduce((acc, item) => acc + (item.productId.price * item.quantity), 0);
+//      totalAmount-=couponDiscount
+//      totalAmount-=offerDiscount
+//     const shippingAddress = {
+//         fullname: fullName,
+//         address,
+//         pincode,
+//         phone: phoneNumber
+//     };
 
-    const orderData = { items, totalAmount, shippingAddress,
-         paymentMethod,couponCode,offerDiscount,couponDiscount };
+//     const orderData = { items, totalAmount, shippingAddress,
+//          paymentMethod,couponCode,offerDiscount,couponDiscount };
 
-    if (paymentMethod === 'cashOnDelivery') {
-        // Place COD order       
-        confirmOrder(orderData);
-    } else {
-        // Trigger Razorpay payment
-        launchRazorpay(orderData);
-    }
-}
+//     if (paymentMethod === 'cashOnDelivery') {
+//         // Place COD order       
+//         confirmOrder(orderData);
+//     } else {
+//         // Trigger Razorpay payment
+//         launchRazorpay(orderData);
+//     }
+// }
 
-async function confirmOrder(orderData, razorpayResponse) {
-    if (razorpayResponse) {
-        // Add paymentId, orderId, and signature only if they are present
-        orderData.paymentId = razorpayResponse.razorpay_payment_id; 
-        orderData.orderId = razorpayResponse.razorpay_order_id; 
-        orderData.signature = razorpayResponse.razorpay_signature; 
-    }
+// async function confirmOrder(orderData, razorpayResponse) {
+//     if (razorpayResponse) {
+//         // Add paymentId, orderId, and signature only if they are present
+//         orderData.paymentId = razorpayResponse.razorpay_payment_id; 
+//         orderData.orderId = razorpayResponse.razorpay_order_id; 
+//         orderData.signature = razorpayResponse.razorpay_signature; 
+//     }
 
-    try {
-        const response = await fetch('/user/cart/checkout/confirm-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData)
-        });
-        console.log(orderData);
-        if (response.ok) {          
-            const data = await response.json();
-            Toastify({
-                text: data.message,
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: 'center',
-                backgroundColor: "#4CAF50",
-            }).showToast();
+//     try {
+//         const response = await fetch('/user/cart/checkout/confirm-order', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(orderData)
+//         });
+//         console.log(orderData);
+//         if (response.ok) {          
+//             const data = await response.json();
+//             Toastify({
+//                 text: data.message,
+//                 duration: 3000,
+//                 close: true,
+//                 gravity: "top",
+//                 position: 'center',
+//                 backgroundColor: "#4CAF50",
+//             }).showToast();
 
-            setTimeout(() => {
-                window.location.href = '/user/profile/orders'; // Redirect to orders page
-            }, 3000);
-        } else {
-            alert('Error placing order. Please try again.');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('There was an issue placing your order.');
-    }
-}
+//             setTimeout(() => {
+//                 window.location.href = '/user/profile/orders'; // Redirect to orders page
+//             }, 3000);
+//         } else {
+//             alert('Error placing order. Please try again.');
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//         alert('There was an issue placing your order.');
+//     }
+// }
 
 async function fetchRazorpayKey() {
     try {
@@ -434,45 +434,182 @@ async function fetchRazorpayKey() {
     }
 }
 
-async function launchRazorpay(orderData) {
+// async function launchRazorpay(orderData) {
+//     const razorpayKey = await fetchRazorpayKey();
+//     const options = {
+//         key: razorpayKey,
+//         amount: orderData.totalAmount * 100, // Amount in paisa (1 INR = 100 paisa)
+//         currency: "INR",
+//         name: "SHOEZIE",
+//         description: "Order Payment",
+//         handler: async function (response) {
+//             console.log(response);
+            
+//             // Capture payment ID, order ID, and signature from the response
+//             orderData.paymentId = response.razorpay_payment_id; 
+//             orderData.orderId = response.razorpay_order_id; // Ensure this is added
+//             orderData.signature = response.razorpay_signature; // Ensure this is added
+            
+//             // Call confirmOrder with the orderData and the response
+//             await confirmOrder(orderData, response); // Pass the entire response to confirmOrder
+//         },
+//         prefill: {
+//             name: orderData.shippingAddress.fullname,
+//             contact: orderData.shippingAddress.phone,
+//         },
+//         theme: {
+//             color: "#3399cc",
+//         },
+//         modal: {
+//             ondismiss: function () {
+//                 Toastify({
+//                     text: "Payment cancelled!",
+//                     duration: 3000,
+//                     backgroundColor: "#f44336"
+//                 }).showToast();
+//             }
+//         }
+//     };
+
+//     const rzp = new Razorpay(options);
+//     rzp.open();
+// }
+
+
+async function placeOrder() {
+    const fullName = document.querySelector('input[placeholder="Full Name"]').value;
+    const address = document.querySelector('textarea[placeholder="Address"]').value;
+    const pincode = document.querySelector('input[placeholder="Pincode"]').value;
+    const phoneNumber = document.querySelector('input[placeholder="Phone Number"]').value;
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    const couponCode = document.getElementById('couponCode').value || null;
+    let couponDiscount = document.getElementById('couponDiscount').innerHTML || 0;
+    let offerDiscount = document.getElementById('offerDiscount').innerHTML || 0;
+
+    couponDiscount = parseFloat(couponDiscount.replace(/[₹\s]/g, ''));
+    offerDiscount = parseFloat(offerDiscount.replace(/[₹\s]/g, ''));
+
+    const cartElement = document.getElementById('cartData');
+    const cart = JSON.parse(cartElement.getAttribute('data-cart'));
+
+    const items = cart.products.map(item => ({
+        productId: item.productId._id,
+        sizeId: item.sizeId,
+        quantity: item.quantity,
+        price: item.productId.price
+    }));
+
+    let totalAmount = cart.products.reduce((acc, item) => acc + (item.productId.price * item.quantity), 0);
+    totalAmount -= couponDiscount + offerDiscount;
+
+    const shippingAddress = {
+        fullname: fullName,
+        address,
+        pincode,
+        phone: phoneNumber
+    };
+
+    const orderData = {
+        items,
+        totalAmount,
+        shippingAddress,
+        paymentMethod,
+        couponCode,
+        offerDiscount,
+        couponDiscount
+    };
+
+    try {
+        // Create the order in the backend with a Pending status
+        const response = await fetch('/user/cart/checkout/confirm-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+
+        const order = await response.json();
+        if (paymentMethod === 'razorpay') {
+            // Launch Razorpay for payment
+            launchRazorpay(order._id, orderData);
+        } else {
+            showSuccessToast('Order placed successfully!');
+            redirectToOrdersPage();
+        }
+    } catch (error) {
+        console.error('Error creating order:', error);
+        alert('Failed to create order. Please try again.');
+    }
+}
+
+function redirectToOrdersPage() {
+    setTimeout(() => {
+        window.location.href = '/user/profile/orders';
+    }, 3000);
+}
+
+function showSuccessToast(message) {
+    Toastify({
+        text: message,
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: 'center',
+        backgroundColor: "#4CAF50",
+    }).showToast();
+}
+
+async function launchRazorpay(orderId, orderData) {
     const razorpayKey = await fetchRazorpayKey();
     const options = {
         key: razorpayKey,
-        amount: orderData.totalAmount * 100, // Amount in paisa (1 INR = 100 paisa)
+        amount: orderData.totalAmount * 100,
         currency: "INR",
         name: "SHOEZIE",
         description: "Order Payment",
         handler: async function (response) {
-            console.log(response);
-            
-            // Capture payment ID, order ID, and signature from the response
-            orderData.paymentId = response.razorpay_payment_id; 
-            orderData.orderId = response.razorpay_order_id; // Ensure this is added
-            orderData.signature = response.razorpay_signature; // Ensure this is added
-            
-            // Call confirmOrder with the orderData and the response
-            await confirmOrder(orderData, response); // Pass the entire response to confirmOrder
+            // On payment success, update the order status to Paid
+            await updateOrderStatus(orderId, response, 'Paid');
         },
         prefill: {
             name: orderData.shippingAddress.fullname,
             contact: orderData.shippingAddress.phone,
         },
-        theme: {
-            color: "#3399cc",
-        },
+        theme: { color: "#3399cc" },
         modal: {
-            ondismiss: function () {
+            ondismiss: async function () {
                 Toastify({
                     text: "Payment cancelled!",
                     duration: 3000,
-                    backgroundColor: "#f44336"
+                    backgroundColor: "#f44336",
                 }).showToast();
-            }
+                // Update order as Failed on cancellation
+                await updateOrderStatus(orderId, null, 'Failed');
+            },
         }
     };
 
     const rzp = new Razorpay(options);
     rzp.open();
+}
+
+async function updateOrderStatus(orderId, razorpayResponse, status) {
+    const data = { status, razorpayResponse };
+    try {
+        const response = await fetch(`/user/cart/checkout/update-order/${orderId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            showSuccessToast(`Order ${status === 'Paid' ? 'completed' : 'failed'}!`);
+            redirectToOrdersPage();
+        } else {
+            alert('Error updating order status.');
+        }
+    } catch (error) {
+        console.error('Error updating order status:', error);
+    }
 }
 
 

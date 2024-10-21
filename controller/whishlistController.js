@@ -23,24 +23,21 @@ async function getWishlist(req,res){
 
 async function addProductToWishlist(req,res){
     const userId = req.session.user
-    const {productId , sizeId}=req.body
-    console.log(productId,sizeId);
+    const {productId }=req.body
     
     try {
         let wishlist = await Wishlist.findOne({user:userId})
 
         if(!wishlist){
-            const newWishlist = new Wishlist({
+            wishlist = new Wishlist({
                 user:userId,
                 items: []
             })
-            await newWishlist.save()
-
-            wishlist = newWhishlist
+            await wishlist.save()
         }
 
         const productExists = wishlist.items.some(item =>
-            item.productId.toString() === productId && item.sizeId.toString() === sizeId
+            item.productId.toString() === productId 
         );
 
         if (productExists) {
@@ -48,7 +45,7 @@ async function addProductToWishlist(req,res){
         }
 
         // Add the product to the wishlist
-        wishlist.items.push({ productId, sizeId });
+        wishlist.items.push({ productId });
 
         // Save the updated wishlist
         await wishlist.save();

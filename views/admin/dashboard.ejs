@@ -212,27 +212,7 @@
 </head>
 <body>
     <div class="d-flex" id="wrapper">
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="profile-container">
-                    <img src="path/to/profile-photo.jpg" alt="Admin Profile">
-                    <h3 class="text-white">Admin Name</h3>
-                </div>
-            </div>
-            <ul class="list-unstyled components">
-                <li><a href="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="users"><i class="fas fa-users"></i> Users</a></li>
-                <li><a href="products"><i class="fas fa-box"></i> Products</a></li>
-                <li><a href="orders"><i class="fas fa-list"></i> Order List</a></li>
-                <li><a href="offers"><i class="fas fa-tags"></i> Offers</a></li>
-                <li><a href="coupons"><i class="fas fa-gift"></i> Coupons</a></li>
-                <li><a href="deals"><i class="fas fa-percent"></i> Deals</a></li>
-                <li><a href="category"><i class="fas fa-th-list"></i> Category</a></li>
-                <li><a href="settings"><i class="fas fa-cog"></i> Settings</a></li>
-                <li><a href="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </div>
-
+      <%- include('partials/sidebar') %>
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg mb-1 mt-1">
                 <button class="btn btn-light btn-sm" id="menuToggle">

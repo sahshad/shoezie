@@ -31,13 +31,14 @@
             <div class="col-md-9 pl-5 mt-4">
                 <h5 class="mb-4">My Orders</h5>
                 <div class="table-responsive">
-                    <% if(order){ %>
+                    <% if(order.length > 0){ %>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>No</th>
                                 <th>Order Date</th>
                                 <th>Status</th>
+                                <th>Payment </th>
                                 <th>Total Price</th>
                                 <th>Items</th>
                             </tr>
@@ -57,6 +58,17 @@
                                             '' // fallback class if needed
                                         %>">
                                             <%= order.orderStatus %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge <%= 
+                                            order.paymentStatus === 'Pending' ? 'badge-warning' :
+                                            order.paymentStatus === 'Paid' ? 'badge-success' :
+                                            order.paymentStatus === 'Failed' ? 'badge-danger' :
+                                            
+                                            '' // fallback class if needed
+                                        %>">
+                                            <%= order.paymentStatus %>
                                         </span>
                                     </td>
                                     <td>₹ <%= order.totalAmount %>.00</td>
@@ -81,6 +93,8 @@
                             
                         </tbody>
                     </table>
+                    <% }else{ %>
+                        <p>No orders found</p>
                     <% } %>
                 </div>
             </div>

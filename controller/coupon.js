@@ -1,4 +1,5 @@
 const Coupon = require('../model/coupon')
+const User = require('../model/user')
 
 
 async function getCoupons(req,res){
@@ -128,17 +129,24 @@ async function changeCouponStatus(req, res) {
 
 
 async function validateCoupon (req, res){
+    const userId = req.session.user
     const { code, subtotal } = req.body;
 
     console.log(code, subtotal);
     
     try {
         const coupon = await Coupon.findOne({ code });
+        const user = await User.findById(userId)
 
         if (!coupon) {
             return res.status(404).json({ success: false, message: 'Coupon not found' });
         }
+        const usedCoupon = user.usedCoupons.find(coupon => coupon._id.toString()===coupon._id.toString())
 
+        if(usedCoupon){
+            return res.status(400).json({ success: false, message: 'You Already Used The Coupon' });
+        }
+        
         if (coupon.expiresAt < new Date()) {
             return res.status(400).json({ success: false, message: 'Coupon expired' });
         }
@@ -155,7 +163,8 @@ async function validateCoupon (req, res){
         if (coupon.discountType === 'percentage') {
             discount = Math.min((subtotal * coupon.discountAmount) / 100, coupon.maxDiscount);
         }
-
+   
+        
         res.json({ success: true, discountAmount: discount });
 
         // coupon.usedCount += 1;

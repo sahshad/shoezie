@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sales Report</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/admin/dashboard.css">
+    <link rel="stylesheet" href="/styles/admin/products.css"> 
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .btn-download {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+       <%- include('partials/sidebar') %>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg mb-1 mt-1">
+                <button class="btn btn-light btn-sm" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="navbar-text">Sales Report</span>
+            </nav>
+
+            <div class="container">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Generate Sales Report</h5>
+                        <form id="salesReportForm">
+                            <div class="row">
+                                <div class="col-md-3 form-group">
+                                    <label for="reportType">Report Type</label>
+                                    <select id="reportType" class="form-control">
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                        <option value="custom">Custom Date Range</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2 form-group" id="dateFields" style="display: none; margin-left: 10px;">
+                                    <label for="startDate">Start Date</label>
+                                    <input type="date" id="startDate" class="form-control">
+                                </div>
+                                
+                                <div class="col-md-2 form-group" id="endDateField" style="display: none;margin-left: 10px;">
+                                    <label for="endDate">End Date</label>
+                                    <input type="date" id="endDate" class="form-control">
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+                            <button type="button" class="btn btn-secondary btn-download" onclick="downloadReport('pdf')">Download PDF</button>
+                            <button type="button" class="btn btn-secondary btn-download" onclick="downloadReport('excel')">Download Excel</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Sales Summary</h5>
+                        <p><strong>Overall Sales Count:</strong> <span id="overallSalesCount"><%= sales.length %></span></p>
+                        <p><strong>Overall Order Amount:</strong> ₹<span id="overallOrderAmount">
+                            <%= sales.reduce((total, sale) => total + sale.totalAmount, 0).toFixed(2) %>
+                        </span></p>
+                        <p><strong>Overall Discount:</strong> ₹<span id="overallDiscount">
+                            <%= sales.reduce((total, sale) => {
+                           return total + sale.offerDiscount?sale.offerDiscount:0}, 0).toFixed(2) %>
+                        </span></p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Sales Details</h5>
+                        <% if(sales.length > 0){ %>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Date</th>
+                                        <th>Sales Amount</th>
+                                        <th>Offer</th>
+                                        <th>Coupon</th>
+                                        <th>Net Amount</th>
+                                    </tr>
+                                </thead>
+                                <% sales.forEach((sale,index) =>{ %>
+                                    <tbody id="salesDetailsBody">
+                                        <td><%= index+1 %></td>
+                                        <td><%= sale.orderDate.toLocaleDateString() %></td>
+                                        <td><%= sale.totalAmount + (sale.offerDiscount?sale.offerDiscount:0)+(sale.couponDiscount?sale.couponDiscount:0 ) %></td>
+                                        <td><%= sale.offerDiscount?sale.offerDiscount:0 %></td>
+                                        <td><%= sale.couponDiscount?sale.couponDiscount:0 %></td>
+                                        <td><%= sale.totalAmount %></td>
+                                    </tbody>
+                                <% }) %>
+                               
+                            </table>
+                        <% }else{ %>
+                            <p>No sales done yet</p>
+                       <%  } %>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+
+        document.getElementById('reportType').addEventListener('change', function() {
+    const selectedValue = this.value;
+    const dateFields = document.getElementById('dateFields');
+    const endDateField = document.getElementById('endDateField');
+    
+    if (selectedValue === 'custom') {
+        dateFields.style.display = 'block';
+        endDateField.style.display = 'block';
+    } else {
+        dateFields.style.display = 'none';
+        endDateField.style.display = 'none';
+    }
+});
+        // function generateReport() {
+        //     // Fetch the report based on selected criteria
+        //     const reportType = document.getElementById('reportType').value;
+        //     const startDate = document.getElementById('startDate').value;
+        //     const endDate = document.getElementById('endDate').value;
+
+        //     // AJAX call to fetch the report data
+        //     // Replace with your actual endpoint
+        //     $.ajax({
+        //         url: '/api/sales-report',
+        //         method: 'POST',
+        //         data: { reportType, startDate, endDate },
+        //         success: function(response) {
+        //             // Populate sales summary and details
+        //             document.getElementById('overallSalesCount').textContent = response.totalSalesCount;
+        //             document.getElementById('overallOrderAmount').textContent = response.totalOrderAmount.toFixed(2);
+        //             document.getElementById('overallDiscount').textContent = response.totalDiscount.toFixed(2);
+                    
+        //             // Populate sales details
+        //             const tbody = document.getElementById('salesDetailsBody');
+        //             tbody.innerHTML = ''; // Clear previous data
+        //             response.salesDetails.forEach((sale, index) => {
+        //                 tbody.innerHTML += `
+        //                     <tr>
+        //                         <td>${index + 1}</td>
+        //                         <td>${new Date(sale.date).toLocaleDateString()}</td>
+        //                         <td>₹${sale.amount.toFixed(2)}</td>
+        //                         <td>₹${sale.discount.toFixed(2)}</td>
+        //                         <td>₹${(sale.amount - sale.discount).toFixed(2)}</td>
+        //                     </tr>
+        //                 `;
+        //             });
+        //         },
+        //         error: function(err) {
+        //             console.error(err);
+        //             alert('Error generating report');
+        //         }
+        //     });
+        // }
+
+        function generateReport() {
+            const reportType = document.getElementById('reportType').value;
+            let startDate, endDate;
+
+            if (reportType === 'daily') {
+                const today = new Date().toISOString().split('T')[0];
+                startDate = today;
+                endDate = today;
+            } else if (reportType === 'weekly') {
+                const today = new Date();
+                const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 1)); // Monday
+                const lastDayOfWeek = new Date(today.setDate(firstDayOfWeek.getDate() + 6));
+                startDate = firstDayOfWeek.toISOString().split('T')[0];
+                endDate = lastDayOfWeek.toISOString().split('T')[0];
+            } else if (reportType === 'monthly') {
+                const today = new Date();
+                startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+                endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
+            } else if (reportType === 'yearly') {
+                const today = new Date();
+                startDate = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
+                endDate = new Date(today.getFullYear(), 11, 31).toISOString().split('T')[0];
+            } else {
+                startDate = document.getElementById('startDate').value;
+                endDate = document.getElementById('endDate').value;
+            }
+
+            const requestData = {
+                reportType,
+                startDate,
+                endDate,
+            };
+
+            fetch(`/admin/sales-report/${reportType}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text(); // Expecting full HTML in response
+    })
+    .then(html => {
+        // Update the page with the new HTML content
+        document.open();
+        document.write(html);
+        document.close();
+        
+    })
+    .catch(error => {
+        console.error('Error generating report:', error);
+        alert('Error generating report. Please try again.');
+    });
+
+        }
+
+        function downloadReport(format) {
+            // Trigger download of the report in selected format
+            // Replace with your actual endpoint
+            window.location.href = `/admin/sales-report/download?format=${format}`;
+        }
+    </script>
+</body>
+</html>

@@ -44,7 +44,7 @@ async function userLogIn(req,res){
 
         if (isMatch) {
             req.session.user = user.id;
-            return res.redirect('/user/profile');
+            return res.redirect('/user/home');
         } else {
             req.session.error = 'incorrect password'
             return res.redirect('/user/login') 

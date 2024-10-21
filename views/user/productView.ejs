@@ -252,7 +252,7 @@
             <div class="line"></div>
             <div>
                 <button onclick="addToCart('<%= product._id %>')" id="addToCart"  class="btn btn-primary" disabled >Add To Cart</button>
-                <button id="addToWishlist" class="btn btn-secondary " onclick="addToWishlist('<%=product._id %>')" disabled>Add To Fav</button>
+                <button id="addToWishlist" class="btn btn-secondary " onclick="addToWishlist('<%=product._id %>')" >Add To Fav</button>
             </div>
         </div>
     <%} %>  
@@ -352,8 +352,8 @@
 let sizeId=''
 
     function selectSize(button,stock,id) {
-        const addToWishlist = document.getElementById('addToWishlist')
-        addToWishlist.disabled = false;
+        // const addToWishlist = document.getElementById('addToWishlist')
+        // addToWishlist.disabled = false;
         // Deselect all buttons
         sizeId=id
         const buttons = document.querySelectorAll('.size-button');
@@ -435,7 +435,7 @@ function addToWishlist(productId) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ productId, sizeId }),
+        body: JSON.stringify({ productId}),
     })
         .then(response => response.json())
         .then(data => {
@@ -450,7 +450,7 @@ function addToWishlist(productId) {
             } else {
                 Swal.fire({
                     title: 'Failed!',
-                    text: 'Failed to add product to wishlist: ' + data.message,
+                    text:  data.message,
                     icon: 'error',
                     confirmButtonColor: '#d33',
                     confirmButtonText: 'Try Again',

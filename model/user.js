@@ -43,6 +43,7 @@ const userSchema = new mongoose.Schema({
   phone:{type:String, minlength: 10},
   password:{type:String},
   status: { type: Boolean, default: true },
+  usedCoupons:[{type: mongoose.Schema.Types.ObjectId, ref: 'Offer'}]
 },{ timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

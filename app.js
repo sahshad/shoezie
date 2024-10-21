@@ -30,6 +30,7 @@ db()
 app.get('/get-razorpay-key', (req, res) => {
     res.status(200).json({ key: process.env.RAZORPAY_ID_KEY });
   });
+  
 app.use('/user',userRoute)
 app.use('/admin',adminRoute)
 app.use('/auth',require('./routes/auth'))

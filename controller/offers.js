@@ -303,8 +303,11 @@ async function editOffer(req, res) {
         }
 
         // Only update if the target has changed
-        const hasOfferForChanged = existingOffer.offerFor !== offerFor;
-
+        const hasOfferForChanged = existingOffer.offerFor !== offerFor 
+        
+        console.log(oldTargetId,newTarget._id);
+        
+          
         // Update the offer details
         existingOffer.offerFor = offerFor;
         existingOffer.offerType = offerType;
@@ -314,6 +317,15 @@ async function editOffer(req, res) {
         existingOffer.expiresAt = expiresAt;
         existingOffer.targetId = newTarget._id; // Update to new target ID
 
+        if(existingOffer.offerFor === offerFor && oldTargetId.toString() !== newTarget._id.toString()){
+            if (existingOffer.offerFor === 'Product') {
+                await removeOfferReference(oldTargetId, existingOffer._id);
+                await addOfferReference(newTarget._id, existingOffer._id);
+            } else if (existingOffer.offerFor === 'Category') {   
+                await removeOfferReferenceFromCategory(oldTargetId, existingOffer._id);
+                await addOfferReferenceToCategory(newTarget._id, existingOffer._id);
+            }
+        } 
         // Remove the old reference if the offerFor has changed
         if (hasOfferForChanged) {
             if (oldTargetId) {

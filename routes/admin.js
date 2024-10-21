@@ -16,7 +16,9 @@ const {getAllOrders,changeOrderStatus,viewOrder} = require('../controller/orderC
 
 const { getCoupons,addCoupon, editCoupon,changeCouponStatus } = require('../controller/coupon')
 
-const { getOffers,createOffer,changeOfferStatus,editOffer } = require('../controller/offers')
+const { getOffers,createOffer,changeOfferStatus,editOffer } = require('../controller/offers');
+
+const { getSalesReport,getCustomSalesReport,downloadSalesReport } = require('../controller/salesReport');
 
 router.get('/login', getLogin);
 router.post('/login', getHome);
@@ -50,6 +52,10 @@ router.get('/offers',getOffers)
 router.post('/offers/create',createOffer)
 router.patch('/offers/:status/:id',changeOfferStatus)
 router.put('/offers/update/:id',editOffer)
+
+router.get('/sales-report',getSalesReport)
+router.post('/sales-report/:reportType',getCustomSalesReport)
+router.get('/sales-report/download',downloadSalesReport)
 
 router.get('/logout',getLogout)
 
