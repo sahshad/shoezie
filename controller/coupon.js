@@ -141,7 +141,7 @@ async function validateCoupon (req, res){
         if (!coupon) {
             return res.status(404).json({ success: false, message: 'Coupon not found' });
         }
-        const usedCoupon = user.usedCoupons.find(coupon => coupon._id.toString()===coupon._id.toString())
+        const usedCoupon = user.usedCoupons.find(currentCoupon => currentCoupon._id.toString()===coupon._id.toString())
 
         if(usedCoupon){
             return res.status(400).json({ success: false, message: 'You Already Used The Coupon' });

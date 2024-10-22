@@ -3,8 +3,11 @@ const PDFDocument = require('pdfkit')
 const ExcelJS = require('exceljs')
 
 async function getSalesReport(req,res){
+  const reportType = 'Daily'
+  const startDate = 0
+  const endDate = 0
   const sales = await Order.find({orderStatus:'Delivered'})
-    res.render('admin/salesReport',{sales})
+    res.render('admin/salesReport',{sales,reportType,startDate,endDate})
 }
 
 async function getCustomSalesReport(req,res) {
@@ -16,15 +19,24 @@ const  sales = await Order.find({
 });
 
 if(sales){
-res.render('admin/salesReport',{sales})
+res.render('admin/salesReport',{sales,reportType,startDate,endDate})
 }
 }
 
 async function downloadSalesReport(req,res){
-  const {format}= req.query
-  if(format === 'pdf'){
-    const sales = await Order.find({ orderStatus: 'Delivered' }); // Modify as needed
+  const {format,startDate,endDate}= req.query
+  
+  let sales;
+  if(startDate === 0 && endDate === 0 ){
+     sales = await Order.find({ orderStatus: 'Delivered' }); 
+  }else{
+    sales = await Order.find({
+      orderStatus: 'Delivered',
+      orderDate: { $gte: new Date(startDate), $lte: new Date(endDate) }
+  });
+  }
 
+  if(format === 'pdf'){
     const doc = new PDFDocument();
     let filename = 'sales-report.pdf';
     res.setHeader('Content-disposition', `attachment; filename="${filename}"`);
@@ -47,7 +59,7 @@ async function downloadSalesReport(req,res){
 
     doc.end();
   }else if(format === 'excel'){
-    const sales = await Order.find({ orderStatus: 'Delivered' }); // Modify as needed
+    // const sales = await Order.find({ orderStatus: 'Delivered' }); // Modify as needed
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Sales Report');

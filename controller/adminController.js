@@ -74,7 +74,7 @@ const { action, id } = req.params;
 function getLogout(req,res){
     if(req.session.admin){
         delete req.session.admin
-        return res.redirect('/user/login');
+        return res.redirect('/admin/login');
       }else{
         return res.redirect('/user/profile');
       }

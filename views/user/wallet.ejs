@@ -45,9 +45,9 @@
                             <tr>
                                 <th>No</th>
                                 <th>Date</th>
-                                <th>Description</th>
+                                <!-- <th>Description</th> -->
                                 <th>Amount</th>
-                                <th>Status</th>
+                                <th>Type</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -55,7 +55,7 @@
                                 <tr>
                                     <td><%= index + 1 %></td>
                                     <td><%= new Date(transaction.date).toLocaleDateString() %></td>
-                                    <td><%= transaction.description || 'No Description' %></td>
+                                    <!-- <td><%= transaction.description || 'No Description' %></td> -->
                                     <td>₹ <%= transaction.amount %>.00</td>
                                     <td>
                                         <span class="badge <%= 
@@ -64,7 +64,7 @@
                                             transaction.status === 'Failed' ? 'badge-danger' :
                                             '' // fallback class if needed
                                         %>">
-                                            <%= transaction.status %>
+                                            <%= transaction.type %>
                                         </span>
                                     </td>
                                 </tr>

@@ -392,9 +392,11 @@ async function viewOrder(req,res) {
     }
 }
 
-
+async function ordercreated(req,res) {
+  res.render('user/orderCompleted')
+}
 
 module.exports = {
     createOrder,getAllOrders,cancelOrder,changeOrderStatus,viewOrder,
-    createRazorpayOrder,updateOrderStatus
+    createRazorpayOrder,updateOrderStatus,ordercreated
 }

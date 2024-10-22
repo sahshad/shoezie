@@ -13,7 +13,7 @@ const { userAuthenticated,preventCache} = require('../middleware/authMiddleware'
 const {getCart,getCheckout,addProductToCart,
     removeProductFromCart,updateProductQuantity} = require('../controller/cartController')
 
-const { createOrder,cancelOrder,createRazorpayOrder,updateOrderStatus} = require('../controller/orderController')
+const { createOrder,cancelOrder,createRazorpayOrder,updateOrderStatus,ordercreated} = require('../controller/orderController')
 
 const {validateCoupon} = require('../controller/coupon')
 
@@ -43,7 +43,6 @@ router.patch('/profile/orders/cancel/:orderId',cancelOrder)
 router.get('/signup',getSignup)
 router.post('/register',addUser)
 
-
 router.get('/home',getHome)
 router.get('/shop',getShop)
 router.get('/shop/filter',sortProducts)
@@ -53,6 +52,7 @@ router.get('/cart',userAuthenticated,getCart)
 router.get('/cart/checkout',userAuthenticated,getCheckout)
 router.post('/cart/checkout/confirm-order',createOrder)
 router.patch('/cart/checkout/update-order/:orderId',updateOrderStatus)
+router.get('/cart/checkout/order-created',ordercreated)
 
 router.post('/cart/add/:productId/:sizeId',addProductToCart)
 router.delete('/cart/remove/:productId',removeProductFromCart)

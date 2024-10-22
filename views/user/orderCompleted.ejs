@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Success</title>
+  <style>
+    body {
+      background-color: #f4f4f4;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+    h1 {
+      color: #4CAF50;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #555;
+    }
+    .order-details {
+      text-align: left;
+      margin: 20px 0;
+    }
+    .order-details p {
+      margin: 5px 0;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .buttons a {
+      text-decoration: none;
+      color: white;
+      background-color: #4CAF50;
+      padding: 10px 20px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .buttons a:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Order Placed Successfully!</h1>
+    <p>Thank you for your purchase, <%= customerName %>!</p>
+
+    <div class="order-details">
+      <h3>Order Details</h3>
+      <p><strong>Order ID:</strong> <%= orderId %></p>
+      <p><strong>Items:</strong> <%= items %></p>
+      <p><strong>Total Amount:</strong> ₹<%= totalAmount %></p>
+    </div>
+
+    <div class="buttons">
+      <a href="/">Continue Shopping</a>
+      <a href="/orders">View My Orders</a>
+    </div>
+  </div>
+</body>
+</html>

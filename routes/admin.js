@@ -43,19 +43,19 @@ router.get('/orders',preventCache,isAuthenticated,getAllOrders)
 router.get('/orders/view/:orderId',preventCache,isAuthenticated,viewOrder)
 router.patch('/orders/status/:orderId',changeOrderStatus)
 
-router.get('/coupons',getCoupons)
+router.get('/coupons',isAuthenticated,getCoupons)
 router.post('/coupons/create',addCoupon)
 router.patch('/coupons/:status/:id',changeCouponStatus)
 router.put('/coupons/update/:id',editCoupon)
 
-router.get('/offers',getOffers)
+router.get('/offers',isAuthenticated,getOffers)
 router.post('/offers/create',createOffer)
 router.patch('/offers/:status/:id',changeOfferStatus)
 router.put('/offers/update/:id',editOffer)
 
-router.get('/sales-report',getSalesReport)
+router.get('/sales-report',isAuthenticated,getSalesReport)
 router.post('/sales-report/:reportType',getCustomSalesReport)
-router.get('/sales-report/download',downloadSalesReport)
+router.get('/sales-report/download',isAuthenticated,downloadSalesReport)
 
 router.get('/logout',getLogout)
 

@@ -55,12 +55,13 @@
                                 <div class="col-md-3 form-group">
                                     <label for="reportType">Report Type</label>
                                     <select id="reportType" class="form-control">
-                                        <option value="daily">Daily</option>
-                                        <option value="weekly">Weekly</option>
-                                        <option value="monthly">Monthly</option>
-                                        <option value="yearly">Yearly</option>
-                                        <option value="custom">Custom Date Range</option>
+                                        <option value="daily" <%= reportType === 'daily' ? 'selected' : '' %>>Daily</option>
+                                        <option value="weekly" <%= reportType === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                                        <option value="monthly" <%= reportType === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                                        <option value="yearly" <%= reportType === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                                        <option value="custom" <%= reportType === 'custom' ? 'selected' : '' %>>Custom Date Range</option>
                                     </select>
+                                    
                                 </div>
 
                                 <div class="col-md-2 form-group" id="dateFields" style="display: none; margin-left: 10px;">
@@ -75,8 +76,8 @@
                             </div>
 
                             <button type="button" class="btn btn-primary" onclick="generateReport()">Generate Report</button>
-                            <button type="button" class="btn btn-secondary btn-download" onclick="downloadReport('pdf')">Download PDF</button>
-                            <button type="button" class="btn btn-secondary btn-download" onclick="downloadReport('excel')">Download Excel</button>
+                            <button type="button" class="btn btn-secondary btn-download" onclick="downloadReport('pdf','<%= startDate  %>','<%= endDate  %>')">Download PDF</button>
+                            <button type="button" class="btn btn-secondary btn-download" onclick="downloadReport('excel','<%= startDate  %>','<%= endDate  %>')">Download Excel</button>
                         </form>
                     </div>
                 </div>
@@ -90,7 +91,7 @@
                         </span></p>
                         <p><strong>Overall Discount:</strong> ₹<span id="overallDiscount">
                             <%= sales.reduce((total, sale) => {
-                           return total + sale.offerDiscount?sale.offerDiscount:0}, 0).toFixed(2) %>
+                           return total + (sale.totalAmount+ (sale.offerDiscount?sale.offerDiscount:0)+(sale.couponDiscount?sale.couponDiscount:0))}, 0).toFixed(2) %>
                         </span></p>
                     </div>
                 </div>
@@ -195,9 +196,9 @@
             let startDate, endDate;
 
             if (reportType === 'daily') {
-                const today = new Date().toISOString().split('T')[0];
-                startDate = today;
-                endDate = today;
+                const today = new Date();
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Start of the day
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59); // End of the day
             } else if (reportType === 'weekly') {
                 const today = new Date();
                 const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 1)); // Monday
@@ -223,7 +224,7 @@
                 endDate,
             };
 
-            fetch(`/admin/sales-report/${reportType}`, {
+            fetch(`/admin/sales-report/${startDate}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -250,10 +251,10 @@
 
         }
 
-        function downloadReport(format) {
+        function downloadReport(format,start,end) {
             // Trigger download of the report in selected format
             // Replace with your actual endpoint
-            window.location.href = `/admin/sales-report/download?format=${format}`;
+            window.location.href = `/admin/sales-report/download?format=${format}&startDate=${start}&endDate=${end}`;
         }
     </script>
 </body>
