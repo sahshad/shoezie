@@ -172,13 +172,16 @@
             <div class="row">
                 <!-- Vertical Category -->
                  <% category.forEach(category =>{%>
-                    <% if(category.status){ %>  
+                    <% if(category.status){ %> 
                     <div class="col-md-4">
+                        <a href="/user/shop/filter?categories=%5B&quot;<%= category._id %>&quot;%5D">
                         <div class="category-card vertical">
                             <h5 class="category-title"><%= category.name %></h5>
                             <img src="<%= category.imageUrl %>" class="category-img" alt="Men's Fashion">
                         </div>
+                    </a> 
                     </div>
+                
                     <% } %>
                  <%}) %>
                     </div>

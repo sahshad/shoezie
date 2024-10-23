@@ -138,17 +138,20 @@ const productsWithBestOffers = await Promise.all(
 async function addProductToCart(req, res) {
     const { productId, sizeId } = req.params;
     const userId = req.session.user;
+    console.log(sizeId);
+    
     const quantity = 1;
     try {
         const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({success:false, message: 'User not found' });
-        }
         const product = await Product.findById(productId);
+
+        if (!user) {
+            return res.status(404).json({success:false, message: 'You are not loged in. Please Login' });
+        }
         if (!product) {
             return res.status(404).json({success:false, message: 'Product not found' });
         }
-
+       
         const size = product.sizes.find(size => size._id.toString() === sizeId);
         if (!size) {
             return res.status(404).json({success:false, message: 'Size not found' });
@@ -169,8 +172,8 @@ async function addProductToCart(req, res) {
         );
 
         if (productInCart) {
-            if (size.stock < productInCart.quantity) {
-                return res.status(400).json({success:false, message: `Only ${size.stock} items left` });
+            if (size.stock <= productInCart.quantity) {
+                return res.status(400).json({success:false, message: `You already have ${size.stock} in your cart` });
             }
             productInCart.quantity += quantity;
         } else {

@@ -185,6 +185,22 @@ async function createOrder(req, res) {
      couponCode, couponDiscount, offerDiscount } = req.body;
 
   try {
+
+    if(paymentMethod === 'razorpay'){
+      const newOrder = new Order({
+        userId,
+        items,
+        shippingAddress,
+        totalAmount,
+        couponDiscount: couponDiscount || 0,
+        offerDiscount: offerDiscount || 0,
+        paymentMethod,
+        paymentStatus: 'failed',
+    })
+
+    const savedOrder = await newOrder.save();
+    return res.status(201).json(savedOrder);
+    }
       const newOrder = new Order({
           userId,
           items,
@@ -256,10 +272,17 @@ async function createOrder(req, res) {
 async function updateOrderStatus(req, res) {
   const { orderId } = req.params;
   const { status, razorpayResponse } = req.body;
+  let orderStatus
+  if(status === 'Paid'){
+    orderStatus = 'Pending'
+  }else{
+    orderStatus = 'Failed'
+  }
 
   try {
       const update = {
           paymentStatus: status,
+          orderStatus, 
           ...(razorpayResponse && {
               paymentId: razorpayResponse.razorpay_payment_id,
               orderId: razorpayResponse.razorpay_order_id,

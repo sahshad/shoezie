@@ -26,6 +26,9 @@ async function addProductToWishlist(req,res){
     const {productId }=req.body
     
     try {
+        if(!userId){
+            return res.json({ success: false, message: 'You are not loged in. Please Login' });
+        }
         let wishlist = await Wishlist.findOne({user:userId})
 
         if(!wishlist){
