@@ -22,14 +22,14 @@ app.use(session({
     cookie:{secure:false}
 }))
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize())
+app.use(passport.session())
 
 db()
 
 app.get('/get-razorpay-key', (req, res) => {
-    res.status(200).json({ key: process.env.RAZORPAY_ID_KEY });
-  });
+    res.status(200).json({ key: process.env.RAZORPAY_ID_KEY })
+  })
   
 app.use('/user',userRoute)
 app.use('/admin',adminRoute)

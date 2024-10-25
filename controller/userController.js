@@ -1,7 +1,11 @@
+require('dotenv').config()
 const User = require('../model/user')
 const Product = require('../model/product')
 const Category = require('../model/category')
 const bcrypt = require('bcrypt')
+const speakeasy = require('speakeasy')
+const nodemailer = require('nodemailer')
+
 const  { getBestOffer } = require('../utils/offerUtils')
 
 function getLogin(req,res){
@@ -56,28 +60,135 @@ async function userLogIn(req,res){
     }
 }
 
- async function addUser (req, res){
-const {firstname,lastname,email,password} = req.body
-const saltRounds = 10;
+async function addUser(req, res) {
+
+    const { firstname, lastname, email, password } = req.body;
     try {
-        const user = await User.findOne({email})
-        if(user){
-            req.session.error='email already exist'
-            return res.redirect('/user/signup')
+        const user = await User.findOne({ email });
+        if (user) {
+            req.session.error = 'Email already exists';
+            return res.redirect('/user/signup');
         }
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-        const newUser = new User({firstname,lastname, email, password:hashedPassword
-            
-         });
-        await newUser.save();
-        req.session.error='User registered successfully'
-        return res.redirect(201,'/user/login')
-        res.status(201).send('User registered successfully');
+
+        req.session.firstname = firstname;
+        req.session.lastname = lastname;
+        req.session.email = email;
+        req.session.password = password; 
+
+        const secret = speakeasy.generateSecret({ length: 20 });
+        const token = speakeasy.totp({
+            secret: secret.base32,
+            encoding: 'base32',
+        });
+
+        req.session.otpSecret = secret.base32;
+
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: 'shoezie47@gmail.com',
+                pass: process.env.GOOGLE_APP_PASSWORD,
+            },
+        });
+
+        const mailOptions = {
+            from: 'shoezie47@gmail.com',
+            to: email,
+            subject: 'Your OTP Code',
+            text: `Your OTP is: ${token}. It is valid for 30 seconds.`,
+        };
+
+        await transporter.sendMail(mailOptions);
+        req.session.otpEmail = email;
+
+        return res.redirect('/user/verify-otp');
+        
     } catch (error) {
         console.error(error);
-         req.session.error='Error registering user'
-        return res.redirect(500,'/user/signup')
-        res.status(500).send('Error registering user');
+        req.session.error = 'Error registering user';
+        return res.redirect('/user/signup');
+    }
+}
+
+async function getOtpPage(req,res){
+    res.render('user/otp')
+}
+
+async function verifyOtp(req, res) {
+    const { otp } = req.body;
+    try {
+        if(!req.session.email){
+            return res.status(400).json({success:false,message: 'No email found. Please register again'});
+        }
+        const isValidOTP = speakeasy.totp.verify({
+            secret: req.session.otpSecret,
+            encoding: 'base32',
+            token: otp,
+            window: 2,
+        });
+    
+        if (isValidOTP) {
+    
+            const { firstname, lastname, email, password } = req.session;
+            const saltRounds = 10;
+    
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            const newUser = new User({ firstname, lastname, email, password: hashedPassword });
+            await newUser.save();
+    
+            delete req.session.firstname;
+            delete req.session.lastname;
+            delete req.session.email;
+            delete req.session.password;
+            delete req.session.otpSecret;
+    
+            return res.status(201).json({success:true , message:'OTP verified successfully!'})
+        } else {
+            return res.status(400).json({success:false,message: 'Invalid or expired OTP',});
+        }
+    } catch (error) {
+        return res.status(400).json({error: error,});
+    }
+    
+}
+
+async function resendOtp(req,res) {
+    const { email } = req.session;
+
+    try {
+
+        if (!req.session.email) {
+            return res.status(400).json({ success:false, message: 'No email found. Please register again' });
+        }
+
+        const otp = speakeasy.totp({
+            secret: req.session.otpSecret,
+            encoding: 'base32',
+            window: 2, 
+        });
+
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: 'shoezie47@gmail.com',
+                pass: process.env.GOOGLE_APP_PASSWORD,
+            },
+        });
+
+        const mailOptions = {
+            from: 'shoezie47@gmail.com',
+            to: email,
+            subject: 'Your OTP Code',
+            text: `Your OTP is: ${otp}. It is valid for 1 minute.`,
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        return res.json({ seccess:true, message: 'OTP has been resent to your email.' });
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success:false, message: 'Error resending OTP. Please try again.' });
     }
 }
 
@@ -123,54 +234,17 @@ async function getShop(req, res) {
         const products = await Product.find({ status: true })
             .populate('category')
             .populate('offers');
-
-        // const productsWithBestOffers = await Promise.all(products.map(async product => {
-
-        //     const category = await Category.findById(product.category).populate('offers')
-        //     const categoryOffers = category ? category.offers : [];
-
-        //     const combinedOffers = [...product.offers, ...categoryOffers];
-
-
-        //     const validOffers = combinedOffers.filter(offer => {
-        //         if (offer.offerType === 'flat' && offer.value > product.price) {
-        //             return false; // Exclude this offer
-        //         }
-        //         return true; // Include this offer
-        //     });
-
-        //     console.log(validOffers);
-            
-        //     const  hasValidOffer = validOffers .some(offer => {
-        //         if(offer.minProductPrice){
-        //             offer.minProductPrice >= product.price
-        //         }
-        //         });
-
-        //     let bestOffer = null;
-
-        //     if (!hasValidOffer) {
-        //         bestOffer = await getBestOffer(combinedOffers, product.price);
-        //     }
-        //     // const bestOffer = await getBestOffer(combinedOffers, product.price);
-        //     return {
-        //         ...product.toObject(),
-        //         bestOffer
-        //     };
-        // }));
         const productsWithBestOffers = await Promise.all(products.map(async product => {
             const category = await Category.findById(product.category).populate('offers');
             const categoryOffers = category ? category.offers : [];
         
-            // Combine product offers and category offers
             const combinedOffers = [...product.offers, ...categoryOffers];
         
-            // Filter out offers that are "flat" and have a value greater than the product price
             const validOffers = combinedOffers.filter(offer => {
                 if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
-                    return false; // Exclude this offer
+                    return false;
                 }
-                return true; // Include this offer
+                return true;
             });
         
             const hasValidOffer = validOffers.some(offer => {
@@ -346,5 +420,5 @@ async function sortProducts(req, res) {
 
 module.exports ={
     getLogin,getSignup,addUser,getHome,getShop,
-    getProduct,userLogIn,sortProducts,getBestOffer
+    getProduct,userLogIn,sortProducts,getBestOffer,verifyOtp,getOtpPage,resendOtp
 }

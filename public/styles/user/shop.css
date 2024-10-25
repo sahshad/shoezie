@@ -1,0 +1,180 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff;
+}
+
+.form-range {
+    width: 100%;
+}
+.card {
+border: none; 
+
+}
+
+.category{
+font-size:12px;
+margin: 0;
+margin-top: 2px;
+margin-bottom: 4px;
+color: #a4a4a4;
+}
+
+.card-body{
+    display: flex;
+    justify-content: space-between;
+}
+.star-rating {
+color: #F5BF25; 
+font-size: x-small;
+}
+
+.card-link {
+    text-decoration: none; 
+    color: inherit;
+}
+
+.card-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.sort-dropdown {
+    margin-left: auto;
+    margin-bottom: 15px
+}
+.sort-dropdown :hover {
+    cursor: pointer;
+}
+
+#sortOptions {
+    border: none;
+    background: transparent;
+}
+
+#sortOptions:focus {
+    outline: none; 
+    box-shadow: none;
+    border-color: inherit;
+}
+.filter-options {
+    display: none;
+    margin-top: 15px;
+}
+
+.breadcrumb {
+    font-size: 0.8rem;
+    background: transparent;
+}
+
+.breadcrumb-item a {
+    color: #007bff; 
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+
+.filter {
+    text-decoration: none; 
+    color: rgb(0, 0, 0);
+}
+
+.filter:hover {
+    text-decoration: none; 
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+ }
+
+ .size-buttons button{
+    width: 65px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid rgb(212, 212, 212);
+    margin-right: 10px;
+    color: black;
+    transition: all 0.3s ease;
+ }
+ .size-buttons button:hover{
+    border: 1px solid black;
+ }
+
+ .filter-options {
+    position: sticky;
+    top: 80px; 
+    left: 30px;
+    padding: 15px; 
+    z-index: 12;
+    height: fit-content;
+
+}
+.sort-options{
+    position: sticky;
+    top: 0px;
+    z-index: 11;
+    background-color: #ffffff;
+}
+
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer; 
+    margin-bottom: 10px; 
+}
+
+.custom-checkbox input {
+    display: none; 
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #000000;
+    border-radius: 3px; 
+    margin-right: 10px; 
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.custom-checkbox input:checked + .checkmark {
+    background-color: #000000;
+}
+
+.custom-checkbox input:checked + .checkmark::after {
+    content: ''; 
+    position: absolute;
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px; 
+    border: solid white; 
+    border-width: 0 2px 2px 0; 
+    transform: rotate(45deg);
+}
+
+.filter-btn{
+    border: 1px solid black;
+    border-radius: 5px;
+    color: rgb(0, 0, 0);
+    background-color: white;
+    transition: all 0.3s ease;  
+}
+.filter-btn:hover{
+    background-color: #000000;
+    color: rgb(255, 255, 255);
+}
+
+.size-buttons button {
+    width: 65px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid rgb(212, 212, 212);
+    margin-right: 10px;
+    color: black;
+    background-color: #f7f7f7;
+    transition: all 0.3s ease;
+}
+
+.size-buttons button.selected {
+    background-color: #000000; 
+    color: #ffffff; 
+}

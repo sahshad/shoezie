@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="/styles/user/otp.css"> <!-- Custom CSS -->
+    <style>
+        .otp-container {
+    max-width: 470px;
+    width: 100%;
+    padding-inline: 60px;
+    padding-block: 40px;
+    background-color: #f7f7f7; 
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); 
+    }
+    .input-boxes{
+        margin-top: 40px;
+        gap: 20px;
+    }
+    .input-boxes input{
+       width: 40px;
+       height: 40px;
+       padding-left: 14px;
+       border: 1px solid rgb(161, 161, 161);
+       border-radius: 6px;
+    }
+    .verify-btn{
+        margin-top: 10px;
+        background-color: black;
+        color: white;
+        border-radius: 6px;
+    }
+    .verify-btn:hover{
+        color: white;
+        opacity: 0.8;
+    }
+
+    </style>
+</head>
+<body>
+    <div class="d-flex justify-content-center align-items-center min-vh-100 ">
+        <div class="otp-container">
+            <h2 class="text-center">Enter OTP</h2>
+            <p class="text-center">a 6-digit OTP has been sent to your email.</p>
+            <div class="d-flex justify-content-center mb-4 input-boxes">
+                <input type="text" maxlength="1" class="otp-input" id="otp1" oninput="moveFocus(this, 'otp2')" onkeydown="handleBackspace(event, 'otp1')"
+                 onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
+                <input type="text" maxlength="1" class="otp-input" id="otp2" oninput="moveFocus(this, 'otp3')" onkeydown="handleBackspace(event, 'otp2')" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
+                <input type="text" maxlength="1" class="otp-input" id="otp3" oninput="moveFocus(this, 'otp4')" onkeydown="handleBackspace(event, 'otp3')" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
+                <input type="text" maxlength="1" class="otp-input" id="otp4" oninput="moveFocus(this, 'otp5')" onkeydown="handleBackspace(event, 'otp4')" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
+                <input type="text" maxlength="1" class="otp-input" id="otp5" oninput="moveFocus(this, 'otp6')" onkeydown="handleBackspace(event, 'otp5')" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
+                <input type="text" maxlength="1" class="otp-input" id="otp6" oninput="moveFocus(this, 'otp6')" onkeydown="handleBackspace(event, 'otp6')" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
+            </div>
+            <button id="verifyBtn" class="btn verify-btn btn-block" onclick="submitOTP()">Verify OTP</button>
+            <div class="text-center mt-3" id="timer"></div>
+            <div class="text-center mt-3">
+                <button id="resendBtn" class="btn btn-link" onclick="resendOTP()" disabled>Resend OTP</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        let timer;
+        let timeLeft = 60;
+
+        function startTimer() {
+            timer = setInterval(function() {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('timer').innerHTML = "OTP expired";
+                    document.getElementById('resendBtn').disabled = false; 
+                } else {
+                    document.getElementById('timer').innerHTML = timeLeft + " seconds remaining";
+                }
+                timeLeft -= 1;
+            }, 1000);
+        }
+
+        function moveFocus(current, nextId) {
+            if (current.value.length >= 1) {
+                document.getElementById(nextId).focus();
+            }
+        }
+
+        function handleBackspace(event, currentId) {
+            if (event.key === 'Backspace') {
+                const currentInput = document.getElementById(currentId);
+                if (currentInput.value === '') {
+                    const previousId = 'otp' + (parseInt(currentId.replace('otp', '')) - 1);
+                    const previousInput = document.getElementById(previousId);
+                    previousInput.focus();
+                }
+            }
+        }
+
+        function submitOTP() {
+            const otp = [
+                document.getElementById('otp1').value,
+                document.getElementById('otp2').value,
+                document.getElementById('otp3').value,
+                document.getElementById('otp4').value,
+                document.getElementById('otp5').value,
+                document.getElementById('otp6').value
+            ].join('');
+
+            if (otp.length < 6) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Incomplete OTP',
+                    text: 'Please enter all 6 digits of the OTP.',
+                });
+                return; 
+            }
+           
+            fetch('/user/verify-otp', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ otp }),
+            })
+            .then(response => {
+                    return response.json();
+            })
+            .then(data => {
+                
+             if(data.success){
+                Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: data.message,
+                }).then(() => {
+                    window.location.href = '/user/login'; 
+                });
+             }else{
+                Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: data.message,
+                })
+             }
+
+            })
+            .catch(error => {
+                Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: error.message,
+                })
+            })
+        }
+
+        // function resendOTP() {
+        //     timeLeft = 60; 
+        //     document.getElementById('resendBtn').disabled = true;
+        //     startTimer(); 
+        // }
+
+            function resendOTP() {
+
+        //  timeLeft = 60; 
+            document.getElementById('resendBtn').disabled = true;
+            // startTimer(); 
+        // Call the backend to resend the OTP
+        fetch('/user/resend-otp', {  
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            if(data.success){
+                timeLeft = 60; 
+                startTimer(); 
+
+                Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: data.message,
+                })
+            }else{
+                Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: data.message,
+                })
+            }
+        })
+        .catch(error => {
+            console.error(error.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: error.message,
+                })
+        });
+    }
+
+        window.onload = function() {
+            startTimer();
+        };
+    </script>
+</body>
+</html>

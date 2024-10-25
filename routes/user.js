@@ -1,12 +1,12 @@
 const express = require('express')
 const router = express.Router()
 const {addUser,getSignup,getLogin,getHome,getShop,getProduct,sortProducts,
-userLogIn} = require('../controller/userController')
+userLogIn,verifyOtp,getOtpPage,resendOtp} = require('../controller/userController')
 
  const{getProfile,userLogOut,
     getAddress,getOrders,getOrderDetails,
     updateUserDetails,addAddress,
-    updateAddress,deleteAddress}= require('../controller/userProfileController')   
+    updateAddress,deleteAddress, }= require('../controller/userProfileController')   
 
 const { userAuthenticated,preventCache} = require('../middleware/authMiddleware')
 
@@ -42,6 +42,9 @@ router.patch('/profile/orders/cancel/:orderId',cancelOrder)
 
 router.get('/signup',getSignup)
 router.post('/register',addUser)
+router.get('/verify-otp',getOtpPage)
+router.post('/verify-otp',verifyOtp)
+router.post('/resend-otp',resendOtp)
 
 router.get('/home',getHome)
 router.get('/shop',getShop)

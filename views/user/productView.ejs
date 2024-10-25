@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="/styles/user/partials/navbar.css">
-
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -48,7 +47,6 @@
         }
 
         .product-image {
-            /* max-height: 350px; */
             object-fit: cover;
             width: 100%;
             transition: transform 0.3s ease;
@@ -63,12 +61,12 @@
             z-index: 100;
             width: 200px;
             height: 200px;
-            pointer-events: none; /* Prevent interactions */
+            pointer-events: none;
         }
 
         .zoom-preview img {
-            width: 300%; /* Make it larger for zoom */
-            height: auto; /* Maintain aspect ratio */
+            width: 300%;
+            height: auto;
         }
 
         .product-details {
@@ -185,8 +183,8 @@
             right: 80px;
         }
         .selected {
-        background-color: black; /* Black background */
-        color: white; /* White text */
+        background-color: black;
+        color: white;
          }
     .addtocart-btn{
         border: 1px solid black;
@@ -200,10 +198,10 @@
         background-color: #383737;
     }
     .addtocart-btn:disabled{
-    background-color: gray; /* Disabled state */
+    background-color: gray; 
     color: lightgray; 
     cursor: not-allowed;
-    opacity: 0.6; /* Optional for a more muted appearance */
+    opacity: 0.6; 
     }
     .addtowishlist-btn{
         border: 1px solid rgb(152, 152, 152);
@@ -221,10 +219,8 @@
     </style>
 </head>
 <body>
-
-<!-- Navbar -->
 <%- include('partials/navbar') %>
-<!-- Product View Section -->
+
 <div class="container">
     <% if(product){%>
         <div class="thumbnails">
@@ -251,11 +247,11 @@
 
                     <% if(product.bestOffer.offerType === 'percentage' ){ %>
                             <% if(product.bestOffer.maxDiscount){ %>
-<% if((product.price * product.bestOffer.value / 100) > product.bestOffer.maxDiscount){ %>
-₹ <%=(product.price-product.bestOffer.maxDiscount).toFixed(2)  %>
-<%}else{ %>
-₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
-<%}%>
+                                <% if((product.price * product.bestOffer.value / 100) > product.bestOffer.maxDiscount){ %>
+                                ₹ <%=(product.price-product.bestOffer.maxDiscount).toFixed(2)  %>
+                                <%}else{ %>
+                                ₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
+                                <%}%>
                             <% }else{ %>
                                 ₹ <%=(product.price-(product.price * product.bestOffer.value / 100)).toFixed(2) %>
                            <% } %>
@@ -270,9 +266,6 @@
             <label>Stock:</label>
             <div>
                 <p id="product-stock" class="font-weight-bold"></p>
-                <!-- <span class="badge badge-primary" style="cursor: pointer;">Blue</span>
-                <span class="badge badge-danger" style="cursor: pointer;">Red</span>
-                <span class="badge badge-success" style="cursor: pointer;">Green</span> -->
             </div>
             <div class="line"></div>
             <label>Available Sizes:</label>
@@ -466,8 +459,6 @@ let sizeId=0
         console.error('Error:', error);
     });
 }
-
-
 
 function addToWishlist(productId) {
     fetch('/user/wishlist/add', {

@@ -73,13 +73,13 @@ function populateAddress() {
 }
 
 async function fetchRazorpayKey() {
-try {
-    const response = await fetch('/get-razorpay-key');
-    const data = await response.json();
-    return data.key;
-} catch (error) {
-    console.error('Error fetching Razorpay key:', error);
-}
+    try {
+        const response = await fetch('/get-razorpay-key');
+        const data = await response.json();
+        return data.key;
+    } catch (error) {
+        console.error('Error fetching Razorpay key:', error);
+    }
 }
 
 async function placeOrder() {
@@ -126,6 +126,9 @@ const orderData = {
 };
 
 try {
+    if(paymentMethod === 'cashOnDelivery' && totalAmount < 1000){
+
+    }
     const response = await fetch('/user/cart/checkout/confirm-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

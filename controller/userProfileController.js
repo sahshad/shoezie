@@ -33,7 +33,7 @@ async function getOrders(req,res){
 }
 
 async function getOrderDetails(req, res) {
-  const { orderId} = req.params; // Access orderId from req.body
+  const { orderId} = req.params; 
   try {
       const order = await Order.findById(orderId).populate('items.productId')
 
@@ -44,7 +44,6 @@ async function getOrderDetails(req, res) {
       res.render('user/orderDetails', { order });
   } catch (error) {
       console.log(error);
-      // Return an error response if something goes wrong
       res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 }
@@ -156,5 +155,5 @@ async function deleteAddress(req, res) {
 module.exports = {
     getProfile,userLogOut,
     getAddress,getOrders,getOrderDetails,
-    updateUserDetails,addAddress,updateAddress,deleteAddress
+    updateUserDetails,addAddress,updateAddress,deleteAddress,
 }
