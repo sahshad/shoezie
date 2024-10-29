@@ -59,6 +59,26 @@ const orderSchema = new mongoose.Schema({
     orderDate:{
         type:Date,
         default:Date.now()
+    },
+    return: { 
+        reason: String,
+        status: {
+            type: String,
+            enum: ['Pending', 'Approved', 'Rejected'],
+            // default: 'Pending'
+        },
+        refundStatus: {
+            type: String,
+            enum: ['Pending', 'Completed'],
+            // default: 'Pending'
+        },
+        adminComments: String, 
+        approvedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Admin' 
+        },
+        requestedAt: Date,
+        processedAt: Date
     }
 },{timestamps:true});
 

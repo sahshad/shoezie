@@ -126,8 +126,14 @@ const orderData = {
 };
 
 try {
-    if(paymentMethod === 'cashOnDelivery' && totalAmount < 1000){
-
+    if(paymentMethod === 'cashOnDelivery' && totalAmount > 1000){
+        Swal.fire({
+            title: 'COD limit exceed',
+            text: "COD orders can't exceed ₹1000.",
+            icon: 'error',
+            confirmButtonText: 'OK',
+        });
+        return;
     }
     const response = await fetch('/user/cart/checkout/confirm-order', {
         method: 'POST',
@@ -140,7 +146,7 @@ try {
         launchRazorpay(order._id, orderData);
     } else {
         showSuccessToast('Order placed successfully!');
-        redirectToOrdersPage();
+        redirectToOrdersPage(order._id);
     }
 } catch (error) {
     console.error('Error creating order:', error);
@@ -148,9 +154,9 @@ try {
 }
 }
 
-function redirectToOrdersPage() {
+function redirectToOrdersPage(orderId) {
 setTimeout(() => {
-    window.location.href = '/user/profile/orders';
+    window.location.href = `/user/profile/order-created/${orderId}`;
 }, 3000);
 }
 
@@ -208,7 +214,7 @@ try {
 
     if (response.ok) {
         showSuccessToast(`Order ${status === 'Paid' ? 'completed' : 'failed'}!`);
-        redirectToOrdersPage();
+        redirectToOrdersPage(orderId);
     } else {
         alert('Error updating order status.');
     }

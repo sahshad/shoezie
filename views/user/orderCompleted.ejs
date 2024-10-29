@@ -4,10 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order Success</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Poppins Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     body {
       background-color: #f4f4f4;
-      font-family: Arial, sans-serif;
+      font-family: 'Poppins', sans-serif;
       margin: 0;
       padding: 0;
       display: flex;
@@ -22,10 +26,14 @@
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       text-align: center;
       width: 90%;
-      max-width: 400px;
+      max-width: 600px;
     }
     h1 {
       color: #4CAF50;
+      margin-bottom: 10px;
+    }
+    h2 {
+      color: #ba5a49;
       margin-bottom: 10px;
     }
     p {
@@ -39,6 +47,17 @@
     }
     .order-details p {
       margin: 5px 0;
+    }
+    .order-details ul {
+      list-style-type: none; /* Remove default list style */
+      padding: 0; /* Remove default padding */
+    }
+    .order-details li {
+      padding: 5px 0;
+      border-bottom: 1px solid #eee; /* Add a subtle separator */
+    }
+    .order-details li:last-child {
+      border-bottom: none; /* Remove the border for the last item */
     }
     .buttons {
       display: flex;
@@ -60,20 +79,34 @@
 </head>
 <body>
   <div class="container">
-    <h1>Order Placed Successfully!</h1>
-    <p>Thank you for your purchase, <%= customerName %>!</p>
+    <% if(order.orderStatus !== 'Failed'){ %>
+      <h1>Order Placed Successfully!</h1>
+      <p>Thank you for your purchase, <%= order.userId.firstname %>!</p>
+    <% }else{ %>
+      <h2>Payment Failed. Please Try Again</h2>
+    <% } %>
 
     <div class="order-details">
       <h3>Order Details</h3>
-      <p><strong>Order ID:</strong> <%= orderId %></p>
-      <p><strong>Items:</strong> <%= items %></p>
-      <p><strong>Total Amount:</strong> ₹<%= totalAmount %></p>
+      <p><strong>Order ID:</strong> <%= order._id %></p>
+      <p><strong>Items:</strong></p>
+      <ul>
+        <% order.items.forEach(product => { %>
+          <li><%= product.productId.name %> X <%= product.quantity %></li>
+        <% }); %>
+      </ul>
+      <p><strong>Total Amount:</strong> ₹<%= order.totalAmount %></p>
     </div>
 
     <div class="buttons">
-      <a href="/">Continue Shopping</a>
-      <a href="/orders">View My Orders</a>
+      <a href="/user/shop" class="btn">Continue Shopping</a>
+      <a href="/user/profile/orders" class="btn">View My Orders</a>
     </div>
   </div>
+
+  <!-- Bootstrap JS and dependencies (optional, for further interactivity) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

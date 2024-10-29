@@ -7,6 +7,7 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="/styles/user/partials/navbar.css">
     <link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
 </head>
@@ -69,15 +70,30 @@ main{
                 </div>
                 <div class="row d-flex justify-content-between mt-3">
                     <h6 class="ml-3">Total Price: ₹ <%= order.totalAmount %>.00</h6>
-                    <% if(order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Failed'){ %>
+                    <% if(order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Failed' && order.orderStatus !== 'Returned'){ %>
                         <% if(order.orderStatus !== 'Delivered'){ %>
                             <button class="btn btn-danger mr-3" onclick="cancelOrder('<%= order._id %>')">Cancel Order</button>
                         <% } %>
                    <% } %>
 
                    <% if(order.orderStatus === 'Failed'){ %>
-                    <button class="btn btn-success mr-3" onclick="payNow('<%= order._id %>')">Pay Now</button>
+                    <button class="btn btn-success mr-3" onclick="repayOrder('<%= order._id %>','<%=order.totalAmount %>')">Pay Now</button>
                    <% } %>
+
+                   <% if (order.orderStatus === 'Delivered' && !order.return.reason) { %>
+                    <button class="btn btn-outline-danger btn-sm mr-3" onclick="openReturnModal('<%= order._id %>','<%=order.updatedAt %>')">Request Return</button>
+                    <button class="btn btn-info mr-3" onclick="downloadInvoice('<%= order._id %>')">Download Invoice</button>
+                    <% } else if (order.return.reason) { %>
+                    <div>
+                        <strong>Return Status:</strong>
+                        <span class="badge <%= order.return.status === 'Pending' ? 'badge-warning' : 'badge-success' %>">
+                            <%= order.return.status %>
+                        </span>
+                        <% if (order.return.adminComments) { %>
+                        <p><em>Admin Comment: <%= order.return.adminComments %></em></p>
+                        <% } %>
+                    </div>
+                    <% } %>
                 </div>
                
             </div>
@@ -87,13 +103,128 @@ main{
     </div>
 </main>
 
-<!-- Bootstrap JS -->
+
+
+<!-- Modal for Return Reason -->
+<div class="modal fade" id="returnModal" tabindex="-1" role="dialog" aria-labelledby="returnModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="returnModalLabel">Request Return</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="orderId">
+                <form id="returnForm">
+                    <div class="form-group">
+                        <label for="returnReason">Reason for Return</label>
+                        <textarea class="form-control" id="returnReason" rows="3" required></textarea>
+                        <small id="reasonError" class="form-text text-danger d-none">
+                            Reason must be at least 10 characters long.
+                        </small>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="submitButton" onclick="returnOrder()"  disabled>Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+
+function downloadInvoice(orderId) {
+    window.location.href = `/user/profile/order/invoice/${orderId}`
+}
+
+     function openReturnModal(orderId,deliveredDate) {
+console.log(deliveredDate);
+
+        const deliveryDate = new Date(deliveredDate);
+    const today = new Date();
+    
+    const diffTime = Math.abs(today - deliveryDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays > 7) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Return Unavailable',
+            text: 'Return period has expired. You can only return within 7 days of delivery.',
+        });
+        return; 
+    }
+        document.getElementById('orderId').value = orderId
+        $('#returnModal').modal('show');
+    }
+
+    const reasonInput = document.getElementById('returnReason');
+    const reasonError = document.getElementById('reasonError');
+    const submitButton = document.getElementById('submitButton');
+
+    reasonInput.addEventListener('input', () => {
+        const reasonLength = reasonInput.value.trim().length;
+
+        if (reasonLength < 10) {
+            reasonError.classList.remove('d-none'); 
+            submitButton.disabled = true;            
+        } else {
+            reasonError.classList.add('d-none');    
+            submitButton.disabled = false;          
+        }
+    });
+
+
+  
+async function returnOrder(){
+        // if (!validateReason()) return;  
+
+        const reason = reasonInput.value.trim();
+        const orderId = document.getElementById('orderId').value
+console.log(orderId);
+
+        fetch(`/user/profile/order/return/${orderId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason })
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Return Requested!',
+                    text: 'Your return request has been submitted successfully.',
+                }).then(() => location.reload()); 
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.message || 'Something went wrong. Please try again later.',
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: error.message || 'Failed to submit return request.',
+            });
+        });
+    }
+
+
     function cancelOrder(orderId) {
-            // Implement the AJAX call to cancel the order
             console.log(`Cancelling order ${orderId}`);
 
             fetch(`/user/profile/orders/cancel/${orderId}`,{
@@ -105,32 +236,86 @@ main{
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            return response.json(); // Parse JSON response
+            return response.json(); 
         })
         .then(data => {
-            // Handle success (e.g., notify the user, update the UI)
             console.log('Order canceled successfully:', data);
             window.location.href='/user/profile/orders'
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
-            // Optionally, notify the user about the error
         });
         }
 
-        async function payNow(id){
-                        async function fetchRazorpayKey() {
-                try {
-                    const response = await fetch('/get-razorpay-key');
-                    const data = await response.json();
-                    return data.key;
-                } catch (error) {
-                    console.error('Error fetching Razorpay key:', error);
-                }
-            }
 
+        async function fetchRazorpayKey() {
+    try {
+        const response = await fetch('/get-razorpay-key');
+        const data = await response.json();
+        return data.key;
+    } catch (error) {
+        console.error('Error fetching Razorpay key:', error);
+    }
+}
+
+async function updateOrderStatus(orderId, razorpayResponse, status) {
+    const repay=true
+const data = { status, razorpayResponse, repay }
+try {
+    const response = await fetch(`/user/profile/order/repay/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+
+    if (response.ok) {
+        showSuccessToast(`Order ${status === 'Paid' ? 'completed' : 'failed'}!`);
+        redirectToOrdersPage();
+    } else {
+        alert('Error updating order status.');
+    }
+} catch (error) {
+    console.error('Error updating order status:', error);
+}
+}
+
+ async function repayOrder(orderId, totalAmount) {
+
+    try {
+        const razorpayKey = await fetchRazorpayKey();
+        const options = {
+            key: razorpayKey,
+            amount: totalAmount * 100, // Amount in paisa
+            currency: "INR",
+            name: "SHOEZIE",
+            description: "Retry Payment",
+            handler: async function (response) {
+                // On successful payment, update the order status to 'Paid'
+                await updateOrderStatus(orderId, response, 'Paid');
+            },
+            theme: { color: "#3399cc" },
+            modal: {
+                ondismiss: async function () {
+                    Toastify({
+                        text: "Payment cancelled!",
+                        duration: 3000,
+                        backgroundColor: "#f44336",
+                    }).showToast();
+                    // Mark order as 'Cancelled' if user cancels payment again
+                    await updateOrderStatus(orderId, null, 'Cancelled');
+                },
+            },
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+    } catch (error) {
+        console.log('Error initiating repayment:', error);
+        alert('Failed to initiate repayment. Please try again.');
+    }
+}
             
-        }
+        
 </script>
 </body>
 </html>

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const {
-    getLogin, getHome, getUsers,changeUserStatus,getLogout
+    getLogin, getHome, getUsers,changeUserStatus,getLogout , getDashboard
 } = require('../controller/adminController');
 
 const { getProducts,addProduct,addUpload,editUpload,
@@ -12,7 +12,7 @@ const {getCategory,addCategory,uploadCategory,changeCategoryStatus,editCategory}
 
 const { isAuthenticated,preventCache } = require('../middleware/authMiddleware');
 
-const {getAllOrders,changeOrderStatus,viewOrder} = require('../controller/orderController')
+const {getAllOrders,changeOrderStatus,viewOrder,takeReturnAction} = require('../controller/orderController')
 
 const { getCoupons,addCoupon, editCoupon,changeCouponStatus } = require('../controller/coupon')
 
@@ -23,8 +23,7 @@ const { getSalesReport,getCustomSalesReport,downloadSalesReport } = require('../
 router.get('/login', getLogin);
 router.post('/login', getHome);
 
-router.get('/dashboard',preventCache, isAuthenticated, (req, res) => {
-    res.render('admin/dashboard')});
+router.get('/dashboard',preventCache, isAuthenticated,getDashboard);
 
 router.get('/users',preventCache, isAuthenticated, getUsers);
 router.patch('/users/:action/:id',changeUserStatus)
@@ -42,6 +41,7 @@ router.patch('/category/:action/:id',changeCategoryStatus)
 router.get('/orders',preventCache,isAuthenticated,getAllOrders)
 router.get('/orders/view/:orderId',preventCache,isAuthenticated,viewOrder)
 router.patch('/orders/status/:orderId',changeOrderStatus)
+router.patch('/orders/return/:orderId',takeReturnAction)
 
 router.get('/coupons',isAuthenticated,getCoupons)
 router.post('/coupons/create',addCoupon)

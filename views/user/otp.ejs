@@ -162,18 +162,8 @@
             })
         }
 
-        // function resendOTP() {
-        //     timeLeft = 60; 
-        //     document.getElementById('resendBtn').disabled = true;
-        //     startTimer(); 
-        // }
-
             function resendOTP() {
-
-        //  timeLeft = 60; 
             document.getElementById('resendBtn').disabled = true;
-            // startTimer(); 
-        // Call the backend to resend the OTP
         fetch('/user/resend-otp', {  
             method: 'POST',
             headers: {
@@ -206,7 +196,7 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Error!',
-                text: error.message,
+                text: 'error'+error.message,
                 })
         });
     }

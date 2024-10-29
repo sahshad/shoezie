@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const {addUser,getSignup,getLogin,getHome,getShop,getProduct,sortProducts,
-userLogIn,verifyOtp,getOtpPage,resendOtp} = require('../controller/userController')
+userLogIn,verifyOtp,getOtpPage,resendOtp,forgotPassword,sendOtp,
+forgotPasswordVerifyOtp,resetPassword,forgotPasswordResendOtp} = require('../controller/userController')
 
  const{getProfile,userLogOut,
     getAddress,getOrders,getOrderDetails,
@@ -13,7 +14,7 @@ const { userAuthenticated,preventCache} = require('../middleware/authMiddleware'
 const {getCart,getCheckout,addProductToCart,
     removeProductFromCart,updateProductQuantity} = require('../controller/cartController')
 
-const { createOrder,cancelOrder,updateOrderStatus,ordercreated} = require('../controller/orderController')
+const { createOrder,cancelOrder,updateOrderStatus,ordercreated,returnOrder,downloadInvoice} = require('../controller/orderController')
 
 const {validateCoupon} = require('../controller/coupon')
 
@@ -27,6 +28,11 @@ deleteProductFromWishlist
 
 router.get('/login',getLogin)
 router.post('/login',userLogIn)
+router.get('/forgot-password',forgotPassword)
+router.post('/forgot-password/send-otp',sendOtp)
+router.post('/forgot-password/resend-otp',forgotPasswordResendOtp)
+router.post('/forgot-password/verify-otp',forgotPasswordVerifyOtp)
+router.post('/forgot-password/reset',resetPassword)
 
 router.get('/profile',preventCache,userAuthenticated,getProfile)
 router.put('/profile/update',updateUserDetails)
@@ -39,6 +45,9 @@ router.delete('/profile/address/delete/:addressId',deleteAddress)
 router.get('/profile/orders',preventCache,userAuthenticated,getOrders)
 router.get('/profile/orders/:orderId',preventCache,userAuthenticated,getOrderDetails)
 router.patch('/profile/orders/cancel/:orderId',cancelOrder)
+router.patch('/profile/order/repay/:orderId',updateOrderStatus)
+router.post('/profile/order/return/:orderId',returnOrder)
+router.get('/profile/order/invoice/:orderId',downloadInvoice)
 
 router.get('/signup',getSignup)
 router.post('/register',addUser)
@@ -55,7 +64,7 @@ router.get('/cart',userAuthenticated,getCart)
 router.get('/cart/checkout',userAuthenticated,getCheckout)
 router.post('/cart/checkout/confirm-order',createOrder)
 router.patch('/cart/checkout/update-order/:orderId',updateOrderStatus)
-router.get('/cart/checkout/order-created',ordercreated)
+router.get('/cart/checkout/order-created/:orderId',ordercreated)
 
 router.post('/cart/add/:productId/:sizeId',addProductToCart)
 router.delete('/cart/remove/:productId',removeProductFromCart)

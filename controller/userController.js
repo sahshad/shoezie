@@ -5,6 +5,9 @@ const Category = require('../model/category')
 const bcrypt = require('bcrypt')
 const speakeasy = require('speakeasy')
 const nodemailer = require('nodemailer')
+const crypto = require('crypto')
+const {sendOTP} = require('../utils/emailUtils')
+
 
 const  { getBestOffer } = require('../utils/offerUtils')
 
@@ -86,16 +89,16 @@ async function addUser(req, res) {
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
-                user: 'shoezie47@gmail.com',
+                user: process.env.EMAIL_USER,
                 pass: process.env.GOOGLE_APP_PASSWORD,
             },
         });
 
         const mailOptions = {
-            from: 'shoezie47@gmail.com',
+            from: process.env.EMAIL_USER,
             to: email,
             subject: 'Your OTP Code',
-            text: `Your OTP is: ${token}. It is valid for 30 seconds.`,
+            text: `Your OTP is: ${token}. It is valid for 1 minutes.`,
         };
 
         await transporter.sendMail(mailOptions);
@@ -170,13 +173,13 @@ async function resendOtp(req,res) {
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
-                user: 'shoezie47@gmail.com',
+                user: process.env.EMAIL_USER,
                 pass: process.env.GOOGLE_APP_PASSWORD,
             },
         });
 
         const mailOptions = {
-            from: 'shoezie47@gmail.com',
+            from: process.env.EMAIL_USER,
             to: email,
             subject: 'Your OTP Code',
             text: `Your OTP is: ${otp}. It is valid for 1 minute.`,
@@ -418,7 +421,99 @@ async function sortProducts(req, res) {
     }
 }
 
+async function forgotPassword(req,res) {
+    res.render('user/forgotPassword')
+}
+
+async function sendOtp (req, res){
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        return res.status(404).json({success:false, message: 'User not found' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
+    req.session.otp = otp; // Store OTP in session
+    req.session.email = email; // Store email for verification
+
+    try {
+        await sendOTP(email, otp);
+        res.status(200).json({ success:true, message: 'OTP sent to your email' });
+    } catch (error) {
+        res.status(500).json({success:false,  message: 'Error sending OTP' });
+    }
+}
+
+async function forgotPasswordVerifyOtp(req, res){
+    const { otp } = req.body;
+
+    if (req.session.otp && parseInt(otp) === req.session.otp) {
+        req.session.verified = true; // Mark session as verified
+        res.status(200).json({success:true, message: 'OTP verified successfully' });
+    } else {
+        res.status(400).json({success:false, message: 'Invalid OTP' });
+    }
+}
+
+async function resetPassword (req, res) {
+    const { password } = req.body;
+console.log(password);
+
+    if (!req.session.verified || !req.session.email) {
+        return res.status(403).json({success:false, message: 'Unauthorized' });
+    }
+
+    try {
+        const user = await User.findOne({ email: req.session.email });
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Save the hashed password
+        user.password = hashedPassword;
+        await user.save();
+
+        // Clear session data
+        delete req.session.email
+        delete req.session.verified
+        delete req.session.otp
+
+        res.status(200).json({ success:true, message: 'Password reset successful' });
+    } catch (error) {
+        res.status(500).json({success:false, message: 'Error resetting password' });
+    }
+}
+
+async function forgotPasswordResendOtp(req, res){
+    if (!req.session.email) {
+        return res.status(400).json({success:false, message: 'No email found in session. Please start the process again.' });
+    }
+
+    const now = new Date().getTime();
+    const lastSentTime = req.session.lastOtpSentTime || 0;
+    const timeElapsed = (now - lastSentTime) / 1000; // in seconds
+
+    if (timeElapsed < 60) {
+        return res.status(429).json({
+            message: `Please wait ${60 - Math.floor(timeElapsed)} seconds before requesting a new OTP.`,
+        });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000); // Generate new 6-digit OTP
+    req.session.otp = otp;
+    req.session.lastOtpSentTime = now; // Store the time when the OTP was sent
+
+    sendOTP(req.session.email, otp)
+        .then(() => {
+            res.status(200).json({success:true, message: 'OTP resent successfully' });
+        })
+        .catch((error) => {
+            console.error('Error sending OTP:', error);
+            res.status(500).json({success:false, message: 'Error resending OTP. Please try again later.' });
+        });
+}
 module.exports ={
     getLogin,getSignup,addUser,getHome,getShop,
-    getProduct,userLogIn,sortProducts,getBestOffer,verifyOtp,getOtpPage,resendOtp
+    getProduct,userLogIn,sortProducts,getBestOffer,verifyOtp,getOtpPage,resendOtp,forgotPassword,sendOtp,
+    forgotPasswordVerifyOtp,resetPassword,forgotPasswordResendOtp
 }

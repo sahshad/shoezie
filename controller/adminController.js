@@ -1,7 +1,8 @@
 const Admin = require('../model/admin');
 const User = require('../model/user')
 const bcrypt = require('bcrypt');
-
+const Order = require('../model/order')
+const moment = require('moment')
 
 function getLogin(req, res) {
     if (req.session.admin) {
@@ -80,10 +81,151 @@ function getLogout(req,res){
       }
 }
 
+const getTopSellingCategories = async () => {
+    try {
+        const topCategories = await Order.aggregate([
+            { $unwind: "$items" },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "items.productId",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            { $unwind: "$productDetails" },
+            {
+                $group: {
+                    _id: "$productDetails.category",
+                    totalQuantity: { $sum: "$items.quantity" },
+                }
+            },
+            { $sort: { totalQuantity: -1 } },
+            { $limit: 10 },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "categoryDetails"
+                }
+            },
+            { $unwind: "$categoryDetails" },
+            {
+                $project: {
+                    categoryName: "$categoryDetails.name",
+                    categoryImage: "$categoryDetails.imageUrl",
+                    totalQuantity: 1
+                }
+            }
+        ]);
+        return topCategories;
+    } catch (error) {
+        console.error("Error fetching top-selling categories:", error);
+        throw error;
+    }
+};
+
+
+
+const getTopSellingProducts = async () => {
+    try {
+        const topProducts = await Order.aggregate([
+            { $unwind: "$items" },
+            {
+                $group: {
+                    _id: "$items.productId",
+                    totalQuantity: { $sum: "$items.quantity" },
+                }
+            },
+            { $sort: { totalQuantity: -1 } },
+            { $limit: 10 },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            { $unwind: "$productDetails" },
+            {
+                $project: {
+                    productName: "$productDetails.name",
+                    productImage: { $arrayElemAt: ["$productDetails.imageUrls", 0] },
+                    totalQuantity: 1
+                }
+            }
+        ]);
+        return topProducts;
+    } catch (error) {
+        console.error("Error fetching top-selling products:", error);
+        throw error;
+    }
+};
+
+
+
+async function getDashboard(req, res) {
+    try {
+        const users = await User.countDocuments();
+        const totalOrders = await Order.countDocuments();
+
+        const deliveredOrders = await Order.find({ orderStatus: 'Delivered' });
+        const totalSalesAmount = deliveredOrders.reduce((total, order) => total + order.totalAmount, 0);
+        const totalPendingOrders = await Order.countDocuments({ orderStatus: 'Pending' });
+
+
+        const topProducts = await getTopSellingProducts();
+        const topCategories = await getTopSellingCategories();
+
+        console.log(topProducts,topCategories);
+        
+        // Calculate sales data for charts
+        const salesData = {
+            weekly: await getSalesData('week'),
+            monthly: await getSalesData('month'),
+            yearly: await getSalesData('year'),
+        };
+
+        res.render('admin/dashboard', {
+            users,
+            totalOrders,
+            totalSalesAmount,
+            totalPendingOrders,
+            salesData,
+            topProducts,
+            topCategories
+        });
+    } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+async function getSalesData(period) {
+    const startDate = moment().startOf(period).toDate();
+    const endDate = moment().endOf(period).toDate();
+
+    const orders = await Order.find({
+        orderStatus: 'Delivered',
+        createdAt: { $gte: startDate, $lte: endDate }
+    });
+
+    const sales = {};
+    orders.forEach(order => {
+        const dateKey = moment(order.createdAt).format(period === 'year' ? 'YYYY' : period === 'month' ? 'MMM YYYY' : 'dddd');
+        sales[dateKey] = (sales[dateKey] || 0) + order.totalAmount;
+    });
+
+    return sales;
+}
+
 module.exports = {
     getLogin,
     getHome,
     getUsers,
     changeUserStatus,
-    getLogout
+    getLogout,
+    getDashboard
 };

@@ -8,210 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/admin/dashboard.css"> <!-- Point to your custom CSS -->
+
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #ffffff;
-        }
 
-        .sidebar {
-            height: 100vh;
-            width: 250px;
-            background-color: rgb(153, 176, 220);
-            position: fixed;
-            top: 0;
-            left: 0;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-
-        }
-
-        .sidebar.active {
-            transform: translateX(-100%);
-        }
-
-        .sidebar .sidebar-header {
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        .sidebar .profile-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .sidebar .profile-container img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 10px;
-        }
-
-        .sidebar .profile-container h3 {
-            font-size: 1rem;
-            color: #ffffff;
-            margin: 0;
-        }
-
-        .sidebar .list-unstyled {
-            padding: 0;
-            margin: 0;
-        }
-
-        .sidebar .list-unstyled li {
-            padding: 13px 15px;
-            text-align: left;
-            margin-left: 40px;
-        }
-
-        .sidebar .list-unstyled li a {
-            color: #000000;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            transition: background 0.3s, transform 0.3s, color 0.3s;
-        }
-
-        .sidebar .list-unstyled li a:hover {
-            color: #ffffff;
-            transform: scale(1.05);
-        }
-
-        .sidebar .list-unstyled li a i {
-            margin-right: 8px;
-        }
-
-        #page-content-wrapper {
-            padding: 3px;
-            width: 100%;
-            margin-left: 250px;
-            transition: margin-left 0.3s, width 0.3s;
-        }
-
-        #page-content-wrapper.toggled {
-            margin-left: 0;
-            width: 100%;
-        }
-
-        .navbar {
-            background-color: #ffffff;
-            height: 50px; /* Reduced height */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .navbar button {
-            height: 30px; /* Reduced height of toggle button */
-      
-        }
-
-        .form-inline input {
-            height: 30px; /* Reduced height of input */
-            padding: 0 10px; /* Adjusted padding */
-            font-size: 14px; /* Font size of input */
-        }
-
-        .form-inline button {
-            height: 30px; /* Reduced height of button */
-            padding: 0 10px; /* Adjusted padding */
-            font-size: 14px; /* Font size of button */
-        }
-
-        .card {
-            border: none;
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .bg-primary {
-            background-color: #007bff !important;
-        }
-
-        .bg-success {
-            background-color: #28a745 !important;
-        }
-
-        .bg-info {
-            background-color: #17a2b8 !important;
-        }
-
-        .bg-warning {
-            background-color: #ffc107 !important;
-        }
-
-        .text-white {
-            color: #ffffff !important;
-        }
-
-        .text-dark {
-            color: #212529 !important;
-        }
-
-        .form-inline {
-            display: flex;
-            flex-flow: row nowrap;
-            align-items: center;
-        }
-
-        .navbar-text {
-            color: #ffffff;
-            font-weight: bold;
-        }
-        .line {
-            border:1px solid rgb(243, 243, 243);
-          margin-bottom: 25px;
-        }
-        /* Custom Card Styles */
-.custom-card {
-    border-radius: 0.5rem; /* Rounded corners */
-    padding: 20px; /* Padding inside the card */
-    color: #333; /* Dark text color for better contrast */
-    transition: transform 0.2s; /* Smooth scaling on hover */
-}
-
-.custom-card:hover {
-    transform: scale(1.05); /* Scale effect on hover */
-}
-
-/* Light Background Colors for Different Card Types */
-.card-users {
-    background-color: #e7f1ff; /* Light blue */
-}
-
-.card-orders {
-    background-color: #d4edda; /* Light green */
-}
-
-.card-sales {
-    background-color: #d1ecf1; /* Light cyan */
-}
-
-.card-pending {
-    background-color: #fff3cd; /* Light yellow */
-}
     </style>
 </head>
 <body>
-    <div class="d-flex" id="wrapper">
+    <div class="d-flex " id="wrapper">
       <%- include('partials/sidebar') %>
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg mb-1 mt-1">
@@ -230,7 +34,7 @@
                         <div class="card custom-card card-users">
                             <div class="card-body">
                                 <h5 class="card-title">Total Users</h5>
-                                <p class="card-text" id="totalUsers">1,234</p>
+                                <p class="card-text" id="totalUsers"><%= users %></p>
                             </div>
                         </div>
                     </div>
@@ -239,7 +43,7 @@
                         <div class="card custom-card card-orders">
                             <div class="card-body">
                                 <h5 class="card-title">Total Orders</h5>
-                                <p class="card-text" id="totalOrders">567</p>
+                                <p class="card-text" id="totalOrders"><%= totalOrders %></p>
                             </div>
                         </div>
                     </div>
@@ -248,7 +52,7 @@
                         <div class="card custom-card card-sales">
                             <div class="card-body">
                                 <h5 class="card-title">Total Sales</h5>
-                                <p class="card-text" id="totalSales">₹89,345</p>
+                                <p class="card-text" id="totalSales">₹ <%= totalSalesAmount.toFixed(2) %></p>
                             </div>
                         </div>
                     </div>
@@ -257,25 +61,159 @@
                         <div class="card custom-card card-pending">
                             <div class="card-body">
                                 <h5 class="card-title">Total Pending</h5>
-                                <p class="card-text" id="totalPending">12</p>
+                                <p class="card-text" id="totalPending"><%= totalPendingOrders %></p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="container">
+                <h4 class="my-4">Sales Charts</h4>
+                <div class="btn-group" role="group" aria-label="Time Frame">
+                    <button type="button" class="btn btn-outline-primary" onclick="updateChart('weekly')">Weekly</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="updateChart('monthly')">Monthly</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="updateChart('yearly')">Yearly</button>
+                </div>
+                <canvas id="salesChart" width="600" height="200"></canvas>
+            </div>
+
+            <div class="container mt-5">
+                <div class="row">
+                    <!-- Left: Top 10 Best-Selling Products -->
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Best-Selling Products</h5>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Image</th>
+                                    <th>Product Name</th>
+                                    <th>Total Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% topProducts.forEach((product,index) => { %>
+                                    <tr>
+                                        <td># <%= index+1 %></td>
+                                        <td>
+                                            <img 
+                                                src="<%= product.productImage %>" 
+                                                alt="<%= product.productName %>" 
+                                                width="50"
+                                                height="50"
+                                                style="object-fit: cover; border-radius: 5px;">
+                                        </td>
+                                        <td><%= product.productName %></td>
+                                        <td><%= product.totalQuantity %></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
             
-            
+                    <!-- Right: Top 10 Best-Selling Categories -->
+                    <div class="col-md-6">
+                        <h5 class="mb-3"> Best-Selling Categories</h5>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Image</th>
+                                    <th>Category Name</th>
+                                    <th>Total Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% topCategories.forEach((category,index) => { %>
+                                    <tr>
+                                        <td>#<%= index+1 %></td>
+                                        <td>
+                                            <img 
+                                                src="<%= category.categoryImage %>" 
+                                                alt="<%= category.categoryName %>" 
+                                                width="50"
+                                                height="50"
+                                                style="object-fit: cover; border-radius: 5px;">
+                                        </td>
+                                        <td><%= category.categoryName %></td>
+                                        <td><%= category.totalQuantity %></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> 
         </div>
     </div>
 
+    <div id="sales-data" data-sales='<%- JSON.stringify(salesData) %>'></div>
+
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('page-content-wrapper').classList.toggle('toggled');
         });
+
+        const salesData = JSON.parse(document.getElementById('sales-data').dataset.sales);
+
+
+    let currentChart; // Store the current chart instance
+
+    const ctx = document.getElementById('salesChart').getContext('2d');
+
+    function createChart(period) {
+        const labels = Object.keys(salesData[period]);
+        const data = Object.values(salesData[period]);
+
+        if (currentChart) {
+            currentChart.destroy(); // Destroy the previous chart instance
+        }
+
+        currentChart = new Chart(ctx, {
+            type: 'bar',// Change to 'bar' for bar chart
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: `${period.charAt(0).toUpperCase() + period.slice(1)} Sales`,
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)', // Bar color
+                    borderColor: 'rgba(54, 162, 235, 1)', // Border color
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Sales Amount (₹)', // Y-axis title
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time Period', // X-axis title
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateChart(period) {
+        createChart(period); // Call the createChart function with the selected period
+    }
+
+    // Initialize the chart with the default period
+    updateChart('weekly'); // Load weekly data by default
     </script>
 </body>
 </html>

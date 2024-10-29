@@ -4,16 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SHOEZIE - My Orders</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="/styles/user/partials/navbar.css">
     <link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
     
@@ -28,75 +22,107 @@
     <div class="container mt-5">
         <div class="row">
             <%- include('partials/profileSidebar')  %>
-            <div class="col-md-9 pl-5 mt-4">
+            <div class="col-md-9 pl-5">
                 <h5 class="mb-4">My Orders</h5>
-                <div class="table-responsive">
+                <div class="order-container">
                     <% if(order.length > 0){ %>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Order Date</th>
-                                <th>Status</th>
-                                <th>Payment </th>
-                                <th>Total Price</th>
-                                <th>Items</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% order.forEach((order,index) =>{ %>
-                                <tr>
-                                    <td><%= index+1%></td>
-                                    <td><%= order.orderDate.toLocaleDateString() %></td>
-                                    <td>
-                                        <span class="badge <%= 
+                        <% order.forEach((order, index) => { %>
+                            <div class="order-card border p-3 mb-3">
+                                <a href="/user/profile/orders/<%= order._id %>">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="">
+                                        <strong>Order #<%= index + 1 %></strong>
+                                        <div>
+                                        <span class="badge  <%= 
+                                            order.orderStatus === 'Returned' ? 'badge-success' :
                                             order.orderStatus === 'Pending' ? 'badge-warning' :
                                             order.orderStatus === 'Processing' ? 'badge-info' :
                                             order.orderStatus === 'Shipped' ? 'badge-primary' :
-                                            order.orderStatus === 'Delivered' ? 'badge-success' :
+                                            order.orderStatus === 'Delivered' ? 'badge-success':
                                             order.orderStatus === 'Cancelled' ? 'badge-danger' :
-                                            '' // fallback class if needed
+                                            order.orderStatus === 'Failed' ? 'badge-danger' :
+                                            '' 
                                         %>">
                                             <%= order.orderStatus %>
                                         </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge <%= 
-                                            order.paymentStatus === 'Pending' ? 'badge-warning' :
-                                            order.paymentStatus === 'Paid' ? 'badge-success' :
-                                            order.paymentStatus === 'Failed' ? 'badge-danger' :
-                                            
-                                            '' // fallback class if needed
-                                        %>">
-                                            <%= order.paymentStatus %>
-                                        </span>
-                                    </td>
-                                    <td>₹ <%= order.totalAmount %>.00</td>
-                                    <td>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div class="d-flex">
-                                                <% order.items.forEach((item, index) => { %>
-                                                    <% if (index < 3) { %>
-                                                        <img src="<%= item.productId.imageUrls[0] %>" alt="Item <%= index + 1 %>" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 3px;">
-                                                    <% } %>
-                                                <% }) %>
-                                                
-                                                <% if (order.items.length > 3) { %>
-                                                    <span class="mt-2 ml-2">+<%= order.items.length -3 %></span>
-                                                <% } %>
-                                            </div>
-                                            <a href="/user/profile/orders/<%= order._id %>" class="btn btn-info  btn-sm ml-2"><i class="fa-regular fa-eye" style="color: #ffffff;"></i> View</a>
+                                    </div>
+                                    </div>
+
+                                    
+                                    <div><%= order.orderDate.toLocaleDateString() %></div>
+                                    <% if(order.return.status){ %>
+                                        <div class="d-flex align-items-center">
+                                            Return
+                                            <span class="badge ml-3  <%= 
+                                                order.return.status === 'Pending' ? 'badge-warning' :
+                                                order.return.status === 'Approved' ? 'badge-success' :
+                                                order.return.status === 'Rejected' ? 'badge-danger' :
+                                                '' 
+                                            %>">
+                                                <%= order.return.status %>
+                                            </span>
                                         </div>
-                                    </td>
-                                </tr>
-                           <% }) %>
-                            
-                        </tbody>
-                    </table>
-                    <% }else{ %>
+                                    <% }else if(order.orderStatus === 'Cancelled'){ %>
+                                        <div class="d-flex align-items-center">
+                                            Order Cancelled
+                                        </div>
+                                    <% }else{ %>
+                                        <div class="d-flex align-items-center">
+                                            payment
+                                            <span class="badge ml-3  <%= 
+                                                order.paymentStatus === 'Pending' ? 'badge-warning' :
+                                                order.paymentStatus === 'Paid' ? 'badge-success' :
+                                                order.paymentStatus === 'Failed' ? 'badge-danger' :
+                                                '' 
+                                            %>">
+                                                <%= order.paymentStatus %>
+                                            </span>
+                                        </div>
+                                    <% } %>
+                               
+                                    <div> ₹ <%= order.totalAmount %>.00</div>
+                                    <div class="d-flex align-items-center ml-3">
+                                        <% order.items.forEach((item, index) => { %>
+                                            <% if (index < 3) { %>
+                                                <img src="<%= item.productId.imageUrls[0] %>" alt="Item <%= index + 1 %>" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 3px;">
+                                            <% } %>
+                                        <% }) %>
+                                        <% if (order.items.length > 3) { %>
+                                            <span class="mt-2">+<%= order.items.length - 3 %></span>
+                                        <% } %>
+                                    </div>
+                                </div>  
+                            </a>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
                         <p>No orders found</p>
                     <% } %>
                 </div>
+                
+                <style>
+                .order-container {
+                    max-width: 800px; /* Adjust width as needed */
+                    margin: auto;
+                }
+                
+                .order-card {
+                    border: 1px solid #ccc; /* Border for each order */
+                    border-radius: 5px; /* Optional: rounded corners */
+                    background-color: #fff; /* Optional: background color */
+                }
+                .order-card a{
+                    text-decoration: none;
+                    color: black;
+                }
+                .order-card img {
+                    width: 50px; /* Image width */
+                    height: 50px; /* Image height */
+                    margin-right: 3px; /* Spacing between images */
+                }
+                </style>
+                
+    
             </div>
         </div>
     </div>
@@ -106,5 +132,7 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </body>
 </html>

@@ -76,12 +76,14 @@
                             </div>
 
                             <button type="button" class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+                         <% if(sales.length > 0){ %>
                             <button type="button" class="btn btn-secondary btn-download" onclick="downloadReport('pdf','<%= startDate  %>','<%= endDate  %>')">Download PDF</button>
                             <button type="button" class="btn btn-secondary btn-download" onclick="downloadReport('excel','<%= startDate  %>','<%= endDate  %>')">Download Excel</button>
+                         <%  } %>
                         </form>
                     </div>
                 </div>
-
+                <% if(sales.length > 0){ %>
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Sales Summary</h5>
@@ -91,11 +93,11 @@
                         </span></p>
                         <p><strong>Overall Discount:</strong> ₹<span id="overallDiscount">
                             <%= sales.reduce((total, sale) => {
-                           return total + (sale.totalAmount+ (sale.offerDiscount?sale.offerDiscount:0)+(sale.couponDiscount?sale.couponDiscount:0))}, 0).toFixed(2) %>
+                           return total + ( (sale.offerDiscount?sale.offerDiscount:0)+(sale.couponDiscount?sale.couponDiscount:0))}, 0).toFixed(2) %>
                         </span></p>
                     </div>
                 </div>
-
+                <%  } %>
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Sales Details</h5>

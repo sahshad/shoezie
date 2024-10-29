@@ -11,8 +11,10 @@
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <!-- Custom CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <link rel="stylesheet" href="/styles/admin/dashboard.css">
-    <link rel="stylesheet" href="/styles/admin/products.css"> <!-- Add custom styles for the orders page -->
+    <link rel="stylesheet" href="/styles/admin/products.css">
 </head>
 
 <body>
@@ -43,12 +45,13 @@
                         </thead>
                         <tbody>
                             <% orders.forEach((order,index) => { %>
-                                <tr>
+                                <tr class="orders">
                                     <td><%= index+1 %></td>
                                     <td><%= order._id %></td>
                                     <td><%= order.userId.firstname %></td>
                                     <td class="d-flex justify-content-between align-items-center">
                                         <span id="orderStatus" class="badge <%= 
+                                            order.orderStatus === 'Returned' ? 'badge-success' :
                                             order.orderStatus === 'Pending' ? 'badge-warning' :
                                             order.orderStatus === 'Processing' ? 'badge-info' :
                                             order.orderStatus === 'Shipped' ? 'badge-primary' :
@@ -59,18 +62,20 @@
                                             <%= order.orderStatus %>
                                         </span>
                                         <div >
-                                            <% if(order.orderStatus === 'Cancelled'){ %>
+                                            <% if(order.orderStatus === 'Cancelled' || order.orderStatus === 'Returned' || order.orderStatus === 'Delivered'){ %>
                                                 <button class="btn" onclick="openChangeStatusModal('<%= order._id %>')" disabled
                                                     >
                                                     <i class="fa-solid fa-arrow-right-arrow-left" style="color: black;"></i>
                                                 </button>
-                                            <%}else{ %>
+                                            <%}else if(order.return.reason && order.return.status !== 'Approved' && order.return.status !== 'Rejected'){ %>
+                                                  <button class="btn btn-sm btn-primary ml-2" 
+                                                  onclick="openReturnApprovalModal('<%= order._id %>','<%=order.return.reason %>')">Review</button>
+                                            <% }else{ %>
                                                 <button class="btn" onclick="openChangeStatusModal('<%= order._id %>')">
                                                     <i class="fa-solid fa-arrow-right-arrow-left" style="color: black;"></i>
                                                 </button>
                                            <%  } %>
                                             
-
                                         </div>
                                     </td>
                                     <td>₹ <%= order.totalAmount.toFixed(2) %></td>
@@ -145,6 +150,29 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="returnApprovalModal" tabindex="-1" role="dialog" aria-labelledby="returnApprovalModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="returnApprovalModalLabel">Return Approval</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6>Order ID: <span id="returnOrderId"></span></h6>
+                <p>Reason for Return: <span id="returnReason"></span></p>
+                <div class="d-flex justify-content-around mt-4">
+                    <button class="btn btn-success" onclick="approveReturn('approved')">Approve</button>
+                    <button class="btn btn-danger" onclick="approveReturn('rejected')">Reject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Modal for Changing Order Status -->
 <div class="modal fade" id="changeStatusModal" tabindex="-1" role="dialog" aria-labelledby="changeStatusModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -177,7 +205,57 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
+
+
+function openReturnApprovalModal(orderId,reason) {
+    // Fetch order details if needed
+    document.getElementById('returnOrderId').innerText = orderId;
+    document.getElementById('returnReason').innerText = reason
+    $('#returnApprovalModal').modal('show');
+}
+
+function approveReturn(action) {
+    const orderId = document.getElementById('returnOrderId').innerText;
+
+    fetch(`/admin/orders/return/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }) // 'approved' or 'rejected'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success alert using SweetAlert
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: data.message,
+            }).then(() => {
+                location.reload(); // Reload the page on success
+            });
+        } else {
+            // Show error alert if the request failed
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed',
+                text: data.message,
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Show error alert if the fetch operation fails
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong. Please try again later.',
+        });
+    });
+}
+
         function viewOrder(orderId, products) {
             
             document.getElementById('orderId').innerText=orderId
@@ -227,6 +305,8 @@ function submitChangeStatus() {
         console.error('There was a problem with the fetch operation:', error);
     });
 }
+
+
 
     </script>
 </body>

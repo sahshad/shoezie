@@ -8,6 +8,10 @@ const Cart = require('../model/cart')
 const Wallet = require('../model/wallet')
 const Coupon = require('../model/coupon')
 const User = require('../model/user')
+const pdf = require('html-pdf');
+const fs = require('fs');
+const ejs = require('ejs');
+
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_ID_KEY,
@@ -177,7 +181,6 @@ async function createRazorpayOrder(amount) {
 
 
 
-// Create Order Route
 
 async function createOrder(req, res) {
   const userId = req.session.user;
@@ -198,6 +201,9 @@ async function createOrder(req, res) {
     }
 
     if (paymentMethod === 'razorpay') {
+      if(couponCode){
+        req.session.coupon = couponCode
+      }
       const newOrder = new Order({
         userId,
         items,
@@ -273,49 +279,80 @@ async function createOrder(req, res) {
 async function updateOrderStatus(req, res) {
   const userId = req.session.user
   const { orderId } = req.params;
-  const { status, razorpayResponse } = req.body;
+  const { status, razorpayResponse,repay } = req.body;
   let orderStatus
+  
+  if(repay){
+    console.log('hi');
+    
+  }
+  if (req.session.coupon) {
+    const couponCode = req.session.coupon
+    delete req.session.coupon
+    const updatedCoupon = await Coupon.findOneAndUpdate(
+      { code: couponCode },
+      { $inc: { usedCount: 1 } },
+      { new: true }
+    );
+    const coupon = await Coupon.findOne({ code: couponCode })
+
+    const user = await User.findById(userId)
+
+    if (!user.usedCoupons) {
+      user.usedCoupons = []
+    }
+
+    user.usedCoupons.push(coupon._id)
+    await user.save()
+
+    if (!updatedCoupon) {
+      console.log('Coupon not found or already used limit reached.');
+      return;
+    }
+  }
+
   if (status === 'Paid') {
     orderStatus = 'Pending'
-
+  if(!repay){
     await Cart.findOneAndUpdate(
       { user: userId },
       { $set: { products: [] } },
       { new: true }
     );
+  }
 
-    if (couponCode) {
+    const order = await Order.findById(orderId)
+    const items = order.items
+    console.log(order,items);
+    
+    for (const item of items) {
+            const product = await Product.findById(item.productId);
+            if (!product) throw new Error('Product not found');
+      
+            const variant = product.sizes.find(size => size._id.toString() === item.sizeId.toString());
+            if (!variant) throw new Error('Size not found');
+      
+            if (variant.stock < item.quantity) {
+              return res.status(400).json({ success:false, message: `Not enough stock for ${product.name}. Available stock: ${variant.stock}` });
+            }
+          }
 
-      const updatedCoupon = await Coupon.findOneAndUpdate(
-        { code: couponCode },
-        { $inc: { usedCount: 1 } },
-        { new: true }
+    for (const item of items) {
+      const updateResult = await Product.updateOne(
+        { _id: item.productId, 'sizes._id': item.sizeId },
+        { $inc: { 'sizes.$.stock': -item.quantity } }
       );
-      const coupon = await Coupon.findOne({ code: couponCode })
-
-      const user = await User.findById(userId)
-
-      if (!user.usedCoupons) {
-        user.usedCoupons = []
-      }
-
-      user.usedCoupons.push(coupon._id)
-      await user.save()
-
-      if (!updatedCoupon) {
-        console.log('Coupon not found or already used limit reached.');
-        return;
-      }
     }
-
   } else {
     orderStatus = 'Failed'
 
+     if(!repay){
     await Cart.findOneAndUpdate(
       { user: userId },
       { $set: { products: [] } },
       { new: true }
     );
+  }
   }
 
   try {
@@ -455,10 +492,150 @@ async function viewOrder(req, res) {
 }
 
 async function ordercreated(req, res) {
-  res.render('user/orderCompleted')
+  const {orderId} = req.params
+  const order = await Order.findById(orderId).populate('userId').populate('items.productId')
+  res.render('user/orderCompleted',{order})
 }
 
+async function returnOrder (req, res){
+  const { orderId } = req.params;
+  const { reason } = req.body;
+
+  try {
+      const order = await Order.findById(orderId);
+      if (!order) {
+          return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+
+      if (order.return.reason) {
+          return res.status(400).json({ success: false, message: 'Return request already submitted' });
+      }
+
+      order.return = {
+          reason,
+          status: 'Pending', 
+          requestedAt: new Date(),
+      };
+
+      await order.save();
+
+      res.status(200).json({ success: true, message: 'Return request submitted successfully' });
+  } catch (error) {
+      console.error('Error processing return request:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+}
+
+
+async function takeReturnAction(req,res){
+  const { orderId } = req.params;
+  const { action } = req.body;
+
+  try {
+      const order = await Order.findById(orderId).populate('userId');
+
+      if (!order) {
+          return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+
+      if (!order.return || order.return.status !== 'Pending') {
+          return res.status(400).json({ success: false, message: 'No pending return request for this order' });
+      }
+
+      if (action === 'approved') {
+          for (const item of order.items) {
+              const updateResult = await Product.updateOne(
+                  { _id: item.productId, 'sizes._id': item.sizeId },
+                  { $inc: { 'sizes.$.stock': item.quantity } }
+              );
+
+              if (updateResult.nModified === 0) {
+                  return res.status(400).json({
+                      success: false,
+                      message: `Failed to update stock for product ID ${item.productId} and size ID ${item.sizeId}`,
+                  });
+              }
+          }
+
+          const wallet = await Wallet.findOne({ userId: order.userId._id });
+
+          if (!wallet) {
+              return res.status(404).json({ success: false, message: 'Wallet not found for this user' });
+          }
+
+          wallet.balance += order.totalAmount;
+          wallet.transactions.push({
+              amount: order.totalAmount,
+              type: 'credit',
+          });
+          await wallet.save();
+          
+          order.orderStatus = 'Returned'
+      }
+
+      order.return.status = action === 'approved' ? 'Approved' : 'Rejected';
+      order.return.processedAt = new Date();
+      await order.save();
+
+      return res.status(200).json({
+          success: true,
+          message: `Return has been ${action} successfully`,
+      });
+
+  } catch (error) {
+      console.error('Error while processing return request:', error);
+      return res.status(500).json({
+          success: false,
+          message: 'Internal server error. Please try again later.',
+      });
+  }
+
+}
+
+async function downloadInvoice(req,res) {
+
+  try {
+    const order = await Order.findById(req.params.orderId).populate('items.productId');
+    if (!order) return res.status(404).send('Order not found');
+
+    const invoiceData = {
+        invoiceId: order._id,
+        orderDate: order.orderDate.toLocaleDateString(),
+        customerName: order.shippingAddress.fullname,
+        customerAddress: `${order.shippingAddress.address}`,
+        items: order.items.map(item => ({
+            productName: item.productId.name,
+            quantity: item.quantity,
+            price: item.price
+        })),
+        totalAmount: order.items.reduce((total, item) => total + (item.price * item.quantity), 0)
+    };
+
+    ejs.renderFile('views/user/invoice/invoice-template.ejs', invoiceData, (err, html) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error generating PDF');
+        }
+
+        const options = { format: 'A4' };
+        pdf.create(html, options).toBuffer((err, buffer) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Error generating PDF');
+            }
+
+            res.setHeader('Content-Disposition', `attachment; filename=invoice-${order._id}.pdf`);
+            res.setHeader('Content-Type', 'application/pdf');
+            res.send(buffer);
+        });
+    });
+} catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+}
+  
+}
 module.exports = {
   createOrder, getAllOrders, cancelOrder, changeOrderStatus, viewOrder,
-  createRazorpayOrder, updateOrderStatus, ordercreated
+  createRazorpayOrder, updateOrderStatus, ordercreated, returnOrder ,takeReturnAction,downloadInvoice
 }
