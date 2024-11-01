@@ -62,7 +62,8 @@
                                             <%= order.orderStatus %>
                                         </span>
                                         <div >
-                                            <% if(order.orderStatus === 'Cancelled' || order.orderStatus === 'Returned' || order.orderStatus === 'Delivered'){ %>
+                                            <% if(order.orderStatus === 'Cancelled' || order.orderStatus === 'Returned' ){ %>
+
                                                 <button class="btn" onclick="openChangeStatusModal('<%= order._id %>')" disabled
                                                     >
                                                     <i class="fa-solid fa-arrow-right-arrow-left" style="color: black;"></i>

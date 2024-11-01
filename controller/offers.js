@@ -4,7 +4,7 @@ const Offer = require('../model/offers')
 
 async function getOffers(req,res){
     const offers = await Offer.find().populate('targetId')
-    res.render('admin/offers',{offers})
+    res.render('admin/offers',{offers , currentPage:'offers'})
 }
 
 

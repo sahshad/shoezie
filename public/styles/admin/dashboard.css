@@ -3,10 +3,12 @@ body {
     background-color: #ffffff;
 }
 
+
 .sidebar {
     height: 100vh;
     width: 250px;
-    background-color: rgb(153, 176, 220);
+    background-color: rgb(248, 248, 248);
+    /* border-right: 1px solid black; */
     position: fixed;
     top: 0;
     left: 0;
@@ -63,18 +65,22 @@ body {
     display: flex;
     align-items: center;
     text-decoration: none;
-    transition: background 0.3s, transform 0.3s, color 0.3s;
 }
 
-.sidebar .list-unstyled li a:hover {
-    color: #ffffff;
-    transform: scale(1.05);
-}
 
 .sidebar .list-unstyled li a i {
     margin-right: 8px;
 }
+.sidebar .list-unstyled li.active a {
+    padding-block: 5px;
+    padding-inline: 8px;
+    border-radius: 5px;
+    width: 140px;
+    background-color: #393939; /* Black background */
+    color: #ffffff; /* White text */
+    transition: all 1s ease;
 
+}
 #page-content-wrapper {
     padding: 3px;
     width: 100%;
@@ -198,3 +204,9 @@ body {
 .card-pending {
     background-color: #fff3cd; /* Light yellow */
 }
+.add-category , .add-product ,.create-offer ,.create-coupon{
+    color: rgb(255, 255, 255);
+    background-color: #393939;
+    border: 1px solid black;
+    border-radius: 5px;
+   }

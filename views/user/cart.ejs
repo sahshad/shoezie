@@ -14,7 +14,7 @@
     .product-card {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: space-evenly;
         margin-bottom: 15px; 
         border: 1px solid #ddd;
         padding: 10px; 
@@ -22,20 +22,11 @@
         height: 100px;
     }
     .product-info {
-        flex-grow: 1;
+        flex: 5;
         margin-left: 10px; 
     }
     .product-info p{
         margin: 0;
-    }
-    .delete-icon {
-        cursor: pointer;
-        color: red;
-        font-size: 1em;
-        display: block;
-        text-align: right;
-        margin-bottom: 20px;
-        margin-right: 10px;
     }
 
     .quantity-input {
@@ -44,6 +35,59 @@
         margin-top: 5px; 
     }
 
+    .product-quantity{
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        gap: 25px;
+        justify-content: space-evenly;
+        align-items: center;
+        border: 1px solid rgb(189, 189, 189);
+        background-color: #f8f8f8;
+        border-radius: 5px;
+        padding-inline: 10px;
+        padding-block: 3px;
+
+    }
+    .quantity-decrease , .quantity-increase {
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .product-remove{
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 10px;
+    }
+    .xmark {
+    position: relative;
+    width: 22px;
+    height: 22px; 
+    background-color: #ebebeb;
+    border-radius: 5px;
+    cursor: pointer;
+    }
+
+    .xmark::before,
+    .xmark::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5%;
+        height: 13px; 
+        background-color: rgb(74, 74, 74);
+    }
+
+    .xmark::before {
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .xmark::after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+    }
 
     </style>
 </head>
@@ -66,15 +110,20 @@
     
                         <% const size = cart.productId.sizes.find(size =>
                              size._id.toString() === cart.sizeId.toString()) %>
-                        <p>Size: <%= size.size %></p>
-    
+
+                             <%if(size.stock === 0){ %>
+                                <p class="out-of-stock" style="color: red;"><small>currently unavailable</small></p>
+                                <%}else{%>
+                                    <p class="size">Size: <%= size.size %></p>
+                                <%}%>
+
                         <p class="price">
                             <% let originalPrice = cart.productId.price; %>
                             <% let finalPrice = originalPrice; %>
                             <% let discountAmount = 0; %>
     
                             <% if (cart.bestOffer) { %>
-                                <span style="text-decoration: line-through; color: gray; margin-right: 5px;">
+                                <span class="original-price" style="text-decoration: line-through; color: gray; margin-right: 5px;">
                                     ₹ <%= originalPrice %>
                                 </span>
     
@@ -93,26 +142,27 @@
                                     %>
                                 <% } %>
     
-                                ₹ <%= finalPrice.toFixed(2) %>
+                                <span class="discounted-price">₹ <%= finalPrice.toFixed(2) %></span>
                             <% } else { %>
-                                ₹ <%= originalPrice.toFixed(2) %>
+                                <span class="original-price">₹ <%= originalPrice.toFixed(2) %></span>
                             <% } %>
                         </p>
     
                     </div>
-                    <div>
-                        <span class="delete-icon" onclick="removeProduct('<%= cart._id %>')">
-                            <i class="fas fa-trash"></i>
-                        </span>
-                        <input type="number" value="<%= cart.quantity %>" min="1" 
-                               class="form-control quantity-input" 
-                               oninput="debounceUpdateQuantity('<%= cart._id %>', this.value)">
+                    <div class="product-quantity">
+                        <div class="quantity-decrease" onclick="decreaseQuantity(this ,'<%= cart._id %>')">-</div>
+                        <div class="current-quantity" id="current-quantity"><%= cart.quantity %></div>
+                        <div class="quantity-increase" onclick="increaseQuantity(this ,'<%= cart._id %>')">+</div>
+                    </div>
+                    
+                    <div class="product-remove">
+                       <div class="xmark" onclick="removeProduct('<%= cart._id %>')"></div>
                     </div>
                 </div>
     
                 <% subtotal += finalPrice * cart.quantity; %>
                 <% totalDiscount += discountAmount * cart.quantity; %>
-            <% }); %>    
+            <% }) %>    
         </div>
     
         <% } else { %>
@@ -142,7 +192,7 @@
             </ul>
     
             <div class="text-center mt-4">
-                <a href="/user/cart/checkout" class="btn btn-success">Go to Checkout <i class="fas fa-arrow-right"></i></a>
+                <a onclick="goToCheckout()" class="btn btn-success">Go to Checkout <i class="fas fa-arrow-right"></i></a>
             </div>
         </div>
         <% } %>
@@ -164,7 +214,7 @@
         text: "This product will be removed from your cart.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: '#000',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
@@ -211,25 +261,37 @@
     });
 }
 
- let debounceTimer;
- let currentStockValue;
-function debounceUpdateQuantity(cartId, newQuantity) {
-    clearTimeout(debounceTimer); 
-    debounceTimer = setTimeout(() => {
-        updateQuantity(cartId, newQuantity); 
-        
-    }, 2000);  
+function increaseQuantity(element , cartId){
+    const productCard = element.closest('.product-card')
+    const quantityCard = productCard.querySelector('.product-quantity')
+    const currentQuantityElement = quantityCard.querySelector('.current-quantity')
+    const newQuantity = parseFloat(currentQuantityElement.innerText) + 1
+    updateQuantity(cartId,newQuantity,currentQuantityElement)
 }
 
-function updateQuantity(cartId, newQuantity) {
+function decreaseQuantity(element , cartId){
+    const productCard = element.closest('.product-card')
+    const quantityCard = productCard.querySelector('.product-quantity')
+    const currentQuantityElement = quantityCard.querySelector('.current-quantity')
+    const newQuantity = parseFloat(  currentQuantityElement.innerText) - 1
+    updateQuantity(cartId,newQuantity,currentQuantityElement)
+}
+
+function updateQuantity(cartId , newQuantity,currentQuantityElement) {
 
     if (newQuantity < 1) {
-        alert("Quantity cannot be less than 1");
+        Toastify({
+            text: 'quantity cannot be less than 1',
+            duration: 1000,
+            close: true,
+            gravity: "top",
+            position: 'right',
+            style:{ background: "linear-gradient(to right, #ff5f5f, #ff1a1a)" }
+        }).showToast()
         return;
     }
 
     const data = { quantity: newQuantity };
-
 
     fetch(`/user/cart/update/${cartId}`, {
         method: 'PUT', 
@@ -243,20 +305,20 @@ function updateQuantity(cartId, newQuantity) {
         if (data.success) {
             Toastify({
                 text: data.message,
-                duration: 3000,
+                duration: 1000,
                 close: true,
-                gravity: "bottom",
-                position: 'center',
+                gravity: "top",
+                position: 'right',
                 backgroundColor: "#4CAF50",
             }).showToast();
-            updateOrderSummary()
+            updateOrderSummary(newQuantity,currentQuantityElement)
         }else{
             Toastify({
             text:  data.message,
-            duration: 3000,
+            duration: 1000,
             close: true,
-            gravity: "bottom",
-            position: 'center',
+            gravity: "top",
+            position: 'right',
             backgroundColor: "#f44336",
         }).showToast()
         }
@@ -274,53 +336,43 @@ function updateQuantity(cartId, newQuantity) {
     console.error("Error:", error));
 }
 
-function updateOrderSummary() {
+function updateOrderSummary(newQuantity,currentQuantityElement) {
+    currentQuantityElement . innerText = newQuantity
         let subtotal = 0;
+        let totalDiscount = 0;
         document.querySelectorAll('.product-card').forEach(productCard => {
-            const priceElement = productCard.querySelector('.product-info p:nth-of-type(3)');
-            const quantityElement = productCard.querySelector('.quantity-input');
-            const price = parseFloat(priceElement.innerText.replace('₹', '').trim());
-            const quantity = parseInt(quantityElement.value);
-            subtotal += price * quantity;           
+            const discountPriceElement = productCard.querySelector('.discounted-price');
+            const quantityElement = productCard.querySelector('.current-quantity');
+            const originalPriceElement = productCard.querySelector('.original-price')
+
+            const originalPrice = parseFloat(originalPriceElement.innerText.replace('₹' ,'').trim())
+            const discountPrice = parseFloat(discountPriceElement.innerText.replace('₹', '').trim());
+            const quantity = parseInt(quantityElement.innerText);
+            subtotal += originalPrice * quantity;
+            totalDiscount += (originalPrice * quantity) - (discountPrice * quantity)
+            
         });
-        document.getElementById('subtotal').innerText = subtotal.toFixed(2);
-        document.getElementById('total').innerText = subtotal.toFixed(2);
+        document.getElementById('subtotal').innerText = '₹ ' + subtotal.toFixed(2);
+        document.getElementById('discount').innerText = '₹ ' + totalDiscount.toFixed(2)
+        document.getElementById('total').innerText = '₹ ' + (subtotal-totalDiscount).toFixed(2);
     }
 
-//     function calculateSummary() {
-//     let subtotal = 0;
-//     let totalDiscount = 0;
+    function goToCheckout(){
+      const outOfStock = document.querySelectorAll('.out-of-stock')
 
-//     document.querySelectorAll('.product-card').forEach((productCard) => {
-//         const priceElement = productCard.querySelector('.price').textContent.trim().replace('₹', '');
-//         const originalPriceElement = productCard.querySelector('span[style*="line-through"]');
-//         const quantity = productCard.querySelector('.quantity-input').value;
-
-//         const price = parseFloat(priceElement);
-//         const originalPrice = originalPriceElement
-//             ? parseFloat(originalPriceElement.textContent.trim().replace('₹', ''))
-//             : price;
-
-//         const discount = originalPrice - price;
-
-//         if (!isNaN(price) && !isNaN(quantity)) {
-//             subtotal += price * quantity;
-//             totalDiscount += discount * quantity;
-//         }
-//     });
-
-//     document.getElementById('subtotal').textContent = `₹ ${subtotal.toFixed(2)}`;
-//     document.getElementById('discount').textContent = `₹ ${totalDiscount.toFixed(2)}`;
-//     document.getElementById('total').textContent = `₹ ${(subtotal - totalDiscount).toFixed(2)}`;
-// }
-
-// // Recalculate summary when quantity changes
-// document.querySelectorAll('.quantity-input').forEach((input) => {
-//     input.addEventListener('input', calculateSummary);
-// });
-
-// // Initial calculation on page load
-// window.addEventListener('DOMContentLoaded', calculateSummary);
+      if(outOfStock.length > 0){
+        Toastify({
+            text: 'please remove out of stock products',
+            duration: 1000,
+            close: true,
+            gravity: "top",
+            position: 'right',
+            style: {background: "linear-gradient(to right, #ff5f5f, #ff1a1a)"}
+        }).showToast()
+        return 
+      }
+      window.location.href = '/user/cart/checkout'
+    }
 
 </script>
 </body>

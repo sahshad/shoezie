@@ -1,33 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - SHOEZIE</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+        <%- include('partials/header') %>
     <link rel="stylesheet" href="/styles/admin/dashboard.css"> <!-- Point to your custom CSS -->
 
-    <style>
-
-    </style>
 </head>
 <body>
     <div class="d-flex " id="wrapper">
       <%- include('partials/sidebar') %>
         <div id="page-content-wrapper">
-            <nav class="navbar navbar-expand-lg mb-1 mt-1">
-                <button class="btn btn-light btn-sm" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="form-inline ml-auto">
-                    <input class="form-control mr-sm-2 rounded-pill" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-dark my-2 my-sm-0 rounded-pill" type="submit">Search</button>
-                </div>
-            </nav>
-            <div class="line"></div>
+            <%- include('partials/navbar') %>
             <div class="container">
                 <div class="row">
                     <div class="col-md-3 mb-4">
@@ -67,7 +46,7 @@
                     </div>
                 </div>
             </div>
-            <div class="container">
+            <div class="container ">
                 <h4 class="my-4">Sales Charts</h4>
                 <div class="btn-group" role="group" aria-label="Time Frame">
                     <button type="button" class="btn btn-outline-primary" onclick="updateChart('weekly')">Weekly</button>
@@ -79,7 +58,6 @@
 
             <div class="container mt-5">
                 <div class="row">
-                    <!-- Left: Top 10 Best-Selling Products -->
                     <div class="col-md-6">
                         <h5 class="mb-3">Best-Selling Products</h5>
                         <table class="table table-striped">
@@ -111,7 +89,6 @@
                         </table>
                     </div>
             
-                    <!-- Right: Top 10 Best-Selling Categories -->
                     <div class="col-md-6">
                         <h5 class="mb-3"> Best-Selling Categories</h5>
                         <table class="table table-striped">
@@ -149,10 +126,8 @@
 
     <div id="sales-data" data-sales='<%- JSON.stringify(salesData) %>'></div>
 
-    
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <%- include('partials/footer') %>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.getElementById('menuToggle').addEventListener('click', function() {

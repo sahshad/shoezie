@@ -20,8 +20,16 @@
             <%- include('partials/navbar') %>
 
             <div class="container">
-                <h5 class="mb-4">Offers</h5>
-                <button id="createOfferBtn" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createOfferModal">Create Offer</button>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div></div>
+                    <div>
+                <button id="createOfferBtn" class=" btn-sm create-offer" data-toggle="modal" data-target="#createOfferModal">
+                    <i class="fa-solid fa-plus" style="color: #ffffffff;"></i>
+                    Create Offer</button>
+
+                    </div>
+                </div>
+               
 
                 <table class="custom-table">
                     <thead>
@@ -190,7 +198,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Disable the create offer button initially
         const createOfferButton = document.querySelector('#createOfferForm button[type="submit"]');
         createOfferButton.disabled = true;
     
@@ -228,7 +235,6 @@
     const row = button.closest('tr');
     const badge = row.querySelector('.badge');
 
-    // SweetAlert confirmation
     Swal.fire({
         title: isActive ? 'Unlist Offer?' : 'Activate Offer?',
         text: `Are you sure you want to ${isActive ? 'unlist' : 'activate'} this offer?`,
@@ -238,13 +244,11 @@
         cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Update badge and button text before the request
             badge.className = `badge ${isActive ? 'badge-danger' : 'badge-success'}`;
             badge.textContent = isActive ? 'Inactive' : 'Active';
             button.textContent = isActive ? 'Activate' : 'Unlist';
             button.setAttribute('data-active', isActive);
 
-            // Make the fetch request
             fetch(`/admin/offers/${!isActive}/${offerId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' }
@@ -291,7 +295,6 @@
             document.getElementById('offerType').dispatchEvent(new Event('change'));
         });
     
-        // Real-time validation
         const validateInput = (input) => {
             const value = input.value;
             let errorMessage = '';
@@ -302,7 +305,6 @@
                 }
             }
     
-            // Find or create the error message container
             let errorContainer = input.nextElementSibling;
             if (!errorContainer || !errorContainer.classList.contains('error-message')) {
                 errorContainer = document.createElement('div');
@@ -310,11 +312,8 @@
                 input.parentNode.insertBefore(errorContainer, input.nextSibling);
             }
     
-            // Update error message
             errorContainer.textContent = errorMessage;
             input.setCustomValidity(errorMessage ? errorMessage : '');
-    
-            // Check overall form validity and enable/disable the button
             toggleCreateOfferButton();
         };
     
@@ -335,7 +334,6 @@
             input.addEventListener('input', () => validateInput(input));
         });
     
-        // Ensure error messages are cleared on focus
         document.querySelectorAll('#createOfferForm input').forEach(input => {
             input.addEventListener('focus', () => {
                 const errorContainer = input.nextElementSibling;
@@ -345,8 +343,6 @@
             });
         });
 
-
-        //edit offer
         const editOfferButton = document.querySelector('#editOfferForm button[type="submit"]');
     editOfferButton.disabled = true;
 
@@ -390,7 +386,6 @@
             }
         }
 
-        // Find or create the error message container
         let errorContainer = input.nextElementSibling;
         if (!errorContainer || !errorContainer.classList.contains('error-message')) {
             errorContainer = document.createElement('div');
@@ -398,11 +393,8 @@
             input.parentNode.insertBefore(errorContainer, input.nextSibling);
         }
 
-        // Update error message
         errorContainer.textContent = errorMessage;
         input.setCustomValidity(errorMessage ? errorMessage : '');
-
-        // Check overall form validity and enable/disable the button
         toggleEditOfferButton();
     };
 
@@ -423,7 +415,6 @@
         input.addEventListener('input', () => validateEditInput(input));
     });
 
-    // Ensure error messages are cleared on focus
     document.querySelectorAll('#editOfferForm input').forEach(input => {
         input.addEventListener('focus', () => {
             const errorContainer = input.nextElementSibling;
@@ -436,14 +427,13 @@
     document.getElementById('editOfferType').addEventListener('change', function () {
         const editMinProductPriceField = document.getElementById('editMinProductPriceField');
         editMinProductPriceField.style.display = (document.getElementById('editOfferFor').value === 'Category' && this.value === 'flat') ? 'block' : 'none';
-        toggleEditOfferButton(); // Check validity on change
+        toggleEditOfferButton(); 
     });
 
     document.getElementById('editOfferFor').addEventListener('change', function () {
         document.getElementById('editOfferType').dispatchEvent(new Event('change'));
     });
 
-    // Populate modal fields
     function openEditModal(offerId, offerFor, targetName, offerType, value, expiresAt, minProductPrice) {
         document.getElementById('editOfferId').value = offerId;
         document.getElementById('editOfferFor').value = offerFor;
@@ -456,9 +446,8 @@
         const editMinProductPriceField = document.getElementById('editMinProductPriceField');
         editMinProductPriceField.style.display = (offerFor === 'Category' && offerType === 'flat') ? 'block' : 'none';
 
-        // Clear validation messages and reset button state
         toggleEditOfferButton();
-        $('#editOfferModal').modal('show'); // Open the modal
+        $('#editOfferModal').modal('show');
     }
     </script>
 </body>

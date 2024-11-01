@@ -92,6 +92,13 @@ const cart = await Cart.findOne({user:userId})
     populate:{path :'offers'}
 })
 
+cart.products.forEach(product => {
+     const productSize =  product.productId.sizes.find(size => size._id.toString() === product.sizeId.toString())
+     if(productSize.stock === 0){
+        return res.redirect('/user/cart')
+     }
+})
+
 const productsWithBestOffers = await Promise.all(
     cart.products.map(async (item) => {
         const product = item.productId;
@@ -252,7 +259,7 @@ async function updateProductQuantity(req,res) {
 
         cartItem.quantity = quantity;
         await cart.save();
-       return res.status(200).json({success:true, message: 'Product quantity updated successfully', cart: cart });
+       return res.status(200).json({success:true, message: ' quantity updated successfully', cart: cart });
     } catch (error) {
         console.error('Error updating product quantity:', error);
         res.status(500).json({success:false, message: 'Internal Server Error' });

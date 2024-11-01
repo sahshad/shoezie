@@ -1,44 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products - Admin Dashboard - SHOEZIE</title>
+            <%- include('partials/header') %>
 
-        <!-- Cropper.js CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Bootstrap CSS CDN -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/styles/admin/dashboard.css"> <!-- Point to your custom CSS -->
-    <link rel="stylesheet" href="/styles/admin/products.css"> <!-- Add custom styles for the products page -->
-    <style>
-        .is-invalid {
-    border-color: red;
-}
-
-    </style>
+    <link rel="stylesheet" href="/styles/admin/dashboard.css">
+    <link rel="stylesheet" href="/styles/admin/products.css"> 
 </head>
 
 <body>
     <div class="d-flex" id="wrapper">
-        <!-- Sidebar -->
+        
         <%- include('partials/sidebar.ejs') %>
-        <!-- Page Content -->
+       
         <div id="page-content-wrapper">
-            <!-- Navbar -->
+
             <%- include('partials/navbar.ejs') %>
-            <!-- Content Area -->
+
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="mb-0">Products</h5>
-                    <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addProductModal">
-                        Add Product</button>
+                    <div></div>
+                    <div>
+                        <button class=" btn-sm add-product" data-toggle="modal" data-target="#addProductModal">
+                            <i class="fa-solid fa-plus" style="color: #ffffffff;"></i>
+                            Add Product</button>
+                    </div>
                 </div>
                 <!-- Product Table -->
                 <% if(product){ %>
@@ -72,10 +55,11 @@
                                         </select>
                                     </td>
                                     <td>
+                                        <div class="product-description" id="product-description" data-description="<%= product.description%>"></div>
                                         <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editProductModal"
-                                            onclick="populateEditModal('<%= product.name %>', '<%= product.description %>', 
+                                            onclick="populateEditModal('<%= product.name %>', 
                                             '<%= product.category.name %>', '<%= product.price %>', '<%= JSON.stringify(product.sizes) %>', 
-                                            '<%= JSON.stringify(product.imageUrls) %>', '<%= product._id %>')">
+                                            '<%= JSON.stringify(product.imageUrls) %>', '<%= product._id %>',this)">
                                             <i class="fas fa-edit icon-spacing"></i>Edit
                                         </button>
                                         <button class="btn <%= product.status ? 'btn-danger' : 'btn-success' %> btn-sm" 
@@ -128,16 +112,16 @@
                             </div>
                             <div class="form-group">
                                 <label for="productPrice">Price</label>
-                                <input type="number" class="form-control" name="productPrice" id="productPrice" placeholder="Enter product price" min="1" required>
+                                <input type="text" class="form-control" name="productPrice" id="productPrice" placeholder="Enter product price" min="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
                             </div>
                             <div class="form-group mt-4" id="sizeStockContainer">
                                 <label>Sizes and Stocks</label>
                                 <div class="row align-items-center size-stock-pair">
                                     <div class="col-md-5">
-                                        <input type="text" class="form-control" name="productSize[]" placeholder="Enter size" required>
+                                        <input type="text" class="form-control" name="productSize[]" placeholder="Enter size" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
                                     </div>
                                     <div class="col-md-5">
-                                        <input type="number" class="form-control" name="productStock[]" placeholder="Enter stock" min="1" required>
+                                        <input type="text" class="form-control" name="productStock[]" placeholder="Enter stock" min="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
                                     </div>
                                     <div class="col-md-2">
                                         <button type="button" class="btn btn-success add-size-stock">
@@ -175,34 +159,6 @@
     </div>
 </div>
 
-<script>
-    document.querySelector('.add-size-stock').addEventListener('click', function() {
-        const container = document.getElementById('sizeStockContainer');
-        const newPair = document.createElement('div');
-        newPair.className = 'row align-items-center size-stock-pair mt-2';
-        newPair.innerHTML = `
-            <div class="col-md-5">
-                <input type="text" class="form-control" name="productSize[]" placeholder="Enter size" required>
-            </div>
-            <div class="col-md-5">
-                <input type="number" class="form-control" name="productStock[]" placeholder="Enter stock" min="1" required>
-            </div>
-            <div class="col-md-2">
-                <button type="button" class="btn btn-danger remove-size-stock">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
-        `;
-        container.appendChild(newPair);
-        
-        // Add event listener for the new remove button
-        newPair.querySelector('.remove-size-stock').addEventListener('click', function() {
-            container.removeChild(newPair);
-        });
-    });
-</script>
-
-
    <!-- Modal for Editing Product -->
 <div class="modal fade" id="editProductModal" tabindex="-1" role="dialog" aria-labelledby="editProductModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document"> <!-- Added 'modal-lg' class for larger modal -->
@@ -236,7 +192,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="editProductPrice">Price</label>
-                                <input type="number" class="form-control" id="editProductPrice" placeholder="Enter product price" required>
+                                <input type="text" class="form-control" id="editProductPrice" placeholder="Enter product price" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
                             </div>
                             <p class="mb-0"><small>Sizes and Stocks</small></p>
                             <div class="form-group mt-4" id="editSizeStockContainer">
@@ -268,108 +224,9 @@
         </div>
     </div>
 </div>
-
-      <script src="/js/product.js"></script>
-    <!-- Bootstrap and jQuery Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Cropper.js JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <script>
-        // Function to validate the product name
-        // function validateProductName() {
-        //     const nameInput = document.getElementById('productName');
-        //     const nameValue = nameInput.value.trim();
-        //     const isValid = nameValue.length >= 3; // Minimum length of 3 characters
-        //     nameInput.classList.toggle('is-invalid', !isValid);
-        //     return isValid;
-        // }
-    
-        // // Function to validate the product price
-        // function validateProductPrice() {
-        //     const priceInput = document.getElementById('productPrice');
-        //     const priceValue = priceInput.value.trim();
-        //     const isValid = priceValue > 0; // Price must be greater than 0
-        //     priceInput.classList.toggle('is-invalid', !isValid);
-        //     return isValid;
-        // }
-    
-        // // Function to validate the product size and stock inputs
-        // function validateSizeStock() {
-        //     const sizeInputs = document.querySelectorAll('input[name="productSize[]"]');
-        //     const stockInputs = document.querySelectorAll('input[name="productStock[]"]');
-        //     let isValid = true;
-    
-        //     sizeInputs.forEach((input, index) => {
-        //         if (input.value.trim() === '' || stockInputs[index].value <= 0) {
-        //             input.classList.add('is-invalid');
-        //             stockInputs[index].classList.add('is-invalid');
-        //             isValid = false;
-        //         } else {
-        //             input.classList.remove('is-invalid');
-        //             stockInputs[index].classList.remove('is-invalid');
-        //         }
-        //     });
-    
-        //     return isValid;
-        // }
-    
-        // // Add event listeners for real-time validation on Add Product Modal
-        // document.getElementById('productName').addEventListener('input', validateProductName);
-        // document.getElementById('productPrice').addEventListener('input', validateProductPrice);
-        // document.querySelectorAll('input[name="productSize[]"], input[name="productStock[]"]').forEach(input => {
-        //     input.addEventListener('input', validateSizeStock);
-        // });
-    
-        // // Similar functions for Edit Product Modal
-        // function validateEditProductName() {
-        //     const nameInput = document.getElementById('editProductName');
-        //     const nameValue = nameInput.value.trim();
-        //     const isValid = nameValue.length >= 3; // Minimum length of 3 characters
-        //     nameInput.classList.toggle('is-invalid', !isValid);
-        //     return isValid;
-        // }
-    
-        // function validateEditProductPrice() {
-        //     const priceInput = document.getElementById('editProductPrice');
-        //     const priceValue = priceInput.value.trim();
-        //     const isValid = priceValue > 0; // Price must be greater than 0
-        //     priceInput.classList.toggle('is-invalid', !isValid);
-        //     return isValid;
-        // }
-    
-        // // Add event listeners for real-time validation on Edit Product Modal
-        // document.getElementById('editProductName').addEventListener('input', validateEditProductName);
-        // document.getElementById('editProductPrice').addEventListener('input', validateEditProductPrice);
-    
-        // // Validate on form submission
-        // document.getElementById('addProductButton').addEventListener('click', function(event) {
-        //     const isNameValid = validateProductName();
-        //     const isPriceValid = validateProductPrice();
-        //     const isSizeStockValid = validateSizeStock();
-    
-        //     if (!isNameValid || !isPriceValid || !isSizeStockValid) {
-        //         event.preventDefault(); // Prevent form submission if validation fails
-        //         alert('Please correct the highlighted fields.');
-        //     } else {
-        //         document.getElementById('addProductForm').submit(); // Submit the form if valid
-        //     }
-        // });
-    
-        // document.getElementById('editProductButton').addEventListener('click', function(event) {
-        //     const isNameValid = validateEditProductName();
-        //     const isPriceValid = validateEditProductPrice();
-    
-        //     if (!isNameValid || !isPriceValid) {
-        //         event.preventDefault(); // Prevent form submission if validation fails
-        //         alert('Please correct the highlighted fields.');
-        //     } else {
-        //         document.getElementById('editProductForm').submit(); // Submit the form if valid
-        //     }
-        // });
-    </script>
-    
+            <%- include('partials/footer') %>
+      <script src="/js/admin/sidebarToggle.js"></script>
+      <script src="/js/admin/product.js"></script>    
 </body>
 </html>
 

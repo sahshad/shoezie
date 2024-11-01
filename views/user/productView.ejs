@@ -121,24 +121,29 @@
 
         .related-products-wrapper {
             display: flex;
-            justify-content: center;
+            width: 90%;
+            margin-inline: 5%;
+            padding-inline: 5%;
+            justify-content: left;
             overflow: hidden;
             position: relative;
         }
 
         .related-product {
-            border: 1px solid #ccc;
             border-radius: 5px;
             padding: 5px;
             text-align: left;
-            width: 170px;
+            width: 220px;
             margin: 0 20px;
             flex: none;
         }
-
+        .related-product a{
+            text-decoration: none;
+            color: black;
+        }
         .related-product img {
             width: 100%;
-            height: 170px;
+            height: 200px;
             object-fit: cover;
         }
 
@@ -176,11 +181,11 @@
         }
 
         .scroll-left {
-            left: 80px;
+            left: 40px;
         }
 
         .scroll-right {
-            right: 80px;
+            right: 40px;
         }
         .selected {
         background-color: black;
@@ -295,40 +300,29 @@
 </div>
 
 <!-- You Might Also Like Section -->
-<div class="related-products">
+<div class="related-products ">
     <h4>You Might Also Like</h4>
     <div class="related-products-wrapper">
         <button class="scroll-button scroll-left" onclick="scrollLeft()">&#10094;</button>
-        <div class="related-product">
-            <img src="https://via.placeholder.com/150" alt="Related Product 1">
-            <h5>Related Product 1</h5>
-            <p class="rating">★★★★☆ (4.0)</p>
-            <p class="price">₹ 1,999</p>
-        </div>
-        <div class="related-product">
-            <img src="https://via.placeholder.com/150" alt="Related Product 2">
-            <h5>Related Product 2</h5>
-            <p class="rating">★★★☆☆ (3.5)</p>
-            <p class="price">₹ 2,199</p>
-        </div>
-        <div class="related-product">
-            <img src="https://via.placeholder.com/150" alt="Related Product 3">
-            <h5>Related Product 3</h5>
-            <p class="rating">★★★★☆ (4.0)</p>
-            <p class="price">₹ 2,399</p>
-        </div>
-        <div class="related-product">
-            <img src="https://via.placeholder.com/150" alt="Related Product 4">
-            <h5>Related Product 4</h5>
-            <p class="rating">★★★★☆ (4.0)</p>
-            <p class="price">₹ 2,599</p>
-        </div>
-        <div class="related-product">
-            <img src="https://via.placeholder.com/150" alt="Related Product 5">
-            <h5>Related Product 5</h5>
-            <p class="rating">★★★☆☆ (3.0)</p>
-            <p class="price">₹ 1,299</p>
-        </div>
+        <% relatedProducts.forEach(product =>{ %>
+            <div class="related-product">
+                <a href="/user/shop/<%= product._id %>">
+                <img src="<%= product.imageUrls[0] %>" alt="Related Product 1">
+                <h6><%= product.name %></h6>
+                <p class="rating">★★★★☆ (4.0)</p>
+                <p class="price">₹ <%= product.price %></p>
+            </a>
+            </div>
+        <% }) %>
+        <% relatedProducts.forEach(product =>{ %>
+            <div class="related-product">
+                <img src="<%= product.imageUrls[0] %>" alt="Related Product 1">
+                <h6><%= product.name %></h6>
+                <p class="rating">★★★★☆ (4.0)</p>
+                <p class="price">₹ <%= product.price %></p>
+            </div>
+        <% }) %>
+        
         <button class="scroll-button scroll-right" onclick="scrollRight()">&#10095;</button>
     </div>
 </div>

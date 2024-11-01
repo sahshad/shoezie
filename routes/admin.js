@@ -26,17 +26,17 @@ router.post('/login', getHome);
 router.get('/dashboard',preventCache, isAuthenticated,getDashboard);
 
 router.get('/users',preventCache, isAuthenticated, getUsers);
-router.patch('/users/:action/:id',changeUserStatus)
+router.patch('/users/:id/:action',changeUserStatus)
 
 router.get('/products',preventCache,isAuthenticated,  getProducts);
 router.post('/products/add',addUpload,addProduct)
-router.post('/products/edit',editUpload,editProduct)
-router.patch('/products/:action/:id',changeProductStatus)
+router.post('/products/edit/:id',editUpload,editProduct)
+router.patch('/products/:id/:action',changeProductStatus)
 
 router.get('/category',preventCache, isAuthenticated, getCategory);
 router.post('/category/add',uploadCategory,addCategory)
 router.put('/category/edit/:id',uploadCategory,editCategory)
-router.patch('/category/:action/:id',changeCategoryStatus)
+router.patch('/category/:id/:action',changeCategoryStatus)
 
 router.get('/orders',preventCache,isAuthenticated,getAllOrders)
 router.get('/orders/view/:orderId',preventCache,isAuthenticated,viewOrder)

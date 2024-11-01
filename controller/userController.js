@@ -8,11 +8,13 @@ const nodemailer = require('nodemailer')
 const crypto = require('crypto')
 const {sendOTP} = require('../utils/emailUtils')
 
-
 const  { getBestOffer } = require('../utils/offerUtils')
 
 function getLogin(req,res){
     let error
+    if(req.session.user){
+      return  res.redirect('/user/home')
+    }
    if(req.session.error){
      error = req.session.error
     delete req.session.error
@@ -32,7 +34,6 @@ function getSignup(req,res){
     }
     res.render('user/signup',{error})
 }
-
 
 async function userLogIn(req,res){
     const { email, password } = req.body;
@@ -152,7 +153,6 @@ async function verifyOtp(req, res) {
     } catch (error) {
         return res.status(400).json({error: error,});
     }
-    
 }
 
 async function resendOtp(req,res) {
@@ -278,6 +278,11 @@ async function getProduct(req,res){
     const productId = req.params.id 
     const product = await Product.findById(productId)
     .populate('offers');
+    const relatedProducts = await Product.find({category:product.category}) 
+
+    const filteredRelatedProducts = relatedProducts.filter(
+        relatedProduct => relatedProduct._id.toString() !== product._id.toString()
+    );
 
     const category = await Category.findById(product.category).populate('offers')
     const categoryOffers = category ? category.offers : [];
@@ -319,7 +324,7 @@ async function getProduct(req,res){
     };
     
     if (product) {
-        res.render('user/productView', { product:productsWithBestOffers });
+        res.render('user/productView', { product:productsWithBestOffers ,relatedProducts:filteredRelatedProducts});
     } else {
         res.status(404).send('Product not found'); 
     }
@@ -380,7 +385,7 @@ async function sortProducts(req, res) {
         }
 
     try {
-        const products = await Product.find(query).sort(sortOptions);
+        const products = await Product.find(query).sort(sortOptions).populate('category')
         const category = await Category.find({})
 
         const productsWithBestOffers = await Promise.all(products.map(async product => {

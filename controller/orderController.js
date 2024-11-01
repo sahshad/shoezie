@@ -1,6 +1,9 @@
 require('dotenv').config();
 const Razorpay = require('razorpay')
 const crypto = require('crypto')
+const pdf = require('html-pdf');
+const fs = require('fs');
+const ejs = require('ejs');
 const mongoose = require('mongoose')
 const Order = require('../model/order')
 const Product = require('../model/product')
@@ -8,9 +11,6 @@ const Cart = require('../model/cart')
 const Wallet = require('../model/wallet')
 const Coupon = require('../model/coupon')
 const User = require('../model/user')
-const pdf = require('html-pdf');
-const fs = require('fs');
-const ejs = require('ejs');
 
 
 const razorpay = new Razorpay({
@@ -38,149 +38,6 @@ async function createRazorpayOrder(amount) {
     throw new Error('Failed to create Razorpay order');
   }
 }
-
-// async function createOrder(req, res) {
-
-//   const userId = req.session.user;
-//   const { items, shippingAddress, totalAmount, paymentMethod,
-//      razorpayPaymentId, razorpayOrderId, razorpaySignature,
-//      couponCode,couponDiscount,offerDiscount } = req.body;
-
-//   try {
-//     for (const item of items) {
-//       const product = await Product.findById(item.productId);
-//       if (!product) throw new Error('Product not found');
-
-//       const variant = product.sizes.find(size => size._id.toString() === item.sizeId);
-//       if (!variant) throw new Error('Size not found');
-
-//       if (variant.stock < item.quantity) {
-//         return res.status(400).json({ message: `Not enough stock for ${product.name}. Available stock: ${variant.stock}` });
-//       }
-//     }
-
-//     for (const item of items) {
-//       const updateResult = await Product.updateOne(
-//         { _id: item.productId, 'sizes._id': item.sizeId },
-//         { $inc: { 'sizes.$.stock': -item.quantity } }
-//       );
-//     }
-
-//   //   // Handle Razorpay Payment Method
-//   //   if (paymentMethod === 'razorpay') {
-//   //     // Verify payment signature to prevent tampering
-//   //     const generatedSignature = crypto
-//   //       .createHmac('sha256', process.env.RAZORPAY_SECRET_KEY)
-//   //       .update(razorpayOrderId + '|' + razorpayPaymentId)
-//   //       .digest('hex');
-
-//   //     if (generatedSignature !== razorpaySignature) {      
-//   //       return res.status(400).json({ message: 'Invalid payment signature' });
-//   //     }
-//   //   }
-
-//     const newOrder = new Order({
-//       userId,
-//       items,
-//       shippingAddress,
-//       totalAmount,
-//       couponDiscount : couponDiscount || 0,
-//       offerDiscount : offerDiscount || 0,
-//       paymentMethod,
-//       paymentStatus: paymentMethod === 'razorpay' ? 'Paid' : 'Pending',
-//     });
-//     await newOrder.save();
-
-//     await Cart.findOneAndUpdate(
-//       { user: userId },
-//       { $set: { products: [] } },
-//       { new: true }
-//     );
-
-//     if(couponCode){
-
-//      const updatedCoupon = await Coupon.findOneAndUpdate(
-//       { code: couponCode }, // Find coupon by code
-//       { $inc: { usedCount: 1 } }, // Increment usedCount by 1
-//       { new: true } // Return the updated document
-//     );
-
-//     if (!updatedCoupon) {
-//       console.log('Coupon not found or already used limit reached.');
-//       return;
-//     }
-//     }
-//     res.status(201).json({ message: 'Order placed successfully!', orderId: newOrder._id });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Failed to place order. Please try again.' });
-//   }
-// }
-
-
-
-// async function createOrder(req,res){
-//     const userId = req.session.user
-//     const { items, shippingAddress, totalAmount,paymentMethod } = req.body;
-//     try { 
-
-//         for( const item of items){
-//             const product = await Product.findById(item.productId)
-
-//             if(!product){
-//                 throw new Error('Product not found')
-//             }
-
-//             const sizeId = item.sizeId
-//             const variant = product.sizes.find((size) =>{ 
-//                 return size._id.toString() === sizeId 
-//             })
-//             console.log(variant._id);
-
-//             if(!variant){
-//                 throw new Error('Size not found')
-//             }
-
-//             if(variant.stock < item.quantity){
-//                 return res.status(400).json({ message: `Not enough stock for ${product.name}. Available stock: ${variant.stock}` });
-//             }
-//         }
-
-//         for (const item of items) {
-//             const productId = item.productId;
-//             const sizeId = item.sizeId;
-
-//             const updateResult = await Product.updateOne(
-//                 { _id: productId, 'sizes._id': sizeId },  
-//                 { $inc: { 'sizes.$.stock': -item.quantity } }
-//             );
-
-//         }
-
-//         const newOrder = new Order({
-//             userId, 
-//             items, 
-//             shippingAddress,
-//             totalAmount,
-//             paymentMethod 
-//         });
-//          await newOrder.save();
-
-//          const cartUpdateResult = await Cart.findOneAndUpdate(
-//             { user: userId },
-//             { $set: { products: [] } },
-//             { new: true }
-//         );
-
-//         res.status(201).json({ message: 'Order placed successfully!', orderId: newOrder._id });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Failed to place order. Please try again.' });
-//     }  
-// }
-
-
-
 
 async function createOrder(req, res) {
   const userId = req.session.user;
@@ -282,10 +139,6 @@ async function updateOrderStatus(req, res) {
   const { status, razorpayResponse,repay } = req.body;
   let orderStatus
   
-  if(repay){
-    console.log('hi');
-    
-  }
   if (req.session.coupon) {
     const couponCode = req.session.coupon
     delete req.session.coupon
@@ -323,8 +176,7 @@ async function updateOrderStatus(req, res) {
 
     const order = await Order.findById(orderId)
     const items = order.items
-    console.log(order,items);
-    
+
     for (const item of items) {
             const product = await Product.findById(item.productId);
             if (!product) throw new Error('Product not found');
@@ -374,19 +226,40 @@ async function updateOrderStatus(req, res) {
   }
 }
 
-
-
 async function getAllOrders(rq, res) {
   try {
     const orders = await Order.find({}).populate('userId').populate('items.productId').sort({ createdAt: -1 })
     if (!orders) {
 
     }
-    res.render('admin/ordersList', { orders })
+    res.render('admin/ordersList', { orders , currentPage:'orders' })
   } catch (error) {
 
   }
 }
+
+// async function getAllOrders(rq, res) {
+//   try {
+//     const page = parseInt(rq.query.page) || 1;
+//     const limit = parseInt(rq.query.limit) || 10;
+//     const skip = (page - 1) * limit;
+
+//     const orders = await Order.find({})
+//       .populate('userId')
+//       .populate('items.productId')
+//       .sort({ createdAt: -1 })
+//       .skip(skip)
+//       .limit(limit);
+
+//     const totalOrders = await Order.countDocuments({});
+//     const totalPages = Math.ceil(totalOrders / limit);
+
+//     res.render('admin/ordersList', { orders, currentPage: page, totalPages, limit });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// }
 
 async function cancelOrder(req, res) {
   const { orderId } = req.params;
@@ -439,7 +312,6 @@ async function cancelOrder(req, res) {
     res.status(500).json({ message: 'Server error', error });
   }
 }
-
 
 async function changeOrderStatus(req, res) {
   const { orderId } = req.params;
@@ -525,7 +397,6 @@ async function returnOrder (req, res){
       res.status(500).json({ success: false, message: 'Internal server error' });
   }
 }
-
 
 async function takeReturnAction(req,res){
   const { orderId } = req.params;
@@ -635,7 +506,17 @@ async function downloadInvoice(req,res) {
 }
   
 }
+
 module.exports = {
-  createOrder, getAllOrders, cancelOrder, changeOrderStatus, viewOrder,
-  createRazorpayOrder, updateOrderStatus, ordercreated, returnOrder ,takeReturnAction,downloadInvoice
+  createOrder,
+  getAllOrders,
+  cancelOrder,
+  changeOrderStatus,
+  viewOrder,
+  createRazorpayOrder,
+  updateOrderStatus,
+  ordercreated,
+  returnOrder,
+  takeReturnAction,
+  downloadInvoice
 }

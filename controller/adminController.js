@@ -44,7 +44,7 @@ async function getHome(req, res) {
 
 async function getUsers(req, res) {
     const user = await User.find()  
-    res.render('admin/usersList',{user});
+    res.render('admin/usersList',{user , currentPage:'users'})
 }
 
 async function changeUserStatus(req,res){
@@ -52,18 +52,22 @@ const { action, id } = req.params;
     
     try {
         const newStatus = action === 'list'; 
-        const result=await User.findByIdAndUpdate(id, { status: newStatus });
 
         const user = await User.findById(id)
+        if(!user){
+        res.status(406).json({ success:false , message: `User not found` });
+
+        }
+        const result=await User.findByIdAndUpdate(id, { status: newStatus });
 
         if(user.status===false){
-            
+
             if(req.session.user && req.session.user === id.toString())
             delete req.session.user
         }
 
         if(result)
-        res.status(200).json({ message: `User ${action === 'list' ? 'listed' : 'unlisted'} successfully.` });
+        res.status(200).json({ success:true , message: `User ${action === 'list' ? 'listed' : 'unlisted'} successfully.` });
 
 
     } catch (error) {
@@ -84,6 +88,7 @@ function getLogout(req,res){
 const getTopSellingCategories = async () => {
     try {
         const topCategories = await Order.aggregate([
+            { $match: { orderStatus: 'Delivered' } }, 
             { $unwind: "$items" },
             {
                 $lookup: {
@@ -131,6 +136,7 @@ const getTopSellingCategories = async () => {
 const getTopSellingProducts = async () => {
     try {
         const topProducts = await Order.aggregate([
+            { $match: { orderStatus: 'Delivered' } }, 
             { $unwind: "$items" },
             {
                 $group: {
@@ -181,7 +187,6 @@ async function getDashboard(req, res) {
 
         console.log(topProducts,topCategories);
         
-        // Calculate sales data for charts
         const salesData = {
             weekly: await getSalesData('week'),
             monthly: await getSalesData('month'),
@@ -195,7 +200,8 @@ async function getDashboard(req, res) {
             totalPendingOrders,
             salesData,
             topProducts,
-            topCategories
+            topCategories,
+            currentPage:'dashboard'
         });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);

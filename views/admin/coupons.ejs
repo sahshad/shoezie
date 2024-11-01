@@ -26,8 +26,15 @@
             <%- include('partials/navbar') %>
             <!-- Content Area -->
             <div class="container">
-                <h5 class="mb-4">Coupons</h5>
-                <button id="createCouponBtn" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createCouponModal">Create Coupon</button>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div></div>
+                    <div>
+                <button id="createCouponBtn" class="btn-sm create-coupon" data-toggle="modal" data-target="#createCouponModal">
+                    <i class="fa-solid fa-plus" style="color: #ffffffff;"></i>
+                    Create Coupon</button>
+                    </div>
+                </div>
                 
                 <table class="custom-table">
                     <thead>
@@ -56,7 +63,7 @@
                                     <!-- <td><%= coupon.discountType %></td> -->
                                     <!-- <td><%= coupon.maxDiscount %></td> -->
                                     <td><%= coupon.minOrderValue %></td>
-                                    <td><%= coupon.expiresAt.toLocaleString() %></td>
+                                    <td><%= coupon.expiresAt.toLocaleDateString() %></td>
                                     <td><%= coupon.usageLimit %></td>
                                     <!-- <td><%= coupon.usedCount %></td> -->
                                     <td>
@@ -111,7 +118,7 @@
                             <small class="text-danger" id="codeError"></small>
                         </div>
                         <div class="form-group">
-                            <label for="discountAmount">Discount Amount:</label>
+                            <label for="discountAmount">Discount Value:</label>
                             <input type="number" class="form-control" id="discountAmount" name="discountAmount" required min="0">
                             <small class="text-danger" id="discountAmountError"></small>
                         </div>
@@ -210,6 +217,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="/js/admin/sidebarToggle.js"></script>
 
     <script>
 

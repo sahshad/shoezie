@@ -1,37 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users - Admin Dashboard - SHOEZIE</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Bootstrap CSS CDN -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/styles/admin/usersList.css"> <!-- Point to your custom CSS -->
-    <link rel="stylesheet" href="/styles/admin/dashboard.css"> <!-- Point to your custom CSS -->
+
+                  <%- include('partials/header') %>
+
+    <link rel="stylesheet" href="/styles/admin/category.css"> 
+    <link rel="stylesheet" href="/styles/admin/dashboard.css"> 
    
 </head>
 <body>
     <div class="d-flex" id="wrapper">
-        <!-- Sidebar -->
+
         <%- include('partials/sidebar') %>
-        <!-- Page Content -->
+
         <div id="page-content-wrapper">
-            <!-- Navbar -->
+
             <%- include('partials/navbar') %>
-            <!-- Content Area -->
+
             <div class="container">
                 <h5 class="mb-4">Users</h5>
                 <table class="custom-table">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>No</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -40,8 +31,13 @@
                             <% user.forEach((user, index) => { %>
                                 <tr>
                                     <td><%= index + 1 %></td>
-                                    <td><%= user.firstname %> <%= user.lastname %></td>
+                                    <td><%= user.firstname %> </td>
                                     <td><%= user.email %></td>
+                                    <td >
+                                        <span class="badge text-light <%= user.status ? 'bg-success' : 'bg-danger' %> status-badge">
+                                            <%= user.status ? 'Active' : 'Inactive' %>
+                                        </span>
+                                    </td>
                                     <td>
                                     <button class="btn <%= user.status ? 'btn-danger' : 'btn-success' %> btn-sm" 
                                     onclick="toggleUserStatus('<%= user._id %>', this)">
@@ -52,89 +48,14 @@
                             <% }) %>
                         <% } %>
                     </tbody>
-                </table>
-                
+                </table> 
             </div>
         </div>
     </div>
 
-    <!-- Block/Unblock Confirmation Modal -->
-    <div class="modal fade" id="blockUnblockModal" tabindex="-1" aria-labelledby="blockUnblockModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="blockUnblockModalLabel">Confirm Action</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to <span id="blockUnblockAction"></span> <span id="blockUnblockUserName"></span>?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="confirmBlockUnblockButton">Confirm</button>
-                </div>
-            </div>
-        </div>
-    </div>
+                    <%- include('partials/footer') %>
 
-    <!-- Bootstrap and jQuery Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        // Sidebar toggle functionality
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('page-content-wrapper').classList.toggle('toggled');
-        });
-
-        function toggleUserStatus(UserId, button) {
-    const currentStatus = button.innerText === 'Unlist'; // Determine current status
-
-    fetch(`/admin/users/${currentStatus ? 'unlist' : 'list'}/${UserId}`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-    .then(response => {
-        if (response.ok) {
-            // Toggle button properties
-            button.classList.toggle('btn-danger', !currentStatus);
-            button.classList.toggle('btn-success', currentStatus);
-            button.innerText = currentStatus ? 'List' : 'Unlist';
-        } else {
-            alert('Failed to toggle product status.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while toggling the product status.');
-    });
-}
-        // Handle confirm block/unblock button click
-        document.getElementById('confirmBlockUnblockButton').addEventListener('click', function() {
-            fetch(`/admin/users/${currentAction}/${currentUserId}`, {
-                method: 'PATCH', // or 'PUT' depending on your server setup
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(`User ${currentUserId} has been ${currentAction}ed.`);
-                $('#blockUnblockModal').modal('hide');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while processing the request.');
-            });
-        });
-
-
-
-    </script>
+        <script src="/js/admin/sidebarToggle.js"></script>
+        <script src="/js/admin/usersList.js"></script>
 </body>
 </html>

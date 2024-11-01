@@ -7,7 +7,7 @@ async function getSalesReport(req,res){
   const startDate = 0
   const endDate = 0
   const sales = 0
-    res.render('admin/salesReport',{sales,reportType,startDate,endDate})
+    res.render('admin/salesReport',{sales,reportType,startDate,endDate , currentPage:'sales-report'})
 }
 
 async function getCustomSalesReport(req,res) {

@@ -1,60 +1,47 @@
-/* Products Page Styles */
+
 .custom-table {
     width: 100%;
-    border-collapse: collapse; /* Remove vertical lines */
-    border-radius: 0.5rem; /* Rounded edges */
-    overflow: hidden; /* Ensure corners are rounded */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border-collapse: collapse;
+    border: none; 
+    border-radius: 5px; 
+    overflow: hidden;
 }
-
 .custom-table thead {
-    background-color: rgb(153, 176, 220); /* Header background */
-    color: #ffffff;
+    background-color: rgb(237, 237, 237);
+    color: #313131;
 }
-
 .custom-table th, .custom-table td {
-    text-align: center; /* Center align */
-    padding: 10px; /* Padding for cells */
-    border: none; /* No cell borders */
+    text-align: center;
+    padding: 10px; 
+    border: none; 
 }
 
-.custom-table tbody tr:nth-of-type(odd) {
-    background-color: #f9f9f9; /* Alternate row color */
-}
-
-.custom-table tbody tr:nth-of-type(even) {
-    background-color: #ffffff; /* Base row color */
-}
-
-/* Button Styles */
 .btn-warning {
-    background-color: #ffeeba; /* Light warning */
-    color: #856404; /* Dark text color */
+    background-color: #e3e3e3;
+    color: #000000;
+    border: 1px solid #c2c1bb;
 }
 
 .btn-success {
-    background-color: #d4edda; /* Light green */
-    color: #155724; /* Dark green text */
+    background-color: #d4edda;
+    color: #155724;
 }
 
 .btn-danger {
-    background-color: #f5c6cb; /* Light danger */
-    color: #721c24; /* Dark text color */
+    background-color: #f5c6cb;
+    color: #721c24;
 }
 
 .icon-spacing {
-    margin-right: 5px; /* Space between icon and text */
+    margin-right: 5px;
 }
-/* Product List Styles */
-
 
 .product-image {
-    width: 100px; /* Adjust size as needed */
-    height: 100px; /* Ensure it's a square */
-    object-fit: cover; /* Ensure the image covers the space without distortion */
+    width: 100px; 
+    height: 100px; 
+    object-fit: cover;
 }
 
-/* Product Image Display Area */
 .product-image-display {
     padding: 15px;
     border: 1px solid #dee2e6;
@@ -67,8 +54,8 @@
     height: auto;
 }
 .product-table-image {
-    width: 50px; /* Adjust the width as needed */
-    height: auto; /* Maintain aspect ratio */
+    width: 50px; 
+    height: auto; 
 }
 
 #imagePreview {
@@ -104,9 +91,11 @@
 
 .delete-button {
     position: absolute;
-    bottom: -25px; /* Adjust based on your layout */
+    bottom: -25px; 
     left: 50%;
     transform: translateX(-50%);
 }
 
-
+.is-invalid {
+    border-color: red;
+}

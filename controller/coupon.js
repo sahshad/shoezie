@@ -5,7 +5,7 @@ const User = require('../model/user')
 async function getCoupons(req,res){
     try {
         const coupons = await Coupon.find()
-        res.render('admin/coupons',{coupons})
+        res.render('admin/coupons',{coupons ,currentPage:'coupons'})
         
     } catch (error) {
         console.log(error);      

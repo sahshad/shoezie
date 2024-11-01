@@ -145,10 +145,10 @@ function applyFilters() {
     function performSearch(event) {
     event.preventDefault(); 
 
-    const searchInput = document.getElementById('searchInput').value.trim();
+    const searchInput = document.getElementById('searchInput').value
     if (searchInput) {
         const queryParams = new URLSearchParams(window.location.search);
-        queryParams.set('search', searchInput); 
+        queryParams.set('search', searchInput) 
         window.location.href = `/user/shop/filter?${queryParams.toString()}`; 
     }
 }

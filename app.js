@@ -8,6 +8,7 @@ const db =require('./config/db')
 const passport = require('passport')
 require('./passport');
 require('dotenv').config()
+const { preventCache} = require('./middleware/authMiddleware')
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -26,6 +27,8 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 db()
+
+app.use(preventCache)
 
 app.get('/get-razorpay-key', (req, res) => {
     res.status(200).json({ key: process.env.RAZORPAY_ID_KEY })

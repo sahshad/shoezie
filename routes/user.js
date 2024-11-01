@@ -7,7 +7,7 @@ forgotPasswordVerifyOtp,resetPassword,forgotPasswordResendOtp} = require('../con
  const{getProfile,userLogOut,
     getAddress,getOrders,getOrderDetails,
     updateUserDetails,addAddress,
-    updateAddress,deleteAddress, }= require('../controller/userProfileController')   
+    updateAddress,deleteAddress, } = require('../controller/userProfileController')   
 
 const { userAuthenticated,preventCache} = require('../middleware/authMiddleware')
 
@@ -27,23 +27,23 @@ deleteProductFromWishlist
 } = require('../controller/whishlistController')
 
 router.get('/login',getLogin)
-router.post('/login',userLogIn)
+router.post('/login',preventCache,userLogIn)
 router.get('/forgot-password',forgotPassword)
 router.post('/forgot-password/send-otp',sendOtp)
 router.post('/forgot-password/resend-otp',forgotPasswordResendOtp)
 router.post('/forgot-password/verify-otp',forgotPasswordVerifyOtp)
 router.post('/forgot-password/reset',resetPassword)
 
-router.get('/profile',preventCache,userAuthenticated,getProfile)
+router.get('/profile',userAuthenticated,getProfile)
 router.put('/profile/update',updateUserDetails)
 
-router.get('/profile/address',preventCache,userAuthenticated,getAddress)
+router.get('/profile/address',userAuthenticated,getAddress)
 router.post('/profile/address/add',addAddress)
 router.post('/profile/address/update',updateAddress)
 router.delete('/profile/address/delete/:addressId',deleteAddress)
 
-router.get('/profile/orders',preventCache,userAuthenticated,getOrders)
-router.get('/profile/orders/:orderId',preventCache,userAuthenticated,getOrderDetails)
+router.get('/profile/orders',userAuthenticated,getOrders)
+router.get('/profile/orders/:orderId',userAuthenticated,getOrderDetails)
 router.patch('/profile/orders/cancel/:orderId',cancelOrder)
 router.patch('/profile/order/repay/:orderId',updateOrderStatus)
 router.post('/profile/order/return/:orderId',returnOrder)

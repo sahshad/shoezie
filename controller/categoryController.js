@@ -8,85 +8,90 @@ const streamifier = require('streamifier')
 
 async function getCategory(req, res) {
     const category = await Category.find({})
-    res.render('admin/category',{category});
+    res.render('admin/category',{category,currentPage : 'category'});
 }
 
 
-function addCategory(req,res){
-   const {categoryName} =req.body
-   console.log(categoryName);
-   console.log(req.file);
+async function addCategory(req, res) {
+    const { categoryName } = req.body;
 
+    if (!categoryName) {
+        return res.status(404).json({ message: 'Category name is required' });
+    }
     if (!req.file) {
-        return res.status(400).json({ message: 'No image uploaded' });
+        return res.status(404).json({ message: 'No image uploaded' });
     }
 
-    // Create a stream from the buffer
-    const stream = cloudinary.uploader.upload_stream(
-        { folder: 'category' }, // Specify the folder in Cloudinary
-        async (error, result) => {
-            if (error) {
-                return res.status(500).json({ message: 'Error uploading to Cloudinary', error });
-            }
-
-            // Create a new product document
-            const newCategory = new Category({
-                name: categoryName,
-                imageUrl: result.secure_url,
-            });
-
-            try {
-                // Save the product to the database
-                await newCategory.save();
-                // res.status(200).json({
-                //     message: 'Product added successfully!',
-                //     imageUrl: result.secure_url,
-                // });
-                return res.redirect('/admin/category')
-            } catch (dbError) {
-                console.error(dbError);
-                res.status(500).json({ message: 'Error saving product to database', dbError });
-            }
+    try {
+        const categoryExist = await Category.findOne({ name: new RegExp(`^${categoryName}$`, 'i') });
+        if (categoryExist) {
+            return res.status(409).json({ success: false, message: 'Category already exists' });
         }
-    );
 
-    // Stream the buffer to Cloudinary
-    streamifier.createReadStream(req.file.buffer).pipe(stream);
-};
+        const stream = cloudinary.uploader.upload_stream(
+            { folder: 'category' }, 
+            async (error, result) => {
+                if (error) {
+                    return res.status(500).json({ message: 'Error uploading to Cloudinary', error });
+                }
+
+                try {
+                    const newCategory = new Category({
+                        name: categoryName,
+                        imageUrl: result.secure_url,
+                    });
+
+                    await newCategory.save();
+                    return res.status(201).json({ success: true, message: 'Category added successfully' });
+                } catch (dbError) {
+                    console.error(dbError);
+                    return res.status(500).json({ success:false, message: 'Error saving category to database', dbError });
+                }
+            }
+        )
+
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: 'Unexpected error occurred', err });
+    }
+}
 
 async function changeCategoryStatus(req,res) {
     const { action, id } = req.params;
     
     try {
-        const newStatus = action === 'list'; // Set status based on action
+        const newStatus = action === 'list'
         const result=await Category.findByIdAndUpdate(id, { status: newStatus });
         if(result)
-        res.status(200).json({ message: `Category ${action === 'list' ? 'listed' : 'unlisted'} successfully.` });
+        res.status(200).json({ success: true , message: `Category ${action === 'list' ? 'listed' : 'unlisted'} successfully.` });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error toggling product status.', error });
+        res.status(500).json({ success:false , message: 'Error toggling product status.', error });
     }
     
 }
 
 async function editCategory(req, res) {
-    const { id } = req.params; // Get the category ID from the URL parameters
-    const { categoryName } = req.body; // Get the new category name from the request body
-    const imageFile = req.file; // Get the uploaded file
+    const { id } = req.params; 
+    const { categoryName } = req.body; 
+    const imageFile = req.file; 
 
     try {
-        // Find the category by ID
         const category = await Category.findById(id);
         
-        // If category not found, return an error
         if (!category) {
-            return res.status(404).json({ message: 'Category not found' });
+            return res.status(404).json({ success:false , message: 'Category not found' });
         }
 
         if(category.name !== categoryName){
-            category.name = categoryName;
+            const categoryExist = await Category.findOne({name: new RegExp(`^${categoryName}$`,'i')})
+             if(categoryExist){
+                return res.status(409).json({success:false , message: 'category name already exist'})
+             }
         }
 
+        category.name = categoryName
         if (imageFile) {
 
             const stream = streamifier.createReadStream(imageFile.buffer);
@@ -109,10 +114,10 @@ async function editCategory(req, res) {
         }
         await category.save();
 
-        return res.status(200).json({ message: 'Category updated successfully', category });
+        return res.status(200).json({ success:true , message: 'Category updated successfully'});
     } catch (error) {
         console.error('Error updating category:', error);
-        return res.status(500).json({ message: 'Server error', error });
+        return res.status(500).json({ success:false , message: 'Server error', error });
     }
 }
 

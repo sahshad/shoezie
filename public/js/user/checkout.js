@@ -156,7 +156,7 @@ try {
 
 function redirectToOrdersPage(orderId) {
 setTimeout(() => {
-    window.location.href = `/user/profile/order-created/${orderId}`;
+    window.location.href = `/user/cart/checkout/order-created/${orderId}`;
 }, 3000);
 }
 
