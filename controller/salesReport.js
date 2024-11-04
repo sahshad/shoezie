@@ -19,7 +19,7 @@ const  sales = await Order.find({
 });
 
 if(sales){
-res.render('admin/salesReport',{sales,reportType,startDate,endDate})
+res.render('admin/salesReport',{sales,reportType,startDate,endDate , currentPage:'sales-report'})
 }
 }
 

@@ -317,6 +317,11 @@ document.addEventListener('DOMContentLoaded', function () {
             formData.expiresAt= document.getElementById('expiresAt').value
             formData.usageLimit= document.getElementById('usageLimit').value
 
+            if(new Date(formData.expiresAt) < new Date() ){
+                Swal.fire('Error!', 'Expire date must be futue date', 'error');
+                return;
+            }
+
         fetch('/admin/coupons/create', {
             method: 'POST',
             headers: {
@@ -395,6 +400,11 @@ document.addEventListener('DOMContentLoaded', function () {
             expiresAt: document.getElementById('editExpiresAt').value,
             usageLimit: document.getElementById('editUsageLimit').value
         };
+
+        if(new Date(formData.expiresAt) < new Date() ){
+                Swal.fire('Error!', 'Expire date must be futue date', 'error');
+                return;
+            }
 
         fetch(`/admin/coupons/update/${id}`, {
             method: 'PUT',

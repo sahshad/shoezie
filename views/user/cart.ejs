@@ -303,15 +303,15 @@ function updateQuantity(cartId , newQuantity,currentQuantityElement) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            updateOrderSummary(newQuantity,currentQuantityElement)
             Toastify({
                 text: data.message,
                 duration: 1000,
                 close: true,
                 gravity: "top",
                 position: 'right',
-                backgroundColor: "#4CAF50",
+                style: { background: "linear-gradient(to right, #4caf50, #2e7d32)" }
             }).showToast();
-            updateOrderSummary(newQuantity,currentQuantityElement)
         }else{
             Toastify({
             text:  data.message,
@@ -319,39 +319,44 @@ function updateQuantity(cartId , newQuantity,currentQuantityElement) {
             close: true,
             gravity: "top",
             position: 'right',
-            backgroundColor: "#f44336",
+            style:{ background: "linear-gradient(to right, #ff5f5f, #ff1a1a)" }
         }).showToast()
         }
         
     })
-    .catch(error => 
+    .catch(error => {
     Toastify({
-            text: 'Error adding to cart:'+ error.message,
-            duration: 3000,
+            text: 'Error update quantity:'+ error.message,
+            duration: 1000,
             close: true,
             gravity: "bottom",
             position: 'center',
-            backgroundColor: "#f44336",
+            style:{ background: "linear-gradient(to right, #ff5f5f, #ff1a1a)" }
         }).showToast(),
-    console.error("Error:", error));
+    console.error("Error:", error)
+})
+
 }
 
 function updateOrderSummary(newQuantity,currentQuantityElement) {
     currentQuantityElement . innerText = newQuantity
         let subtotal = 0;
         let totalDiscount = 0;
+        
         document.querySelectorAll('.product-card').forEach(productCard => {
             const discountPriceElement = productCard.querySelector('.discounted-price');
             const quantityElement = productCard.querySelector('.current-quantity');
             const originalPriceElement = productCard.querySelector('.original-price')
+console.log(discountPriceElement);
 
             const originalPrice = parseFloat(originalPriceElement.innerText.replace('₹' ,'').trim())
-            const discountPrice = parseFloat(discountPriceElement.innerText.replace('₹', '').trim());
+            const discountPrice = discountPriceElement ? parseFloat(discountPriceElement.innerText.replace('₹', '').trim()) : 0
             const quantity = parseInt(quantityElement.innerText);
             subtotal += originalPrice * quantity;
-            totalDiscount += (originalPrice * quantity) - (discountPrice * quantity)
+            discountPriceElement ? totalDiscount += (originalPrice * quantity) - (discountPrice * quantity) : totalDiscount+=0
             
         });
+
         document.getElementById('subtotal').innerText = '₹ ' + subtotal.toFixed(2);
         document.getElementById('discount').innerText = '₹ ' + totalDiscount.toFixed(2)
         document.getElementById('total').innerText = '₹ ' + (subtotal-totalDiscount).toFixed(2);

@@ -1,6 +1,7 @@
 const User = require('../model/user')
 const Address = require('../model/address')
 const Order = require('../model/order')
+const bcrypt = require('bcrypt')
 
 async function getProfile(req,res){
     const _id = req.session.user
@@ -35,7 +36,7 @@ async function getOrders(req,res){
 async function getOrderDetails(req, res) {
   const { orderId} = req.params; 
   try {
-      const order = await Order.findById(orderId).populate('items.productId')
+      const order = await Order.findById(orderId).populate('items.productId').populate('items.offerId')
 
       if (!order) {
           return res.status(404).json({ message: 'Order not found' });
@@ -93,7 +94,6 @@ async function addAddress(req,res){
 
      const userId = req.session.user
      try {  
-        // Create a new address instance
         const newAddress = new Address({
             user: userId, 
             fullname,
@@ -151,9 +151,38 @@ async function deleteAddress(req, res) {
   }
 }
 
+async function updatePassword(req,res){
+   const userId = req.session.user
+   const {newPassword , currentPassword} = req.body
+   console.log(currentPassword,newPassword);
+   
+   try {
+      const user = await User.findById(userId)
+
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+          return res.status(400).json({ message: 'Current password is incorrect.' });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: 'New password must be at least 6 characters long.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully.' });
+
+   } catch (error) {
+    console.error(error);
+        res.status(500).json({ message: 'Server error.' });
+   }
+}
 
 module.exports = {
     getProfile,userLogOut,
     getAddress,getOrders,getOrderDetails,
-    updateUserDetails,addAddress,updateAddress,deleteAddress,
+    updateUserDetails,addAddress,updateAddress,deleteAddress,updatePassword
 }

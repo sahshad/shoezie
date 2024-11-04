@@ -24,17 +24,18 @@ const sizes = [
         }
     }
     window.onload = setSelectedSortOption;
+    
+    function toggleClearFilter(){
+        const clearFilter = document.getElementById('clearFilter')
 
-    function sortProducts() {
-        const sortOption = document.getElementById('sortOptions').value;
-        const categoryFilter = document.getElementById('categoryFilter').value;
-
-        const queryParams = new URLSearchParams(window.location.search);
-        queryParams.delete('sortedby')
-        if (sortOption) queryParams.append('sortedby', sortOption);
-
-        window.location.href = `/user/shop/filter?${queryParams.toString()}`;
+        if(selectedCategories.length > 0 || selectedSizes.length>0){
+            clearFilter.style.display = 'block'
+         }else{
+            clearFilter.style.display = 'none'
+         }
     }
+
+    let filterToggleOpened = false
 
     function toggleFilter() {
         const productContainer = document.getElementById('productContainer')
@@ -60,6 +61,41 @@ const sizes = [
             productContainer.classList.add('col-md-12')
             filterOptions.style.display = 'none';
         }
+
+        if(filterOptions.style.display === 'none')
+            filterToggleOpened = false
+        else
+           filterToggleOpened = true
+    }
+
+    async function sortProducts() {
+        const sortOption = document.getElementById('sortOptions').value;
+    
+        const queryParams = new URLSearchParams(window.location.search);
+        queryParams.delete('sortedby');
+        if (sortOption) queryParams.append('sortedby', sortOption);
+       
+        const requestUrl = `/user/shop/filter?${queryParams.toString()}`
+
+        window.history.pushState({},'',requestUrl)
+    
+        try {
+            const response = await fetch(requestUrl, {
+                method: 'GET', 
+                headers: {
+                    'Accept': 'application/json' 
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+    
+            displayProducts(data.products); 
+        } catch (error) {
+            console.error('Error fetching sorted products:', error);
+        }
     }
 
     function filterProducts() {
@@ -80,6 +116,8 @@ const sizes = [
         selectedSizes.push(button.value)
     }
     console.log(selectedSizes);
+    applyFilters()
+    toggleClearFilter()
 }
 
 function toggleCategory(checkbox) {
@@ -89,23 +127,96 @@ function toggleCategory(checkbox) {
         selectedCategories = selectedCategories.filter(category => category !== checkbox.value);
     }
     console.log(selectedCategories);  
+    applyFilters()
+    toggleClearFilter()
 }
 
-function applyFilters() {
+async function clearFilter(){
     const queryParams = new URLSearchParams(window.location.search);
-    queryParams.delete('sizes');
-    queryParams.delete('categories');
+        queryParams.delete('sizes');
+        queryParams.delete('categories');
 
-    if (selectedSizes.length > 0) {
-        queryParams.append('sizes', JSON.stringify(selectedSizes));
-    }
+        const requestUrl = `/user/shop/filter?${queryParams.toString()}`
+        window.history.pushState({},'',requestUrl)
 
-    if (selectedCategories.length > 0) {
-        queryParams.append('categories', JSON.stringify(selectedCategories));
-    }
+        try {
+            const response = await fetch(requestUrl, {
+                method: 'GET', 
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
 
-    window.location.href = `/user/shop/filter?${queryParams.toString()}`;
+            const buttons = document.querySelectorAll('.size-buttons button');
+            const checkBoxes = document.querySelectorAll('.checkbox');
+
+           checkBoxes.forEach(checkbox =>{
+                    if(checkbox.checked){
+                       checkbox.checked = false; 
+                    }
+           })
+            selectedCategories = [];
+        
+           buttons.forEach(button =>{
+            if (button.classList.contains('selected')) {
+                button.classList.remove('selected')
+                const valueIndex = selectedSizes.indexOf(button.value);
+                 if (valueIndex > -1) {
+                     selectedSizes.splice(valueIndex, 1);
+                 }
+             }
+           })
+
+           const clearFilter = document.getElementById('clearFilter')
+           clearFilter.style.display = 'none'
+
+           
+            const data = await response.json();
+    
+            displayProducts(data.products); 
+        } catch (error) {
+            console.error('Error fetching filtered products:', error);
+        }
 }
+
+
+    async function applyFilters() {
+        const queryParams = new URLSearchParams(window.location.search);
+        queryParams.delete('sizes');
+        queryParams.delete('categories');
+    
+        if (selectedSizes.length > 0) {
+            queryParams.append('sizes', JSON.stringify(selectedSizes));
+        }
+    
+        if (selectedCategories.length > 0) {
+            queryParams.append('categories', JSON.stringify(selectedCategories));
+        }
+        const requestUrl = `/user/shop/filter?${queryParams.toString()}`
+        window.history.pushState({},'',requestUrl)
+        try {
+            const response = await fetch(requestUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            const data = await response.json();
+    
+            displayProducts(data.products);
+        } catch (error) {
+            console.error('Error fetching filtered products:', error);
+        }
+    }
 
     document.addEventListener("DOMContentLoaded", function() {
         function getQueryParams() {
@@ -120,7 +231,7 @@ function applyFilters() {
         function highlightSelectedFilters() {
             const { sizes, categories,searchValue } = getQueryParams();
             categories.forEach(categoryId => {
-                const checkbox = document.querySelector(`input[type="checkbox"][value="${categoryId}"]`);
+                const checkbox = document.querySelector(`input[type="checkbox"][value="${categoryId}"]`)
                 if (checkbox) {
                     checkbox.checked = true; 
                     selectedCategories.push(checkbox.value)
@@ -142,13 +253,106 @@ function applyFilters() {
         highlightSelectedFilters();
     });
 
-    function performSearch(event) {
-    event.preventDefault(); 
+let debounceTimer;
 
-    const searchInput = document.getElementById('searchInput').value
-    if (searchInput) {
-        const queryParams = new URLSearchParams(window.location.search);
+function performSearch(event) {
+    clearTimeout(debounceTimer); 
+
+    const searchInput = event.target.value; 
+
+    debounceTimer = setTimeout(() => {
+        if (searchInput) {
+            const queryParams = new URLSearchParams(window.location.search);
         queryParams.set('search', searchInput) 
-        window.location.href = `/user/shop/filter?${queryParams.toString()}`; 
+            const requestUrl = `/user/shop/filter?${queryParams.toString()}`;
+
+            window.history.pushState({}, '', requestUrl);
+            
+            fetch(requestUrl,{
+                method: 'GET', 
+                headers: {
+                    'Accept': 'application/json' 
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    displayProducts(data.products); 
+                })
+                .catch(error => console.error('Error:', error));
+        } else {
+ 
+            const queryParams = new URLSearchParams(window.location.search);
+            queryParams.delete('search');
+            const requestUrl = `/user/shop/filter?${queryParams.toString()}`
+            window.history.pushState({}, '', requestUrl);
+
+            fetch(requestUrl,{
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }) 
+                .then(response => response.json())
+                .then(data => {
+                    displayProducts(data.products); 
+                })
+                .catch(error => console.error('Error fetching all products:', error));
+        }
+    }, 300); 
+}
+
+function displayProducts(products) {
+    const productsContainer = document.getElementById('productContainer').querySelector('.row');
+    productsContainer.innerHTML = '';
+
+    if (products.length === 0) {
+        productsContainer.innerHTML = '<p>No products found.</p>';
+        return;
     }
+
+    products.forEach(product => {
+        console.log(filterToggleOpened);
+        
+        const productElement = document.createElement('div');
+        productElement.className = filterToggleOpened ? 'col-md-4 mb-4 productCard':'col-md-3 mb-4 productCard'
+        productElement.innerHTML = 
+        `<a href="/user/shop/${product._id}  " class="card-link">
+        <div class="card">
+            <img src="${product.imageUrls[0]} " class="card-img-top fixed-height" alt="Product 1">
+            <div class="card-body p-0" style="text-align: left;">
+                <div>
+                    <p class="card-title font-weight-bold my-2">${product.name} </p>
+                    <div class="star-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(4.5)</span>
+                    </div>
+                    <p class="category">${product.category.name } Shoe</p>
+                                    <p class="price">
+                    ${product.bestOffer ? `
+                        <span style="text-decoration: line-through; color: rgb(175, 175, 175); margin-right: 5px;">₹ ${product.price}</span> 
+                        ${
+                            product.bestOffer.offerType === 'percentage' ? `
+                                ${product.bestOffer.maxDiscount ? `
+                                    ${ (product.price * product.bestOffer.value / 100) > product.bestOffer.maxDiscount ? 
+                                        `₹ ${(product.price - product.bestOffer.maxDiscount).toFixed(2)}` : 
+                                        `₹ ${(product.price - (product.price * product.bestOffer.value / 100)).toFixed(2)}` 
+                                    }` 
+                                : 
+                                    `₹ ${(product.price - (product.price * product.bestOffer.value / 100)).toFixed(2)}`
+                            }` 
+                        : 
+                        `₹ ${(product.price - product.bestOffer.value).toFixed(2)}`
+                    }` : 
+                    `₹ ${product.price.toFixed(2)}`
+                    }
+                </p>
+                </div>
+            </div>
+        </div>
+    </a>`
+        productsContainer.appendChild(productElement);
+    });
 }

@@ -62,17 +62,50 @@
             </tr>
         </thead>
         <tbody>
+            <% let total = 0 %>
             <% items.forEach(function(item) { %>
                 <tr>
                     <td><%= item.productName %></td>
                     <td><%= item.quantity %></td>
-                    <td><%= item.price %></td>
-                    <td><%= item.price * item.quantity %></td>
+                    <% let effectivePrice %>
+                    <% if(item.offerId){ %>
+                        <td>
+                            <del>₹ <%= item.price %>.00</del>
+                        <% if(item.offerId.offerType === 'percentage' ){ %>
+                            <% if(item.offerId.maxDiscount){ %>
+                                <% if((item.price * item.offerId.value / 100) > item.offerId.maxDiscount){ %>
+                                    
+                                ₹ <%=(item.price-item.offerId.maxDiscount).toFixed(2)  %>
+                                    </td>
+                                    <% effectivePrice = (item.price-item.offerId.maxDiscount).toFixed(2) %>
+                                <%}else{ %>
+                                    
+                                ₹ <%=(item.price-(item.price * item.offerId.value / 100)).toFixed(2) %>
+                                    </td>
+                                    <% effectivePrice = (item.price-(item.price * item.offerId.value / 100)).toFixed(2)  %>
+                                <%}%>
+                            <% }else{ %>
+                                ₹ <%=(item.price-(item.price * item.offerId.value / 100)).toFixed(2) %>
+                                </td>
+                                <% effectivePrice = (item.price-(item.price * item.offerId.value / 100)).toFixed(2) %>
+                           <% } %>
+                       
+                    <% }else{ %>
+                        ₹ <%=(item.price-item.offerId.value ).toFixed(2) %>
+                        </td>
+                        <%  effectivePrice = (item.price-item.offerId.value ).toFixed(2) %>
+                    <% } %>
+                    <% }else{ %>
+                        <td>₹ <%= item.price %>.00</td>
+                        <% effectivePrice =  item.price %>
+                    <% } %>
+                    <td><%= (effectivePrice * item.quantity).toFixed(2) %></td>
+                    <% total = total +  (effectivePrice * item.quantity)%>
                 </tr>
             <% }); %>
             <tr>
                 <td colspan="3" class="total">Total Amount:</td>
-                <td class="total">₹<%= totalAmount %></td>
+                <td class="total">₹<%= total.toFixed(2) %></td>
             </tr>
         </tbody>
     </table>

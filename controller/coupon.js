@@ -10,7 +10,6 @@ async function getCoupons(req,res){
     } catch (error) {
         console.log(error);      
     }
-    
 }
 
 async function addCoupon(req,res){
@@ -164,6 +163,9 @@ async function validateCoupon (req, res){
             discount = Math.min((subtotal * coupon.discountAmount) / 100, coupon.maxDiscount);
         }
    
+        if((subtotal/2) < discount ){
+            return res.status(400).json({success : false , message:'Cannot apply coupon which has more than 50% discount of the cart' })
+        }
         
         res.json({ success: true, discountAmount: discount });
 

@@ -55,7 +55,7 @@
                                     <td>
                                         <%= offer.offerType === 'percentage' ? offer.value + '%' : '₹' + offer.value %>
                                     </td>
-                                    <td><%= new Date(offer.expiresAt).toLocaleString() %></td>
+                                    <td><%= new Date(offer.expiresAt).toLocaleDateString() %></td>
                                     <td>
                                         <span class="badge <%= offer.isActive ? 'badge-success' : 'badge-danger' %>">
                                             <%= offer.isActive ? 'Active' : 'Inactive' %>
@@ -128,7 +128,7 @@
                         </div>
                         <div class="form-group">
                             <label for="expiresAt">Expires At:</label>
-                            <input type="datetime-local" class="form-control" id="expiresAt" name="expiresAt" required>
+                            <input type="date" class="form-control" id="expiresAt" name="expiresAt" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Create Offer</button>
                     </form>                    
@@ -213,6 +213,12 @@
                 maxDiscount: parseFloat(document.getElementById('maxDiscount').value) || null,
                 expiresAt: document.getElementById('expiresAt').value,
             };
+            console.log(new Date() , new Date(offerData.expiresAt) );
+            
+            if(new Date(offerData.expiresAt) < new Date() ){
+                Swal.fire('Error!', 'Expire date must be futue date', 'error');
+                return;
+            }
     
             fetch('/admin/offers/create', {
                 method: 'POST',
@@ -359,6 +365,11 @@
             maxDiscount: parseFloat(document.getElementById('editMaxDiscount').value) || null,
             expiresAt: document.getElementById('editExpiresAt').value,
         };
+
+        if(new Date(offerData.expiresAt) < new Date() ){
+                Swal.fire('Error!', 'Expire date must be futue date', 'error');
+                return;
+            }
 
         fetch(`/admin/offers/update/${offerData.id}`, {
             method: 'PUT',

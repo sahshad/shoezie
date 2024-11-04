@@ -202,6 +202,19 @@
             } else {
                 startDate = document.getElementById('startDate').value;
                 endDate = document.getElementById('endDate').value;
+                if(new Date(startDate) > new Date() || new Date(endDate) > new Date()){    
+                    Swal.fire('Error!', 'Date must be past date', 'error');
+                    return;
+                }
+            }
+            if(!startDate || !endDate){
+                Swal.fire('Error!', 'Start date or end date cannot be empty', 'error');
+                    return;
+            }
+
+            if(startDate > endDate){
+                Swal.fire('Error!', 'End date should be greater than start date ', 'error');
+                    return;
             }
 
             const requestData = {

@@ -266,7 +266,10 @@ async function getShop(req, res) {
             };
         }));
         
-        
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.json({ products: productsWithBestOffers, category: categories });
+        }
+
         res.render('user/shop', { product: productsWithBestOffers, category: categories });
     } catch (error) {
         console.error('Error fetching products:', error);
@@ -322,6 +325,9 @@ async function getProduct(req,res){
         ...product.toObject(),
         bestOffer
     };
+
+    console.log(productsWithBestOffers);
+    
     
     if (product) {
         res.render('user/productView', { product:productsWithBestOffers ,relatedProducts:filteredRelatedProducts});
@@ -331,6 +337,7 @@ async function getProduct(req,res){
 }
 
 async function sortProducts(req, res) {
+
     const sort = req.query.sortedby;
     const sizes = req.query.sizes ? JSON.parse(req.query.sizes) : [];
     const categories = req.query.categories ? JSON.parse(req.query.categories) : [];
@@ -419,6 +426,10 @@ async function sortProducts(req, res) {
             };
         }));
        
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return  res.status(200).json({products:productsWithBestOffers,category})
+        }
+
         res.render('user/shop',{product:productsWithBestOffers,category})
     } catch (error) {
         console.error(error);

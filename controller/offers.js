@@ -7,7 +7,6 @@ async function getOffers(req,res){
     res.render('admin/offers',{offers , currentPage:'offers'})
 }
 
-
 async function createOffer(req, res) {
     try {
         const { targetName, offerFor, offerType, value, maxDiscount, expiresAt,minProductPrice } = req.body;
@@ -32,6 +31,10 @@ console.log(minProductPrice);
             target = await Product.findOne({ 
                 name: { $regex: new RegExp(`^${targetName}$`, 'i') }
             });
+
+            if(value > target.price ){
+            return res.status(400).json({ success: false, message: 'Offer value is greater than product price' });
+            }
 
             const newOffer = new Offer({
                 targetId: target._id,
@@ -73,13 +76,8 @@ console.log(minProductPrice);
             const category = await Category.findById(target._id)
             // const offer = await Offer.findOne({targetId:target._id})
             
-            if (!category.offers) {
-                category.offers = []; 
-            }
-            console.log(category);
-
-            category.offers.push(offer._id); 
-            await category.save();
+            addOfferReferenceToCategory(category._id, offer._id)
+           
         
                 // const products = await Product.find({ category: target._id });
                 // // const offer = await Offer.findOne({targetId:target._id})
@@ -119,53 +117,6 @@ async function addOfferReference(productId, offerId) {
     }
 }
 
-
-// async function applyBestOfferToProduct(productId, newOffer) {
-//     let discountAmount = 0;
-//     const product = await Product.findById(productId)
-//     let offerPrice = product.price;
-// console.log(product,newOffer);
-
-//     // Calculate discount amount based on the offer type
-//     if (newOffer.offerType === 'percentage') {
-//         discountAmount = (newOffer.value / 100) * product.price;
-//         if (newOffer.maxDiscount) discountAmount = Math.min(discountAmount, newOffer.maxDiscount);
-//     } else if (newOffer.offerType === 'flat') {
-//         discountAmount = newOffer.value;
-//     }
-
-//     offerPrice = Math.max(product.price - discountAmount, 0);
-
-//     // Determine whether to apply category or product offer
-//     const existingOffer = product.offerDetails;
-//     if (!existingOffer || offerPrice < existingOffer.offerPrice) {
-//         product.offerDetails = {
-//             offerId: newOffer._id,
-//             offerPrice,
-//             discountAmount,
-//             offerType : newOffer.offerType,
-//             expiresAt: newOffer.expiresAt,
-//         };
-
-//         // If this is a category-level offer, update the category offer field as well
-//         if (newOffer.offerFor === 'Category') {
-//             product.categoryOfferDetails = {
-//                 offerId: newOffer._id,
-//                 offerPrice,
-//                 discountAmount,
-//                 offerType : newOffer.offerType,
-//                 expiresAt: newOffer.expiresAt,
-//             };
-//         }
-//     }
-// console.log(product);
-
-//     // Save the updated product
-//     await product.save();
-// }
-
-
-
 async function changeOfferStatus(req,res){
     const { id, status } = req.params;
 
@@ -185,89 +136,10 @@ async function changeOfferStatus(req,res){
     }
 }
 
-
-
-
-// async function editOffer(req, res) {
-//     try {
-//         const { id, targetName, offerFor, offerType, value, maxDiscount, expiresAt, minProductPrice } = req.body;
-//         // Validate required fields
-//         if (!id || !targetName || !offerFor || !offerType || value == null || !expiresAt) {
-//             return res.status(400).json({ success: false, message: 'All required fields must be provided.' });
-//         }
-
-//         if (offerType === 'percentage' && (value < 0 || value > 100)) {
-//             return res.status(400).json({ success: false, message: 'Percentage value must be between 0 and 100.' });
-//         }
-
-//         if (offerType === 'percentage' && maxDiscount != null && maxDiscount <= 0) {
-//             return res.status(400).json({ success: false, message: 'Max discount must be positive.' });
-//         }
-
-//         // Find the existing offer
-//         const existingOffer = await Offer.findById(id);
-//         if (!existingOffer) {
-//             return res.status(404).json({ success: false, message: 'Offer not found.' });
-//         }
-
-//         // Store the old targetId for reference removal
-//         const oldTargetId = existingOffer.targetId;
-
-//         let newTarget;
-
-//         // Determine the new target (Product or Category)
-//         if (offerFor === 'Product') {
-//             newTarget = await Product.findOne({ name: { $regex: new RegExp(`^${targetName}$`, 'i') } });
-//         } else if (offerFor === 'Category') {
-//             newTarget = await Category.findOne({ name: { $regex: new RegExp(`^${targetName}$`, 'i') } });
-//         }
-
-//         if (!newTarget) {
-//             return res.status(404).json({ success: false, message: `${offerFor} not found.` });
-//         }
-
-//         // Update the offer details
-//         existingOffer.offerFor = offerFor;
-//         existingOffer.offerType = offerType;
-//         existingOffer.value = value;
-//         existingOffer.maxDiscount = maxDiscount || null;
-//         existingOffer.minProductPrice = minProductPrice || null;
-//         existingOffer.expiresAt = expiresAt;
-//         existingOffer.targetId = newTarget._id; // Update to new target ID
-
-//         // Remove the old reference
-//         if (oldTargetId) {
-//             if (existingOffer.offerFor === 'Product') {
-//                 await removeOfferReference(oldTargetId, existingOffer._id);
-//             } else if (existingOffer.offerFor === 'Category') {
-//                 await removeOfferReferenceFromCategory(oldTargetId, existingOffer._id);
-//             }
-//         }
-
-//         // Save the updated offer
-//         await existingOffer.save();
-
-//         // Add new reference to the new target
-//         if (offerFor === 'Product') {
-//             await addOfferReference(newTarget._id, existingOffer._id);
-//         } else if (offerFor === 'Category') {
-//             await addOfferReferenceToCategory(newTarget._id, existingOffer._id);
-//         }
-
-//         return res.status(200).json({ success: true, message: 'Offer updated successfully.', offer: existingOffer });
-
-//     } catch (error) {
-//         console.error('Error editing offer:', error);
-//         res.status(500).json({ success: false, message: 'An error occurred while editing the offer.' });
-//     }
-// }
-
-
 async function editOffer(req, res) {
     try {
         const { id, targetName, offerFor, offerType, value, maxDiscount, expiresAt, minProductPrice } = req.body;
 
-        // Validate required fields
         if (!id || !targetName || !offerFor || !offerType || value == null || !expiresAt) {
             return res.status(400).json({ success: false, message: 'All required fields must be provided.' });
         }
@@ -280,20 +152,20 @@ async function editOffer(req, res) {
             return res.status(400).json({ success: false, message: 'Max discount must be positive.' });
         }
 
-        // Find the existing offer
         const existingOffer = await Offer.findById(id);
         if (!existingOffer) {
             return res.status(404).json({ success: false, message: 'Offer not found.' });
         }
 
-        // Store the old targetId for reference removal
         const oldTargetId = existingOffer.targetId;
 
         let newTarget;
 
-        // Determine the new target (Product or Category)
         if (offerFor === 'Product') {
             newTarget = await Product.findOne({ name: { $regex: new RegExp(`^${targetName}$`, 'i') } });
+            if(value >= newTarget.price ){
+                return res.status(400).json({ success: false, message: 'Offer value is greater than product price' });
+                }
         } else if (offerFor === 'Category') {
             newTarget = await Category.findOne({ name: { $regex: new RegExp(`^${targetName}$`, 'i') } });
         }
@@ -302,22 +174,11 @@ async function editOffer(req, res) {
             return res.status(404).json({ success: false, message: `${offerFor} not found.` });
         }
 
-        // Only update if the target has changed
         const hasOfferForChanged = existingOffer.offerFor !== offerFor 
         
-        console.log(oldTargetId,newTarget._id);
-        
-          
-        // Update the offer details
-        existingOffer.offerFor = offerFor;
-        existingOffer.offerType = offerType;
-        existingOffer.value = value;
-        existingOffer.maxDiscount = maxDiscount || null;
-        existingOffer.minProductPrice = minProductPrice || null;
-        existingOffer.expiresAt = expiresAt;
-        existingOffer.targetId = newTarget._id; // Update to new target ID
-
         if(existingOffer.offerFor === offerFor && oldTargetId.toString() !== newTarget._id.toString()){
+            console.log('hi');
+            
             if (existingOffer.offerFor === 'Product') {
                 await removeOfferReference(oldTargetId, existingOffer._id);
                 await addOfferReference(newTarget._id, existingOffer._id);
@@ -326,21 +187,27 @@ async function editOffer(req, res) {
                 await addOfferReferenceToCategory(newTarget._id, existingOffer._id);
             }
         } 
-        // Remove the old reference if the offerFor has changed
+
         if (hasOfferForChanged) {
             if (oldTargetId) {
                 if (existingOffer.offerFor === 'Product') {
-                    await removeOfferReferenceFromCategory(oldTargetId, existingOffer._id);
-                } else if (existingOffer.offerFor === 'Category') {   
                     await removeOfferReference(oldTargetId, existingOffer._id);
+                } else if (existingOffer.offerFor === 'Category') {   
+                    await removeOfferReferenceFromCategory(oldTargetId, existingOffer._id);
                 }
             }
         }
 
-        // Save the updated offer
+        existingOffer.offerFor = offerFor;
+        existingOffer.offerType = offerType;
+        existingOffer.value = value;
+        existingOffer.maxDiscount = maxDiscount || null;
+        existingOffer.minProductPrice = minProductPrice || null;
+        existingOffer.expiresAt = expiresAt;
+        existingOffer.targetId = newTarget._id;
+                    
         await existingOffer.save();
 
-        // Add new reference to the new target only if the offerFor has changed
         if (hasOfferForChanged) {
             if (offerFor === 'Product') {
                 await addOfferReference(newTarget._id, existingOffer._id);

@@ -4,33 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SHOEZIE - User Profile</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="/styles/user/partials/navbar.css">
     <link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
+    <style>
+        .profile-action{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .edit-btn , .change-password-btn {
+            border: 1px solid black;
+            background-color: black;
+            color: white;
+            padding-inline: 10px;
+            border-radius: 5px;
+        }
+
+        
+    </style>
     
 </head>
 <body>
 
-<!-- Navbar -->
 <%- include('partials/navbar') %>
-<!-- User Profile Section -->
 <main>
     <div class="container mt-5">
         <div class="row">
            <%- include('partials/profileSidebar') %>
             <div class="col-md-9 ">
-                <!-- My Details Section -->
                 <div class="my-details mt-4 pl-5">
-                    <h3 class="mb-4"><small>My Details</small></h3>
+                    <div class="profile-action">
+                        <h3 class="mb-4"><small>My Details</small></h3>
+                        <button class="edit-btn btn-sm" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit"></i> Edit</button>
+
+                    </div>
                     <% if(user){ %>
                        <table class="table table-bordered">
                         <tbody>
@@ -56,7 +69,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="btn-sm change-password-btn"><i class="fa-solid fa-key" style="color: #ffffff; margin-right: 5px;"></i>Change Password</button>
                     <% } %>
                     
                 </div>
@@ -104,55 +117,191 @@
     </div>
 </div>
 
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" placeholder="Enter Current Password" required>
+                        <small class="text-danger"></small> 
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" placeholder="Enter New Password" required>
+                        <small class="text-danger"></small> 
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm New Password" required>
+                        <small class="text-danger"></small> 
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="savePasswordChanges">Change Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
+function validateInput(input) {
+    const value = input.value.trim();
+    let isValid = true;
+    let message = '';
+
+    if (!value) {
+        isValid = false;
+        message = 'This field is required.';
+    } else if (input.id === 'newPassword' || input.id === 'confirmPassword') {
+        if (value.length < 6) {
+            isValid = false;
+            message = 'Password must be at least 6 characters long.';
+        }
+    }
+
+    const errorMessageElement = input.nextElementSibling;
+    if (isValid) {
+        errorMessageElement.textContent = '';
+        input.classList.remove('is-invalid');
+    } else {
+        errorMessageElement.textContent = message;
+        input.classList.add('is-invalid');
+    }
+    return isValid;
+}
+
+document.querySelector('.change-password-btn').addEventListener('click', function () {
+    $('#changePasswordModal').modal('show');
+});
+
+document.querySelectorAll('#changePasswordForm input').forEach(input => {
+    input.addEventListener('input', function () {
+        validateInput(this);
+    });
+});
+
+document.getElementById('savePasswordChanges').addEventListener('click', async function () {
+    const currentPassword = document.getElementById('currentPassword');
+    const newPassword = document.getElementById('newPassword');
+    const confirmPassword = document.getElementById('confirmPassword');
+
+    const isCurrentPasswordValid = validateInput(currentPassword);
+    const isNewPasswordValid = validateInput(newPassword);
+    const isConfirmPasswordValid = validateInput(confirmPassword);
+
+    if (newPassword.value !== confirmPassword.value) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: "New password and confirm password do not match!",
+        });
+        return;
+    }else if(newPassword.value === currentPassword.value){
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: "both new password and new password are same",
+        });
+        return;
+    }
+
+    if (!isCurrentPasswordValid || !isNewPasswordValid || !isConfirmPasswordValid) {
+        return;
+    }
+
+    const passwordData = {
+        currentPassword: currentPassword.value.trim(),
+        newPassword: newPassword.value.trim()
+    };
+
+    try {
+        const response = await fetch('/user/profile/password/update', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(passwordData)
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: "Password changed successfully!",
+            });
+            $('#changePasswordModal').modal('hide');
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: result.message || "Failed to change password.",
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: "An error occurred.",
+        });
+    }
+});
 
 
     document.addEventListener('DOMContentLoaded', function () {
-    // Find the "Edit" button and attach an event listener
-    const editButton = document.querySelector('.btn-primary');
+    const editButton = document.querySelector('.edit-btn');
     
     if (editButton) {
       editButton.addEventListener('click', function () {
-        // Get the current user information from the table
         const firstName = document.getElementById('firstName').textContent.trim();
         const lastName = document.getElementById('lastName').textContent.trim();
         const email = document.getElementById('email').textContent.trim();
-        
-        // Handle the phone number, check if it contains a valid phone number or "Update Your phoneNumber"
+
         const phoneNumberElement = document.getElementById('phoneNumber');
         const phoneNumber = phoneNumberElement.textContent.trim();
         const isPhoneValid = !phoneNumber.includes("Update Your phoneNumber");
 
-        // Populate the edit form fields with the current values
         document.getElementById('editFirstName').value = firstName;
         document.getElementById('editLastName').value = lastName;
         document.getElementById('editEmail').value = email;
 
-        // If the phone number is valid, populate it; otherwise, set the field to empty
         document.getElementById('editPhoneNumber').value = isPhoneValid ? phoneNumber : '';
       });
     }
   });
 
-   // Save changes button logic
    const saveButton = document.getElementById('saveChanges');
     saveButton.addEventListener('click', async function () {
-      // Get values from the modal input fields
       const updatedFirstName = document.getElementById('editFirstName').value.trim();
       const updatedLastName = document.getElementById('editLastName').value.trim();
       const updatedPhoneNumber = document.getElementById('editPhoneNumber').value.trim();
       const updatedEmail = document.getElementById('editEmail').value.trim();
 
-      // Create the request payload
       const updatedData = {
         firstname: updatedFirstName,
         lastname: updatedLastName,
-        phone: updatedPhoneNumber || null,  // Optional: set to null if no phone is provided
+        phone: updatedPhoneNumber || null,  
         email: updatedEmail
       };
 

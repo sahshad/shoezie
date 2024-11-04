@@ -350,6 +350,16 @@ document.getElementById('addProductButton').addEventListener('click', function (
        })
 });
 
+function showErrorAlert(message) {
+    Swal.fire({
+        title: 'Error!',
+        text: message,
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK',
+    });
+}
+
 document.getElementById('editProductButton').addEventListener('click', function() {
     const currentName = document.getElementById('editProductName').value;
     const currentCategory = document.getElementById('editProductCategory').value;

@@ -97,10 +97,13 @@ offerDiscount = parseFloat(offerDiscount.replace(/[₹\s]/g, ''));
 
 const cartElement = document.getElementById('cartData');
 const cart = JSON.parse(cartElement.getAttribute('data-cart'));
+console.log(cart.products);
+
 
 const items = cart.products.map(item => ({
     productId: item.productId._id,
     sizeId: item.sizeId,
+    offerId:item.bestOffer ? item.bestOffer._id : null,
     quantity: item.quantity,
     price: item.productId.price
 }));
@@ -229,7 +232,7 @@ e.preventDefault();
 placeOrder();
 });
 
-function applyCoupon() {
+function applyCoupon(total) {
 const couponCode = document.getElementById('couponCode').value.trim();
 let subtotal = document.getElementById('total').innerText;
 subtotal = subtotal.replace(/[₹\s]/g, '');

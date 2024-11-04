@@ -350,7 +350,7 @@ async function changeOrderStatus(req, res) {
 async function viewOrder(req, res) {
   const { orderId } = req.params;
   try {
-    const order = await Order.findById(orderId).populate('items.productId')
+    const order = await Order.findById(orderId).populate('items.productId').populate('items.offerId')
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
@@ -466,7 +466,7 @@ async function takeReturnAction(req,res){
 async function downloadInvoice(req,res) {
 
   try {
-    const order = await Order.findById(req.params.orderId).populate('items.productId');
+    const order = await Order.findById(req.params.orderId).populate('items.productId').populate('items.offerId')
     if (!order) return res.status(404).send('Order not found');
 
     const invoiceData = {
@@ -477,10 +477,14 @@ async function downloadInvoice(req,res) {
         items: order.items.map(item => ({
             productName: item.productId.name,
             quantity: item.quantity,
+            offerId: item.offerId ? item.offerId : null,
             price: item.price
         })),
         totalAmount: order.items.reduce((total, item) => total + (item.price * item.quantity), 0)
     };
+
+    console.log(invoiceData.items[0].offerId);
+    
 
     ejs.renderFile('views/user/invoice/invoice-template.ejs', invoiceData, (err, html) => {
         if (err) {

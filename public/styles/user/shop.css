@@ -151,7 +151,7 @@ font-size: x-small;
     transform: rotate(45deg);
 }
 
-.filter-btn{
+.filter-btn , .filter-clear-btn{
     border: 1px solid black;
     border-radius: 5px;
     color: rgb(0, 0, 0);
@@ -177,4 +177,9 @@ font-size: x-small;
 .size-buttons button.selected {
     background-color: #000000; 
     color: #ffffff; 
+}
+.filter-buttons{
+    display: flex;
+    flex-direction: row;
+   margin-right: 15%;
 }

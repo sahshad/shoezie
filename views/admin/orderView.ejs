@@ -27,51 +27,100 @@
         </div>
        
         <% if(order){ %>
-        <div class="card">
-            
-            <div class="card-header">
-                <h6>Order #<%= order._id %></h6>
-                <p class="m-0">Order Date : <%= order.orderDate.toLocaleDateString() %></p>
-                <p class="">Order Time : <%= order.orderDate.toLocaleTimeString() %></p>
-                <p>Status: <span class="badge <%= 
-                    order.orderStatus === 'Pending' ? 'badge-warning' :
-                    order.orderStatus === 'Processing' ? 'badge-info' :
-                    order.orderStatus === 'Shipped' ? 'badge-primary' :
-                    order.orderStatus === 'Delivered' ? 'badge-success' :
-                    order.orderStatus === 'Cancelled' ? 'badge-danger' :
-                    '' // fallback class if needed
-                %>">
-                    <%= order.orderStatus %>
-                </span></p>
-            </div>
-            <div class="card-body">
-                <h6>Ordered Address</h6>
-                <p><%= order.shippingAddress.fullname %><br><%= order.shippingAddress.address %><br><%= order.shippingAddress.phone %></p>
-                
-                <h6>Ordered Products</h6>
+            <div class="card ">
+                <div class="card-header">
+                    <h6>Order #<%= order._id %></h6>
+                    <p class="m-0">Order Date: <%= order.orderDate.toLocaleDateString() %></p>
+                    <p class="">Order Time: <%= order.orderDate.toLocaleTimeString() %></p>
+                    <p>Status: <span class="badge <%= 
+                        order.orderStatus === 'Pending' ? 'badge-warning' :
+                        order.orderStatus === 'Processing' ? 'badge-info' :
+                        order.orderStatus === 'Shipped' ? 'badge-primary' :
+                        order.orderStatus === 'Delivered' ? 'badge-success' :
+                        order.orderStatus === 'Cancelled' ? 'badge-danger' :
+                        order.orderStatus === 'Returned' ? 'badge-success' :
 
-                <div class="row">
-                    <% order.items.forEach(order =>{ %>
-                    <div class="col-md-2">
-                        <div class="card mb-3">
-                            <img src="<%= order.productId.imageUrls[0] %>" class="card-img-top" alt="Item 1">
-                            <div class="card-body ">
-                                <p class="card-title m-0 "><small class="font-weight-bold"><%= order.productId.name %></small></p>
-                                <p class="card-text m-0"><small>Price: ₹ <%= order.price %>.00</small></p>
-                                <p class="card-text m-0"><small>Quantity: <%= order.quantity %></small></p>
-                            </div>
-                        </div>
+                        order.orderStatus === 'Failed' ? 'badge-danger' : ''
+                    %>">
+                        <%= order.orderStatus %>
+                    </span></p>
+                </div>
+                <div class="card-body p-4">
+                    <h6>Shipping Address</h6>
+                    <p><%= order.shippingAddress.fullname %><br>
+                       <%= order.shippingAddress.address %><br>
+                       <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.pincode %><br>
+                       <%= order.shippingAddress.phone %></p>
+    
+                    <h6>Payment Information</h6>
+                    <p>Payment Method: <%= order.paymentMethod %></p>
+                    <p>Payment Status: <%= order.paymentStatus %></p>
+                    <h6>Ordered Products</h6>
+                    <table class="table w-75">
+                        <thead>
+                            <tr>
+                                <th scope="col">Image</th>
+                                <th scope="col">Product </th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% order.items.forEach(item => { %>
+                            <tr>
+                                <td><img src="<%= item.productId.imageUrls[0] %>" alt="<%= item.productId.name %>" style="width: 50px; height: auto;"></td>
+    
+                                <td><%= item.productId.name %></td>
+                                <% let effectivePrice %>
+                                <% if(item.offerId){ %>
+                                    <td>
+                                        <del>₹ <%= item.price %>.00</del>
+                                    <% if(item.offerId.offerType === 'percentage' ){ %>
+                                        <% if(item.offerId.maxDiscount){ %>
+                                            <% if((item.productId.price * item.offerId.value / 100) > item.offerId.maxDiscount){ %>
+                                                
+                                            ₹ <%=(item.productId.price-item.offerId.maxDiscount).toFixed(2)  %>
+                                                </td>
+                                                <% effectivePrice = (item.productId.price-item.offerId.maxDiscount).toFixed(2) %>
+                                            <%}else{ %>
+                                                
+                                            ₹ <%=(item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2) %>
+                                                </td>
+                                                <% effectivePrice = (item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2)  %>
+                                            <%}%>
+                                        <% }else{ %>
+                                            ₹ <%=(item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2) %>
+                                            </td>
+                                            <% effectivePrice = (item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2) %>
+                                       <% } %>
+                                   
+                                <% }else{ %>
+                                    ₹ <%=(item.productId.price-item.offerId.value ).toFixed(2) %>
+                                    </td>
+                                    <%  effectivePrice = (item.productId.price-item.offerId.value ).toFixed(2) %>
+                                <% } %>
+                                <% }else{ %>
+                                    <td>₹ <%= item.price %>.00</td>
+                                    <% effectivePrice =  item.price %>
+                                <% } %>
+                                <td><%= item.quantity %></td>
+                                <td>₹ <%= (effectivePrice * item.quantity).toFixed(2) %></td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <div class="mt-4">
+                        <% if(order.couponDiscount){ %>
+                            <h6><small>Coupon Discount: -  ₹ <%= (order.couponDiscount).toFixed(2) %> </small></h6>
+                           <% } %>
+                           <h6>Total Price: ₹ <%= (order.totalAmount).toFixed(2) %></h6>
                     </div>
-                    <% }) %>
-                </div>
-                <div class="row d-flex justify-content-between mt-3">
-                    <h6 class="ml-3">Total Price: ₹ <%= order.totalAmount %>.00</h6>
-                </div>
+                   
                
+                </div>
             </div>
-        </div>
-        <% } %>
-
+            <% } %>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

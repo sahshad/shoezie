@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
+const {v4 : uuidv4 } = require('uuid')
 
 const orderSchema = new mongoose.Schema({
+    orderId:{
+        type:String,
+        required:true,
+        unique:true,
+        default: uuidv4,
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User', 
@@ -15,6 +22,10 @@ const orderSchema = new mongoose.Schema({
             sizeId:{
                 type: mongoose.Schema.Types.ObjectId,
                 required:true
+            },
+            offerId:{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'Offer'
             },
             quantity: {
                 type: Number,

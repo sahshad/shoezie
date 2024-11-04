@@ -7,7 +7,7 @@ forgotPasswordVerifyOtp,resetPassword,forgotPasswordResendOtp} = require('../con
  const{getProfile,userLogOut,
     getAddress,getOrders,getOrderDetails,
     updateUserDetails,addAddress,
-    updateAddress,deleteAddress, } = require('../controller/userProfileController')   
+    updateAddress,deleteAddress,updatePassword } = require('../controller/userProfileController')   
 
 const { userAuthenticated,preventCache} = require('../middleware/authMiddleware')
 
@@ -36,6 +36,7 @@ router.post('/forgot-password/reset',resetPassword)
 
 router.get('/profile',userAuthenticated,getProfile)
 router.put('/profile/update',updateUserDetails)
+router.patch('/profile/password/update',updatePassword)
 
 router.get('/profile/address',userAuthenticated,getAddress)
 router.post('/profile/address/add',addAddress)
