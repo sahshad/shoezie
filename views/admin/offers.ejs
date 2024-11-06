@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="/styles/admin/products.css">
     <link rel="stylesheet" href="/styles/admin/dashboard.css">
+    <link rel="stylesheet" href="/styles/pagination.css">
 </head>
 <body>
     <div class="d-flex" id="wrapper">
@@ -55,7 +56,11 @@
                                     <td>
                                         <%= offer.offerType === 'percentage' ? offer.value + '%' : '₹' + offer.value %>
                                     </td>
-                                    <td><%= new Date(offer.expiresAt).toLocaleDateString() %></td>
+                                    <td><% if(new Date(offer.expiresAt) < new Date()){ %>
+                                        <span class="badge badge-danger">Expired</span>
+                                    <% }else{ %>
+                                        <%= new Date(offer.expiresAt).toLocaleDateString() %>
+                                    <% } %></td>
                                     <td>
                                         <span class="badge <%= offer.isActive ? 'badge-success' : 'badge-danger' %>">
                                             <%= offer.isActive ? 'Active' : 'Inactive' %>
@@ -76,7 +81,31 @@
                         <% } %>
                     </tbody>
                 </table>
-                
+                <!-- Pagination Controls -->
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <% if (currentPage > 1) { %>
+                <li class="page-item">
+                    <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>" class="page-link">Previous</a>
+                </li>
+            <% } %>
+
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a href="?page=<%= i %>&limit=<%= limit %>" class="page-link"><%= i %></a>
+                </li>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                    <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>" class="page-link">Next</a>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
+</div>
+
             </div>
         </div>
     </div>
@@ -183,7 +212,7 @@
                         </div>
                         <div class="form-group">
                             <label for="editExpiresAt">Expires At:</label>
-                            <input type="datetime-local" class="form-control" id="editExpiresAt" name="expiresAt" required>
+                            <input type="date" class="form-control" id="editExpiresAt" name="expiresAt" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Update Offer</button>
                     </form>

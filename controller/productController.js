@@ -4,16 +4,32 @@ const Category = require('../model/category')
 const cloudinary = require('../config/cloudinary')
 const streamifier = require('streamifier')
 const multer = require('multer')
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 async function getProducts(req, res) {
     try {
-        const product =await Product.find({}).populate('category')
-        const category = await Category.find({})
-        res.render('admin/products',{product,category , currentPage:'products'})
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5; 
+        const skip = (page - 1) * limit; 
 
+        const products = await Product.find({})
+            .populate('category')
+            .skip(skip)
+            .limit(limit);
+
+        const totalProducts = await Product.countDocuments();
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        const categories = await Category.find({});
+        res.render('admin/products', {
+            product: products,
+            category: categories,
+            currentPage: page,
+            totalPages,
+            limit,
+            activePage: 'products',
+        });
     } catch (error) {
         console.log(error);
     }

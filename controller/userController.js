@@ -199,6 +199,14 @@ async function getHome(req,res){
   const products = await Product.find({status:true}).populate('category')
   .populate('offers').sort({createdAt:-1}).limit(4)
 
+ const productsWithBestOffers = await findBestOffer(products)
+ 
+  const category = await Category.find({})
+    res.render('user/home',{product:productsWithBestOffers,category})
+}
+
+async function findBestOffer(products){
+    
   const productsWithBestOffers = await Promise.all(products.map(async product => {
     const category = await Category.findById(product.category).populate('offers');
     const categoryOffers = category ? category.offers : [];
@@ -226,9 +234,7 @@ async function getHome(req,res){
         bestOffer
     };
 }));
-
-  const category = await Category.find({})
-    res.render('user/home',{product:productsWithBestOffers,category})
+  return productsWithBestOffers
 }
 
 async function getShop(req, res) {
@@ -281,7 +287,7 @@ async function getProduct(req,res){
     const productId = req.params.id 
     const product = await Product.findById(productId)
     .populate('offers');
-    const relatedProducts = await Product.find({category:product.category}) 
+    const relatedProducts = await Product.find({category:product.category,status:true}) 
 
     const filteredRelatedProducts = relatedProducts.filter(
         relatedProduct => relatedProduct._id.toString() !== product._id.toString()
@@ -291,24 +297,11 @@ async function getProduct(req,res){
     const categoryOffers = category ? category.offers : [];
 
     const combinedOffers = [...product.offers, ...categoryOffers];
-    // const hasValidOffer = combinedOffers.some(offer => offer.minProductPrice >= product.price);
-
-    
-    //         let bestOffer = null;
-
-    //         if (!hasValidOffer) {
-    //             bestOffer = await getBestOffer(combinedOffers, product.price);
-    //         }
-
-    // const productsWithBestOffers={
-    //     ...product.toObject(), 
-    //      bestOffer 
-    //     }
     const validOffers = combinedOffers.filter(offer => {
         if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
-            return false; // Exclude this offer
+            return false;
         }
-        return true; // Include this offer
+        return true;
     });
 
     const hasValidOffer = validOffers.some(offer => {
@@ -325,9 +318,6 @@ async function getProduct(req,res){
         ...product.toObject(),
         bestOffer
     };
-
-    console.log(productsWithBestOffers);
-    
     
     if (product) {
         res.render('user/productView', { product:productsWithBestOffers ,relatedProducts:filteredRelatedProducts});
@@ -371,9 +361,11 @@ async function sortProducts(req, res) {
             sortOptions = { name: -1 }; 
             break;
         default:
-            sortOptions= {name : 1}
+            sortOptions= {}
     }
     const query = {};
+     
+        query.status = 'true'
 
         if (categories.length > 0) {
             query.category = { $in: categories }; 
@@ -390,7 +382,7 @@ async function sortProducts(req, res) {
         if (search) {
             query.name = { $regex: search, $options: 'i' }; 
         }
-
+      
     try {
         const products = await Product.find(query).sort(sortOptions).populate('category')
         const category = await Category.find({})
@@ -398,16 +390,14 @@ async function sortProducts(req, res) {
         const productsWithBestOffers = await Promise.all(products.map(async product => {
             const category = await Category.findById(product.category).populate('offers');
             const categoryOffers = category ? category.offers : [];
-        
-            // Combine product offers and category offers
+
             const combinedOffers = [...product.offers, ...categoryOffers];
         
-            // Filter out offers that are "flat" and have a value greater than the product price
             const validOffers = combinedOffers.filter(offer => {
                 if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
-                    return false; // Exclude this offer
+                    return false; 
                 }
-                return true; // Include this offer
+                return true; 
             });
         
             const hasValidOffer = validOffers.some(offer => {
@@ -449,9 +439,9 @@ async function sendOtp (req, res){
         return res.status(404).json({success:false, message: 'User not found' });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
-    req.session.otp = otp; // Store OTP in session
-    req.session.email = email; // Store email for verification
+    const otp = Math.floor(100000 + Math.random() * 900000); 
+    req.session.otp = otp; 
+    req.session.email = email;
 
     try {
         await sendOTP(email, otp);
@@ -465,7 +455,7 @@ async function forgotPasswordVerifyOtp(req, res){
     const { otp } = req.body;
 
     if (req.session.otp && parseInt(otp) === req.session.otp) {
-        req.session.verified = true; // Mark session as verified
+        req.session.verified = true;
         res.status(200).json({success:true, message: 'OTP verified successfully' });
     } else {
         res.status(400).json({success:false, message: 'Invalid OTP' });
@@ -485,11 +475,9 @@ console.log(password);
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Save the hashed password
         user.password = hashedPassword;
         await user.save();
 
-        // Clear session data
         delete req.session.email
         delete req.session.verified
         delete req.session.otp
@@ -507,7 +495,7 @@ async function forgotPasswordResendOtp(req, res){
 
     const now = new Date().getTime();
     const lastSentTime = req.session.lastOtpSentTime || 0;
-    const timeElapsed = (now - lastSentTime) / 1000; // in seconds
+    const timeElapsed = (now - lastSentTime) / 1000; 
 
     if (timeElapsed < 60) {
         return res.status(429).json({
@@ -515,9 +503,9 @@ async function forgotPasswordResendOtp(req, res){
         });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000); // Generate new 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000);
     req.session.otp = otp;
-    req.session.lastOtpSentTime = now; // Store the time when the OTP was sent
+    req.session.lastOtpSentTime = now; 
 
     sendOTP(req.session.email, otp)
         .then(() => {

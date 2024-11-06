@@ -42,9 +42,35 @@ async function getHome(req, res) {
     }
 }
 
+// async function getUsers(req, res) {
+//     const user = await User.find()  
+//     res.render('admin/usersList',{user , activePage:'users'})
+// }
+
 async function getUsers(req, res) {
-    const user = await User.find()  
-    res.render('admin/usersList',{user , currentPage:'users'})
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const users = await User.find()
+            .skip(skip)
+            .limit(limit);
+
+        const totalUsers = await User.countDocuments();
+        const totalPages = Math.ceil(totalUsers / limit);
+
+        res.render('admin/usersList', {
+            user: users,
+            activePage: 'users',
+            currentPage: page,
+            totalPages,
+            limit,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
 }
 
 async function changeUserStatus(req,res){
@@ -129,9 +155,7 @@ const getTopSellingCategories = async () => {
         console.error("Error fetching top-selling categories:", error);
         throw error;
     }
-};
-
-
+}
 
 const getTopSellingProducts = async () => {
     try {
@@ -181,12 +205,9 @@ async function getDashboard(req, res) {
         const totalSalesAmount = deliveredOrders.reduce((total, order) => total + order.totalAmount, 0);
         const totalPendingOrders = await Order.countDocuments({ orderStatus: 'Pending' });
 
-
         const topProducts = await getTopSellingProducts();
         const topCategories = await getTopSellingCategories();
 
-        console.log(topProducts,topCategories);
-        
         const salesData = {
             weekly: await getSalesData('week'),
             monthly: await getSalesData('month'),
@@ -201,7 +222,7 @@ async function getDashboard(req, res) {
             salesData,
             topProducts,
             topCategories,
-            currentPage:'dashboard'
+            activePage:'dashboard'
         });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -210,19 +231,48 @@ async function getDashboard(req, res) {
 }
 
 async function getSalesData(period) {
-    const startDate = moment().startOf(period).toDate();
-    const endDate = moment().endOf(period).toDate();
-
-    const orders = await Order.find({
-        orderStatus: 'Delivered',
-        createdAt: { $gte: startDate, $lte: endDate }
-    });
-
     const sales = {};
-    orders.forEach(order => {
-        const dateKey = moment(order.createdAt).format(period === 'year' ? 'YYYY' : period === 'month' ? 'MMM YYYY' : 'dddd');
-        sales[dateKey] = (sales[dateKey] || 0) + order.totalAmount;
-    });
+
+    if (period === 'week') {
+        for (let i = 0; i < 4; i++) {
+            const startDate = moment().subtract(i, 'weeks').startOf('week').toDate();
+            const endDate = moment().subtract(i, 'weeks').endOf('week').toDate();
+
+            const orders = await Order.find({
+                orderStatus: 'Delivered',
+                createdAt: { $gte: startDate, $lte: endDate }
+            });
+
+            const dateKey = moment(startDate).format('YYYY-MM-DD');
+            sales[dateKey] = orders.reduce((total, order) => total + order.totalAmount, 0);
+        }
+    } else if (period === 'month') {
+        for (let i = 0; i < 6; i++) {
+            const startDate = moment().subtract(i, 'months').startOf('month').toDate();
+            const endDate = moment().subtract(i, 'months').endOf('month').toDate();
+
+            const orders = await Order.find({
+                orderStatus: 'Delivered',
+                createdAt: { $gte: startDate, $lte: endDate }
+            });
+
+            const dateKey = moment(startDate).format('MMM YYYY'); 
+            sales[dateKey] = orders.reduce((total, order) => total + order.totalAmount, 0);
+        }
+    } else if (period === 'year') {
+        for (let i = 0; i < 2; i++) {
+            const startDate = moment().subtract(i, 'years').startOf('year').toDate();
+            const endDate = moment().subtract(i, 'years').endOf('year').toDate();
+
+            const orders = await Order.find({
+                orderStatus: 'Delivered',
+                createdAt: { $gte: startDate, $lte: endDate }
+            });
+
+            const dateKey = moment(startDate).format('YYYY'); 
+            sales[dateKey] = orders.reduce((total, order) => total + order.totalAmount, 0);
+        }
+    }
 
     return sales;
 }

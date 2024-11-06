@@ -3,14 +3,14 @@
             <h3 class="text-dark font-weight-bold mt-3">SHOEZIE</h3>
     </div>
     <ul class="list-unstyled components">
-        <li class="<%= currentPage === 'dashboard' ? 'active' : '' %>"><a href="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li class="<%= currentPage === 'users' ? 'active' : '' %>"><a href="users"><i class="fas fa-users"></i> Users</a></li>
-        <li class="<%= currentPage === 'products' ? 'active' : '' %>"><a href="products"><i class="fas fa-box"></i> Products</a></li>
-        <li class="<%= currentPage === 'orders' ? 'active' : '' %>"><a href="orders"><i class="fas fa-list"></i> Orders</a></li>
-        <li class="<%= currentPage === 'offers' ? 'active' : '' %>"><a href="offers"><i class="fas fa-tags"></i> Offers</a></li>
-        <li class="<%= currentPage === 'coupons' ? 'active' : '' %>"><a href="coupons"><i class="fas fa-gift"></i> Coupons</a></li>
-        <li class="<%= currentPage === 'category' ? 'active' : '' %>"><a href="category"><i class="fas fa-th-list"></i> Category</a></li>
-        <li class="<%= currentPage === 'sales-report' ? 'active' : '' %>"><a href="sales-report"><i class="fas fa-chart-line"></i> Sales Report </a></li>
+        <li class="<%= activePage === 'dashboard' ? 'active' : '' %>"><a href="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li class="<%= activePage === 'users' ? 'active' : '' %>"><a href="users"><i class="fas fa-users"></i> Users</a></li>
+        <li class="<%= activePage === 'products' ? 'active' : '' %>"><a href="products"><i class="fas fa-box"></i> Products</a></li>
+        <li class="<%= activePage === 'orders' ? 'active' : '' %>"><a href="orders"><i class="fas fa-list"></i> Orders</a></li>
+        <li class="<%= activePage === 'offers' ? 'active' : '' %>"><a href="offers"><i class="fas fa-tags"></i> Offers</a></li>
+        <li class="<%= activePage === 'coupons' ? 'active' : '' %>"><a href="coupons"><i class="fas fa-gift"></i> Coupons</a></li>
+        <li class="<%= activePage === 'category' ? 'active' : '' %>"><a href="category"><i class="fas fa-th-list"></i> Category</a></li>
+        <li class="<%= activePage === 'sales-report' ? 'active' : '' %>"><a href="sales-report"><i class="fas fa-chart-line"></i> Sales Report </a></li>
         <li><a style="cursor: pointer;" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
     </ul>
 </div>

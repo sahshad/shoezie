@@ -7,7 +7,7 @@ async function getSalesReport(req,res){
   const startDate = 0
   const endDate = 0
   const sales = 0
-    res.render('admin/salesReport',{sales,reportType,startDate,endDate , currentPage:'sales-report'})
+    res.render('admin/salesReport',{sales,reportType,startDate,endDate , activePage:'sales-report'})
 }
 
 async function getCustomSalesReport(req,res) {
@@ -19,7 +19,7 @@ const  sales = await Order.find({
 });
 
 if(sales){
-res.render('admin/salesReport',{sales,reportType,startDate,endDate , currentPage:'sales-report'})
+res.render('admin/salesReport',{sales,reportType,startDate,endDate , activePage:'sales-report'})
 }
 }
 
@@ -109,7 +109,6 @@ else if (format === 'excel') {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Sales Report');
 
-  // Add column headers
   worksheet.columns = [
       { header: 'Date', key: 'date', width: 15 },
       { header: 'Total Amount', key: 'totalAmount', width: 15 },
@@ -118,22 +117,18 @@ else if (format === 'excel') {
       { header: 'Net Amount', key: 'netAmount', width: 15 }
   ];
 
-  // Initialize totals
   let totalOfferDiscount = 0;
   let totalCouponDiscount = 0;
   let totalNetAmount = 0;
 
-  // Add rows with sales data
   sales.forEach((sale) => {
       const totalAmount = sale.totalAmount + (sale.offerDiscount || 0) + (sale.couponDiscount || 0);
       const netAmount = sale.totalAmount;
 
-      // Accumulate totals
       totalOfferDiscount += sale.offerDiscount || 0;
       totalCouponDiscount += sale.couponDiscount || 0;
       totalNetAmount += netAmount;
 
-      // Add row to worksheet
       worksheet.addRow({
           date: sale.orderDate.toLocaleDateString(),
           totalAmount,
@@ -143,7 +138,6 @@ else if (format === 'excel') {
       });
   });
 
-  // Add Total Row at the End
   const totalRow = worksheet.addRow({
       date: 'Total',
       offer: totalOfferDiscount,
@@ -151,10 +145,8 @@ else if (format === 'excel') {
       netAmount: totalNetAmount,
   });
 
-  // Style the Total Row (Bold)
   totalRow.font = { bold: true };
 
-  // Adjust Borders for Total Row (Optional)
   worksheet.eachRow((row, rowNumber) => {
       row.eachCell((cell) => {
           cell.border = {
@@ -166,12 +158,10 @@ else if (format === 'excel') {
       });
   });
 
-  // Set filename and headers
   const filename = 'sales-report.xlsx';
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
-  // Write the workbook to the response
   await workbook.xlsx.write(res);
   res.end();
 }

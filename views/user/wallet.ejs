@@ -45,7 +45,6 @@
                             <tr>
                                 <th>No</th>
                                 <th>Date</th>
-                                <!-- <th>Description</th> -->
                                 <th>Amount</th>
                                 <th>Type</th>
                             </tr>
@@ -55,7 +54,6 @@
                                 <tr>
                                     <td><%= index + 1 %></td>
                                     <td><%= new Date(transaction.date).toLocaleDateString() %></td>
-                                    <!-- <td><%= transaction.description || 'No Description' %></td> -->
                                     <td>₹ <%= transaction.amount.toFixed(2) %></td>
                                     <td>
                                         <span class="badge <%= 

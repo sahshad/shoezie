@@ -59,4 +59,10 @@ router.get('/sales-report/download',isAuthenticated,downloadSalesReport)
 
 router.get('/logout',getLogout)
 
+router.use((req, res) => {
+    res.status(404).render('admin/error', {
+        message: 'Oops! The page you are looking for does not exist in the Users section.',
+    });
+});
+
 module.exports = router;

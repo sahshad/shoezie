@@ -226,40 +226,35 @@ async function updateOrderStatus(req, res) {
   }
 }
 
-async function getAllOrders(rq, res) {
+async function getAllOrders(req, res) {
+  const page = parseInt(req.query.page) || 1; 
+  const limit = parseInt(req.query.limit) || 10; 
+  const skip = (page - 1) * limit; 
+
   try {
-    const orders = await Order.find({}).populate('userId').populate('items.productId').sort({ createdAt: -1 })
-    if (!orders) {
+    const totalOrders = await Order.countDocuments({}); 
+    const orders = await Order.find({})
+      .populate('userId')
+      .populate('items.productId')
+      .sort({ createdAt: -1 })
+      .skip(skip) 
+      .limit(limit); 
 
-    }
-    res.render('admin/ordersList', { orders , currentPage:'orders' })
+    const totalPages = Math.ceil(totalOrders / limit); 
+
+    res.render('admin/ordersList', {
+      orders,
+      currentPage: page,
+      totalPages,
+      limit,
+      totalOrders,
+      activePage : 'orders'
+    });
   } catch (error) {
-
+    console.log(error);
+        res.status(500).send('Internal Server Error');
   }
 }
-
-// async function getAllOrders(rq, res) {
-//   try {
-//     const page = parseInt(rq.query.page) || 1;
-//     const limit = parseInt(rq.query.limit) || 10;
-//     const skip = (page - 1) * limit;
-
-//     const orders = await Order.find({})
-//       .populate('userId')
-//       .populate('items.productId')
-//       .sort({ createdAt: -1 })
-//       .skip(skip)
-//       .limit(limit);
-
-//     const totalOrders = await Order.countDocuments({});
-//     const totalPages = Math.ceil(totalOrders / limit);
-
-//     res.render('admin/ordersList', { orders, currentPage: page, totalPages, limit });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// }
 
 async function cancelOrder(req, res) {
   const { orderId } = req.params;

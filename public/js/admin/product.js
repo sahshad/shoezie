@@ -4,6 +4,7 @@
  let newImages = [];
  let croppedImages = [] 
  let deletedSizes = [];
+ let currentImagesLength 
 
 function populateEditModal(name,category, price, sizes, imageUrl,id,button) {
 
@@ -105,6 +106,8 @@ const description = descriptionElement.getAttribute('data-description');
 
     let imagesContainer = document.getElementById('editProductImageView');
     imagesContainer.innerHTML = '';
+
+    currentImagesLength = imageUrls.length
 
     imageUrls.forEach(url => {
         appendImage(imagesContainer, url);
@@ -283,23 +286,67 @@ document.getElementById('addProductButton').addEventListener('click', function (
     event.preventDefault(); 
     const formData = new FormData(); 
     
-    croppedFiles.forEach((file, index) => {   
-        formData.append('productImage[]', file, `croppedImage${index}.png`);
-    });
+    const productName = document.getElementById('productName').value;
+    const productDescription = document.getElementById('productDescription').value;
+    const productCategory = document.getElementById('productCategory').value;
+    const productPrice = document.getElementById('productPrice').value;
 
-    originalFiles.forEach((file, index) => {
-        if (!croppedFiles[index]) { 
-            formData.append('productImage[]', file);
-        }
-    });
-
-    formData.append('productName', document.getElementById('productName').value);
-    formData.append('productDescription', document.getElementById('productDescription').value);
-    formData.append('productCategory', document.getElementById('productCategory').value);
-    formData.append('productPrice', document.getElementById('productPrice').value);
+    if (!productName) {
+        return showErrorAlert('Product Name is required.');
+    }
+    if (!productDescription) {
+        return showErrorAlert('Product Description is required.');
+    }
+    if (!productCategory) {
+        return showErrorAlert('Product Category is required.');
+    }
+    
+    if (!productPrice) {
+        return showErrorAlert('Product Price is required.');
+    }
+    if (productPrice < 1) {
+        return showErrorAlert('Product Price must be greater than 0');
+    }
+    
       const sizes = document.querySelectorAll('input[name="productSize[]"]');
       const stocks = document.querySelectorAll('input[name="productStock[]"]');
   
+      const allSizesFilled = Array.from(sizes).every(sizeInput => sizeInput.value);
+      const allStocksFilled = Array.from(stocks).every(stockInput => stockInput.value);
+  
+      if (!allSizesFilled) {
+          return showErrorAlert('Product Size is required.');
+      }
+      if (!allStocksFilled) {
+          return showErrorAlert('Product Stock is required.');
+      }
+  
+      const totalImages = croppedFiles.length + originalFiles.length;
+      if(totalImages === 0){
+        return showErrorAlert('Product Image is required');
+      }
+      if(totalImages < 3){
+        return showErrorAlert('You have to upload atlead 3 images');
+      }
+      if (totalImages > 5) {
+          return showErrorAlert('You can upload a maximum of 5 images.');
+      }
+  
+      croppedFiles.forEach((file, index) => {   
+          formData.append('productImage[]', file, `croppedImage${index}.png`);
+      });
+  
+      originalFiles.forEach((file, index) => {
+          if (!croppedFiles[index]) { 
+              formData.append('productImage[]', file);
+          }
+      });
+  
+      formData.append('productName', productName);
+      formData.append('productDescription', productDescription);
+      formData.append('productCategory', productCategory);
+      formData.append('productPrice', productPrice);
+
       sizes.forEach(sizeInput => {
           formData.append('productSize[]', sizeInput.value);
       });
@@ -365,6 +412,23 @@ document.getElementById('editProductButton').addEventListener('click', function(
     const currentCategory = document.getElementById('editProductCategory').value;
     const currentDescription = document.getElementById('editProductDescription').value;
     const currentPrice = parseInt(document.getElementById('editProductPrice').value);
+    
+    if (!currentName) {
+        return showErrorAlert('Product Name is required.');
+    }
+    if (!currentCategory) {
+        return showErrorAlert('Product Category is required.');
+    }
+    if (!currentDescription) {
+        return showErrorAlert('Product Description is required.');
+    }
+    if (currentPrice < 1) {
+        return showErrorAlert('Product Price must be greater than 0');
+    }
+    if (!currentPrice) {
+        return showErrorAlert('Product Price is required.');
+    }
+   
 
     const payload = {}; 
 
@@ -372,12 +436,31 @@ document.getElementById('editProductButton').addEventListener('click', function(
     const stockInputs = document.querySelectorAll('input[name="editProductStock[]"]');
 
     const updatedSizes = Array.from(sizeInputs).map((input, index) => {
+
+        const stockValue = stockInputs[index] ? stockInputs[index].value : '';
+        if (!input.value || !stockValue) {
+            return null 
+        }
         return {
             size: input.value,
             stock: stockInputs[index].value,
             id: originalData.sizes[index] ? originalData.sizes[index]._id : null 
         };
-    });
+    })
+
+    if (updatedSizes.includes(null)) {
+        return showErrorAlert('All Product Sizes and Stocks must be filled.');
+    }
+
+    if((currentImagesLength + newImages.length)-deletedImages.length === 0){
+        return showErrorAlert('Product Image is required');
+    }
+    if((currentImagesLength + newImages.length)-deletedImages.length < 3){
+        return showErrorAlert('You have to upload atleast 3 images');
+    }
+    if((currentImagesLength + newImages.length)-deletedImages.length > 5){
+        return showErrorAlert('You can upload a maximum of 5 images')
+    }
 
     const sizeChanged = JSON.stringify(updatedSizes) !== JSON.stringify(originalData.sizes.map(size => ({
         size: size.size,

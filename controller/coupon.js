@@ -1,14 +1,29 @@
 const Coupon = require('../model/coupon')
 const User = require('../model/user')
 
-
-async function getCoupons(req,res){
+async function getCoupons(req, res) {
     try {
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
         const coupons = await Coupon.find()
-        res.render('admin/coupons',{coupons ,currentPage:'coupons'})
-        
+            .skip(skip)
+            .limit(limit);
+
+        const totalCoupons = await Coupon.countDocuments(); 
+        const totalPages = Math.ceil(totalCoupons / limit);
+
+        res.render('admin/coupons', {
+            coupons,
+            activePage: 'coupons',
+            currentPage: page,
+            totalPages,
+            limit,
+        });
     } catch (error) {
-        console.log(error);      
+        console.log(error);
+        res.status(500).send('Internal Server Error');
     }
 }
 
@@ -43,7 +58,7 @@ async function addCoupon(req,res){
 }
 
 async function editCoupon(req, res) {
-    const { id } = req.params; // Assuming you're using route parameters to get the coupon ID
+    const { id } = req.params; 
     const {
         code,
         discountAmount,
@@ -52,7 +67,7 @@ async function editCoupon(req, res) {
         minOrderValue,
         expiresAt,
         usageLimit,
-        isActive // Allow changing the active status as well
+        isActive 
     } = req.body;
 
     try {
@@ -68,7 +83,7 @@ async function editCoupon(req, res) {
                 usageLimit,
                 isActive
             },
-            { new: true, runValidators: true } // Options: return the updated document and validate on update
+            { new: true, runValidators: true } 
         );
 
         if (!updatedCoupon) {
@@ -82,28 +97,8 @@ async function editCoupon(req, res) {
     }
 }
 
-
-// async function changeCouponStatus(req, res) {
-//     const { id } = req.params; // Assuming you're using route parameters to get the coupon ID
-    
-//     try {
-//         const coupon = await Coupon.findById(id);
-//         if (!coupon) {
-//             return res.status(404).json({ success: false, message: 'Coupon not found.' });
-//         }
-
-//         coupon.isActive = !coupon.isActive; // Toggle the active status
-//         await coupon.save();
-
-//         return res.status(200).json({ success: true, message: 'Coupon status updated successfully!', active: coupon.isActive });
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json({ success: false, message: 'Failed to update coupon status. Please try again.' });
-//     }
-// }
-
 async function changeCouponStatus(req, res) {
-    const { id } = req.params; // Get the coupon ID from route parameters
+    const { id } = req.params; 
     
     try {
         const coupon = await Coupon.findById(id);
@@ -111,7 +106,7 @@ async function changeCouponStatus(req, res) {
             return res.status(404).json({ success: false, message: 'Coupon not found.' });
         }
 
-        coupon.isActive = !coupon.isActive; // Toggle the active status
+        coupon.isActive = !coupon.isActive; 
         await coupon.save();
 
         return res.status(200).json({
@@ -124,8 +119,6 @@ async function changeCouponStatus(req, res) {
         return res.status(500).json({ success: false, message: 'Failed to update coupon status. Please try again.' });
     }
 }
-
-
 
 async function validateCoupon (req, res){
     const userId = req.session.user

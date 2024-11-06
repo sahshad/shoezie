@@ -5,28 +5,6 @@ const Product = require('../model/product')
 const Category = require('../model/category')
 const { getBestOffer } = require('../utils/offerUtils')
 
-// async function getCart(req, res) {
-//     const userId = req.session.user;
-
-//     try {
-//         let cart = await Cart.findOne({ user: userId }).populate({path:'products.productId',populate:{path:'offers'}})     
-
-//         if (!cart) {
-//             const newCart = new Cart({
-//                 user: userId,
-//                 products: [],
-//             });
-//             await newCart.save();
-//             cart = newCart; 
-//         }
-
-//         res.render('user/cart', { cart });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send({ message: 'Server error' });
-//     }
-// }
-
 async function getCart(req, res) {
     const userId = req.session.user;
 
@@ -56,9 +34,9 @@ async function getCart(req, res) {
                 const combinedOffers = [...product.offers, ...categoryOffers];       
                 const validOffers = combinedOffers.filter(offer => {
                     if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
-                        return false; // Exclude this offer
+                        return false; 
                     }
-                    return true; // Include this offer
+                    return true; 
                 });
             
                 const hasValidOffer = validOffers.some(offer => {
@@ -107,19 +85,12 @@ const productsWithBestOffers = await Promise.all(
         const categoryOffers = category ? category.offers : [];
 
         const combinedOffers = [...product.offers, ...categoryOffers];       
-        // const hasValidOffer = combinedOffers.some(offer => offer.minProductPrice >= product.price);
-
-        //     let bestOffer = null;
-
-        //     if (!hasValidOffer) {
-        //         bestOffer = await getBestOffer(combinedOffers, product.price);
-        //     }
 
         const validOffers = combinedOffers.filter(offer => {
                 if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
-                    return false; // Exclude this offer
+                    return false; 
                 }
-                return true; // Include this offer
+                return true; 
             });
         
             const hasValidOffer = validOffers.some(offer => {
@@ -140,7 +111,6 @@ const productsWithBestOffers = await Promise.all(
 
  res.render('user/checkout',{address,cart: { ...cart.toObject(), products: productsWithBestOffers }})
 }
-
 
 async function addProductToCart(req, res) {
     const { productId, sizeId } = req.params;

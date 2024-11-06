@@ -2,22 +2,43 @@ const Product = require('../model/product')
 const Category = require('../model/category')
 const Offer = require('../model/offers')
 
-async function getOffers(req,res){
-    const offers = await Offer.find().populate('targetId')
-    res.render('admin/offers',{offers , currentPage:'offers'})
+async function getOffers(req, res) {
+    try {
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit; 
+
+        const offers = await Offer.find()
+            .populate('targetId')
+            .skip(skip)
+            .limit(limit);
+
+        const totalOffers = await Offer.countDocuments(); 
+        const totalPages = Math.ceil(totalOffers / limit); 
+
+        res.render('admin/offers', {
+            offers,
+            activePage: 'offers',
+            currentPage: page,
+            totalPages,
+            limit,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
 }
 
 async function createOffer(req, res) {
     try {
         const { targetName, offerFor, offerType, value, maxDiscount, expiresAt,minProductPrice } = req.body;
-console.log(minProductPrice);
 
         if (!targetName || !offerFor || !offerType || value == null || !expiresAt) {
             return res.status(400).json({ success: false, message: 'All required fields must be provided.' });
         }
 
-        if (offerType === 'percentage' && (value < 0 || value > 100)) {
-            return res.status(400).json({ success: false, message: 'Percentage value must be between 0 and 100.' });
+        if (offerType === 'percentage' && (value < 0 || value > 80)) {
+            return res.status(400).json({ success: false, message: 'Percentage value must be between 0 and 80.' });
         }
 
         if (offerType === 'percentage' && maxDiscount != null && maxDiscount <= 0) {
@@ -31,6 +52,10 @@ console.log(minProductPrice);
             target = await Product.findOne({ 
                 name: { $regex: new RegExp(`^${targetName}$`, 'i') }
             });
+
+            if(!target){
+                return res.status(400).json({ success:false , message: 'product not found. please check product name'})
+            }
 
             if(value > target.price ){
             return res.status(400).json({ success: false, message: 'Offer value is greater than product price' });
@@ -49,9 +74,6 @@ console.log(minProductPrice);
            
                 const product = await Product.findById(target._id );
 
-                // const offer = await Offer.findOne({targetId:target._id})
-                // console.log(product,offer);
-                
                 addOfferReference(product._id, offer._id)
                 return res.status(201).json({ success: true, message: 'Product offer applied successfully.', offer: newOffer });
 
@@ -60,6 +82,10 @@ console.log(minProductPrice);
             target = await Category.findOne({ 
                 name: { $regex: new RegExp(`^${targetName}$`, 'i') }
             });
+
+            if(!target){
+                return res.status(400).json({ success:false , message: 'category not found. please check category name'})
+            }
 
             const newOffer = new Offer({
                 targetId: target._id,
@@ -71,11 +97,9 @@ console.log(minProductPrice);
                 expiresAt,
             });
             const offer = await newOffer.save();
-             console.log(offer);
              
             const category = await Category.findById(target._id)
-            // const offer = await Offer.findOne({targetId:target._id})
-            
+
             addOfferReferenceToCategory(category._id, offer._id)
            
         
@@ -144,8 +168,8 @@ async function editOffer(req, res) {
             return res.status(400).json({ success: false, message: 'All required fields must be provided.' });
         }
 
-        if (offerType === 'percentage' && (value < 0 || value > 100)) {
-            return res.status(400).json({ success: false, message: 'Percentage value must be between 0 and 100.' });
+        if (offerType === 'percentage' && (value < 0 || value > 80)) {
+            return res.status(400).json({ success: false, message: 'Percentage value must be between 0 and 80.' });
         }
 
         if (offerType === 'percentage' && maxDiscount != null && maxDiscount <= 0) {
@@ -163,6 +187,9 @@ async function editOffer(req, res) {
 
         if (offerFor === 'Product') {
             newTarget = await Product.findOne({ name: { $regex: new RegExp(`^${targetName}$`, 'i') } });
+            if(!newTarget){
+                return res.status(400).json({ success:false , message :'Product not found'})
+            }
             if(value >= newTarget.price ){
                 return res.status(400).json({ success: false, message: 'Offer value is greater than product price' });
                 }
@@ -171,7 +198,7 @@ async function editOffer(req, res) {
         }
 
         if (!newTarget) {
-            return res.status(404).json({ success: false, message: `${offerFor} not found.` });
+            return res.status(404).json({ success: false, message: `Category not found.` });
         }
 
         const hasOfferForChanged = existingOffer.offerFor !== offerFor 

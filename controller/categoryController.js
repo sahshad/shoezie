@@ -6,9 +6,35 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const streamifier = require('streamifier')
 
+// async function getCategory(req, res) {
+//     const category = await Category.find({})
+//     res.render('admin/category',{category, activePage : 'category'});
+// }
+
 async function getCategory(req, res) {
-    const category = await Category.find({})
-    res.render('admin/category',{category,currentPage : 'category'});
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+
+        const category = await Category.find()
+            .skip(skip)
+            .limit(limit);
+
+        const totalCategories = await Category.countDocuments();
+        const totalPages = Math.ceil(totalCategories / limit);
+
+        res.render('admin/category', {
+            category,
+            activePage: 'category',
+            currentPage: page,
+            totalPages,
+            limit,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
 }
 
 

@@ -18,20 +18,51 @@ async function getAddress(req,res){
     res.render('user/address',{address,user})
 }
 
-async function getOrders(req,res){
-  const userId = req.session.user
-  try { 
-    const user = await User.findById(userId) 
-    const order = await Order.find({userId}).sort({createdAt:-1}).populate('items.productId')
-    if(!order){
-      throw new Error('Order not found')
-    }
-    res.render('user/order',{order,user})
-  } catch (error) {
-    console.log(error)
-  }
+// async function getOrders(req,res){
+//   const userId = req.session.user
+//   try { 
+//     const user = await User.findById(userId) 
+//     const order = await Order.find({userId}).sort({createdAt:-1}).populate('items.productId')
+//     if(!order){
+//       throw new Error('Order not found')
+//     }
+//     res.render('user/order',{order,user})
+//   } catch (error) {
+//     console.log(error)
+//   }
     
+// }
+
+async function getOrders(req, res) {
+  const userId = req.session.user;
+  const page = parseInt(req.query.page) || 1; 
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page - 1) * limit; 
+
+  try {
+      const user = await User.findById(userId);
+      const order = await Order.find({ userId })
+          .sort({ createdAt: -1 })
+          .populate('items.productId')
+          .skip(skip)
+          .limit(limit);
+
+      const totalOrders = await Order.countDocuments({ userId }); 
+      const totalPages = Math.ceil(totalOrders / limit); 
+
+      res.render('user/order', {
+          order,
+          user,
+          currentPage: page,
+          totalPages,
+          limit
+      });
+  } catch (error) {
+      console.log(error);
+      res.status(500).send('Server Error');
+  }
 }
+
 
 async function getOrderDetails(req, res) {
   const { orderId} = req.params; 

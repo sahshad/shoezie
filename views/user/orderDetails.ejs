@@ -33,7 +33,7 @@ main{
         <% if(order){ %>
         <div class="card ">
             <div class="card-header">
-                <h6>Order #<%= order._id %></h6>
+                <h6>ORDER - <%= order.orderId %></h6>
                 <p class="m-0">Order Date: <%= order.orderDate.toLocaleDateString() %></p>
                 <p class="">Order Time: <%= order.orderDate.toLocaleTimeString() %></p>
                 <p>Status: <span class="badge <%= 
