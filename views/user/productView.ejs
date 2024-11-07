@@ -87,8 +87,7 @@
         }
 
         .line {
-            border-top: 1px solid #ccc;
-            margin: 15px 0;
+            margin: 20px 0;
         }
 
         .size-button {
@@ -221,12 +220,14 @@
         display: flex;
         gap: 20px;
     }
+    
     </style>
 </head>
 <body>
 <%- include('partials/navbar') %>
 
-<div class="container">
+<div class="container col-sm-6 col-md-12 ">
+    
     <% if(product){%>
         <div class="thumbnails">
             <% product.imageUrls.forEach((url,index)=>{ %>
