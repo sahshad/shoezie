@@ -47,21 +47,28 @@ async function createOrder(req, res) {
   try {
     for (const item of items) {
       const product = await Product.findById(item.productId);
-      if (!product) throw new Error('Product not found');
+      if (!product){
+        return res.status(400).json({ success:false, message: `Product not found` });
+      }
 
       const variant = product.sizes.find(size => size._id.toString() === item.sizeId);
-      if (!variant) throw new Error('Size not found');
+      if (!variant){
+        return res.status(400).json({ success:false, message: `Size not found` });
+      }
+
 
       if (variant.stock < item.quantity) {
-        return res.status(400).json({ message: `Not enough stock for ${product.name}. Available stock: ${variant.stock}` });
+        return res.status(400).json({ success:false, message: `Not enough stock for ${product.name}` });
       }
     }
 
-    if (paymentMethod === 'razorpay') {
+    let newOrder ;
+
+     if (paymentMethod === 'razorpay') {
       if(couponCode){
         req.session.coupon = couponCode
       }
-      const newOrder = new Order({
+        newOrder = new Order({
         userId,
         items,
         shippingAddress,
@@ -74,20 +81,50 @@ async function createOrder(req, res) {
 
       const savedOrder = await newOrder.save();
       return res.status(201).json(savedOrder);
-    }
 
-    const newOrder = new Order({
-      userId,
-      items,
-      shippingAddress,
-      totalAmount,
-      couponDiscount: couponDiscount || 0,
-      offerDiscount: offerDiscount || 0,
-      paymentMethod,
-      paymentStatus: 'Pending',
-    });
+    } else if(paymentMethod === 'cod' || paymentMethod === 'wallet'){
 
-
+      if(paymentMethod === 'wallet'){
+        const wallet = await Wallet.findOne({userId})
+        if(!wallet){
+         return  res.status(400).json({success: false , message: 'Wallet not found'})
+        }
+        
+        if(totalAmount > wallet.balance ){
+          return res.status(400).json({ success:false , message: 'insufficient balance'})
+        }
+        wallet.balance -= totalAmount
+        
+        wallet.transactions.push({amount:totalAmount , type:'debit' , date: new Date()})
+  
+        await wallet.save()
+  
+         newOrder = new Order ({
+          userId,
+          items,
+          shippingAddress,
+          totalAmount,
+          couponDiscount: couponDiscount || 0,
+          offerDiscount: offerDiscount || 0,
+          paymentMethod,
+          paymentStatus: 'Paid',
+        })
+  
+      }else{
+        newOrder = new Order({
+          userId,
+          items,
+          shippingAddress,
+          totalAmount,
+          couponDiscount: couponDiscount || 0,
+          offerDiscount: offerDiscount || 0,
+          paymentMethod,
+          paymentStatus: 'Pending',
+        });
+      }
+      }
+       
+ 
     for (const item of items) {
       const updateResult = await Product.updateOne(
         { _id: item.productId, 'sizes._id': item.sizeId },
@@ -133,12 +170,13 @@ async function createOrder(req, res) {
   }
 }
 
-async function updateOrderStatus(req, res) {
+async function updateOrderStatus(req, res){
+
   const userId = req.session.user
   const { orderId } = req.params;
   const { status, razorpayResponse,repay } = req.body;
   let orderStatus
-  
+
   if (req.session.coupon) {
     const couponCode = req.session.coupon
     delete req.session.coupon
@@ -171,7 +209,7 @@ async function updateOrderStatus(req, res) {
       { user: userId },
       { $set: { products: [] } },
       { new: true }
-    );
+    )
   }
 
     const order = await Order.findById(orderId)
@@ -219,7 +257,11 @@ async function updateOrderStatus(req, res) {
     };
 
     await Order.findByIdAndUpdate(orderId, update);
-    res.status(200).json({ message: `Order ${status} successfully!` });
+    if(status === 'Paid'){
+      res.status(200).json({ success:true , message: `Order created successfully!` });
+    }else{
+      res.status(400).json({ success:false , message: `Payment failed !` });
+    }
   } catch (error) {
     console.error('Error updating order status:', error);
     res.status(500).json({ message: 'Failed to update order status.' });
@@ -506,6 +548,45 @@ async function downloadInvoice(req,res) {
   
 }
 
+
+async function checkProduct(req,res) {
+const {orderId} = req.params
+console.log(orderId);
+
+try {
+  const order = await Order.findById(orderId)
+    const items = order.items
+console.log(order);
+
+    for (const item of items) {
+            const product = await Product.findById(item.productId);
+            if (!product){
+              return res.status(400).json({ success:false, message: 'product not found'})
+            }
+
+            if(!product.status){
+              return res.status(400).json({ success:false, message: 'product is currently unavailable'})
+            }
+      
+            const variant = product.sizes.find(size => size._id.toString() === item.sizeId.toString());
+            if (!variant){
+              return res.status(400).json({ success:false, message: 'variant not found'})
+            }
+      
+            if (variant.stock < item.quantity) {
+              console.log('false');
+              return res.status(400).json({ success:false, message: `Not enough stock for ${product.name}. Available stock: ${variant.stock}` });
+            }
+          }
+          
+        res.status(200).json({success:true })
+} catch (error) {
+  console.log(error);
+  
+}
+  
+}
+
 module.exports = {
   createOrder,
   getAllOrders,
@@ -517,5 +598,6 @@ module.exports = {
   ordercreated,
   returnOrder,
   takeReturnAction,
-  downloadInvoice
+  downloadInvoice,
+  checkProduct
 }

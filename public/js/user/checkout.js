@@ -36,13 +36,22 @@ function validatePhone() {
     checkFormValidity();
 }
 
+function onPaymentMethodChange(){
+    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value
+    validateFullName()
+    validateAddress()
+    validatePincode()
+    validatePhone()
+}
+
 function checkFormValidity() {
     const fullNameValid = document.getElementById('fullNameError').textContent === '';
     const addressValid = document.getElementById('addressError').textContent === '';
     const pincodeValid = document.getElementById('pincodeError').textContent === '';
     const phoneValid = document.getElementById('phoneError').textContent === '';
-
-    placeOrderButton.disabled = !(fullNameValid && addressValid && pincodeValid && phoneValid);
+    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value !== ''
+    
+    placeOrderButton.disabled = !(fullNameValid && addressValid && pincodeValid && phoneValid && selectedPaymentMethod );
 }
 
 function populateAddress() {
@@ -97,8 +106,6 @@ offerDiscount = parseFloat(offerDiscount.replace(/[₹\s]/g, ''));
 
 const cartElement = document.getElementById('cartData');
 const cart = JSON.parse(cartElement.getAttribute('data-cart'));
-console.log(cart.products);
-
 
 const items = cart.products.map(item => ({
     productId: item.productId._id,
@@ -106,7 +113,7 @@ const items = cart.products.map(item => ({
     offerId:item.bestOffer ? item.bestOffer._id : null,
     quantity: item.quantity,
     price: item.productId.price
-}));
+}))
 
 let totalAmount = cart.products.reduce((acc, item) => acc + (item.productId.price * item.quantity), 0);
 totalAmount -= couponDiscount + offerDiscount;
@@ -129,6 +136,7 @@ const orderData = {
 };
 
 try {
+
     if(paymentMethod === 'cashOnDelivery' && totalAmount > 1000){
         Swal.fire({
             title: 'COD limit exceed',
@@ -145,6 +153,19 @@ try {
     });
 
     const order = await response.json();
+    
+    if(order.success === false){
+        Toastify({
+            text: order.message,
+            duration: 1000,
+            close: true,
+            gravity: "top",
+            position: 'right',
+            style:{ background: "linear-gradient(to right, #ff5f5f, #ff1a1a)" }
+        }).showToast();
+        return;
+    }
+    
     if (paymentMethod === 'razorpay') {
         launchRazorpay(order._id, orderData);
     } else {
@@ -158,9 +179,7 @@ try {
 }
 
 function redirectToOrdersPage(orderId) {
-setTimeout(() => {
-    window.location.href = `/user/cart/checkout/order-created/${orderId}`;
-}, 3000);
+    window.location.href = `/user/cart/checkout/order-created/${orderId}`
 }
 
 function showSuccessToast(message) {
@@ -192,11 +211,7 @@ const options = {
     theme: { color: "#3399cc" },
     modal: {
         ondismiss: async function () {
-            Toastify({
-                text: "Payment cancelled!",
-                duration: 3000,
-                backgroundColor: "#f44336",
-            }).showToast();
+
             await updateOrderStatus(orderId, null, 'Failed');
         },
     }
@@ -214,15 +229,42 @@ try {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
-
-    if (response.ok) {
-        showSuccessToast(`Order ${status === 'Paid' ? 'completed' : 'failed'}!`);
-        redirectToOrdersPage(orderId);
+    
+    const res = await response.json()
+    
+    if (res.success) {
+        Swal.fire({
+            icon:'success',
+            title:'Success',
+            text: res.message,
+            confirmButtonText: 'Ok',
+            confirmButtonColor: '#000' 
+        })
+        .then(()=>{
+            redirectToOrdersPage(orderId);
+        })
     } else {
-        alert('Error updating order status.');
+            Swal.fire({
+            title: 'Payment Failed',
+            text: res.message,
+            icon: 'error', 
+            confirmButtonText: 'Try Again',
+            confirmButtonColor: '#d9534f' 
+        })
+        .then(()=>{
+            redirectToOrdersPage(orderId);
+        })
     }
 } catch (error) {
     console.error('Error updating order status:', error);
+
+    Swal.fire({
+        title: 'Error',
+        text: 'error'+ error,
+        icon: 'error', 
+        confirmButtonText: 'Ok',
+        confirmButtonColor: '#000' 
+    })
 }
 }
 

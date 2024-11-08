@@ -241,7 +241,6 @@ async function returnOrder(){
 
         const reason = reasonInput.value.trim();
         const orderId = document.getElementById('orderId').value
-console.log(orderId);
 
         fetch(`/user/profile/order/return/${orderId}`, {
             method: 'POST',
@@ -311,6 +310,39 @@ console.log(orderId);
     }
 }
 
+async function checkProduct(orderId) {
+    try {
+        const response = await fetch(`/user/profile/order/repay/check-product/${orderId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json(); 
+        
+        if (data.success) {
+            return data; 
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message,
+            });
+            return null; 
+        }
+    } catch (error) {
+        console.error('Error in fetch:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.message,
+        });
+        return null; 
+    }
+}
+
+
 async function updateOrderStatus(orderId, razorpayResponse, status) {
     const repay=true
 const data = { status, razorpayResponse, repay }
@@ -321,11 +353,16 @@ try {
         body: JSON.stringify(data)
     })
 
-    if (response.ok) {
-        showSuccessToast(`Order ${status === 'Paid' ? 'completed' : 'failed'}!`);
-        redirectToOrdersPage();
+    const res = response.json()
+    
+    if (res.success) {
+        // showSuccessToast(`Order ${status === 'Paid' ? 'completed' : 'failed'}!`);
+        // redirectToOrdersPage();
+        Swal.fire({icon:'success',title:'payment done!',text:res.message})
+
     } else {
-        alert('Error updating order status.');
+        Swal.fire({icon:'error',title:'error!',text:res.message})
+        // alert('Error updating order status.');
     }
 } catch (error) {
     console.error('Error updating order status:', error);
@@ -333,7 +370,12 @@ try {
 }
 
  async function repayOrder(orderId, totalAmount) {
+      const product = await checkProduct(orderId)
 
+      if(!product){
+        return
+      }
+      
     try {
         const razorpayKey = await fetchRazorpayKey();
         const options = {
@@ -349,13 +391,13 @@ try {
             theme: { color: "#3399cc" },
             modal: {
                 ondismiss: async function () {
-                    Toastify({
-                        text: "Payment cancelled!",
-                        duration: 3000,
-                        backgroundColor: "#f44336",
-                    }).showToast();
+                    // ({
+                    //     text: "Payment cancelled!",
+                    //     duration: 3000,
+                    //     backgroundColor: "#f44336",
+                    // }).showToast();
                     // Mark order as 'Cancelled' if user cancels payment again
-                    await updateOrderStatus(orderId, null, 'Cancelled');
+                    await updateOrderStatus(orderId, null, 'Failed');
                 },
             },
         };

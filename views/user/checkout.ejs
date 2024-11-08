@@ -131,15 +131,15 @@
                     <div class="mt-3">
                         <h5 class="mt-3">Payment Method</h5>
                         <div class="payment-option">
-                            <input type="radio" id="wallet" name="paymentMethod" value="wallet" required />
+                            <input type="radio" id="wallet" name="paymentMethod" onchange="onPaymentMethodChange()" value="wallet" required />
                             <label for="wallet">wallet</label>
                           </div>
                         <div class="payment-option">
-                            <input type="radio" id="razorpay" name="paymentMethod" value="razorpay" required />
+                            <input type="radio" id="razorpay" name="paymentMethod" onchange="onPaymentMethodChange()" value="razorpay" required />
                             <label for="razorpay">Razorpay</label>
                           </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cashOnDelivery">
+                            <input class="form-check-input" type="radio" name="paymentMethod" onchange="onPaymentMethodChange()" id="cod" value="cashOnDelivery">
                             <label class="form-check-label" for="cod">
                                 Cash on Delivery
                             </label>

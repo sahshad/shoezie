@@ -14,7 +14,7 @@ const { userAuthenticated,preventCache} = require('../middleware/authMiddleware'
 const {getCart,getCheckout,addProductToCart,
     removeProductFromCart,updateProductQuantity} = require('../controller/cartController')
 
-const { createOrder,cancelOrder,updateOrderStatus,ordercreated,returnOrder,downloadInvoice} = require('../controller/orderController')
+const { createOrder,cancelOrder,updateOrderStatus,ordercreated,returnOrder,downloadInvoice,checkProduct} = require('../controller/orderController')
 
 const {validateCoupon} = require('../controller/coupon')
 
@@ -47,6 +47,7 @@ router.get('/profile/orders',userAuthenticated,getOrders)
 router.get('/profile/orders/:orderId',userAuthenticated,getOrderDetails)
 router.patch('/profile/orders/cancel/:orderId',cancelOrder)
 router.patch('/profile/order/repay/:orderId',updateOrderStatus)
+router.get('/profile/order/repay/check-product/:orderId',checkProduct)
 router.post('/profile/order/return/:orderId',returnOrder)
 router.get('/profile/order/invoice/:orderId',downloadInvoice)
 
