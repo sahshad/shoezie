@@ -8,7 +8,6 @@ body {
     height: 100vh;
     width: 250px;
     background-color: rgb(248, 248, 248);
-    /* border-right: 1px solid black; */
     position: fixed;
     top: 0;
     left: 0;
@@ -67,7 +66,6 @@ body {
     text-decoration: none;
 }
 
-
 .sidebar .list-unstyled li a i {
     margin-right: 8px;
 }
@@ -76,8 +74,8 @@ body {
     padding-inline: 8px;
     border-radius: 5px;
     width: 140px;
-    background-color: #393939; /* Black background */
-    color: #ffffff; /* White text */
+    background-color: #393939; 
+    color: #ffffff; 
     transition: all 1s ease;
 
 }
@@ -95,7 +93,7 @@ body {
 
 .navbar {
     background-color: #ffffff;
-    height: 50px; /* Reduced height */
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -103,20 +101,18 @@ body {
 }
 
 .navbar button {
-    height: 30px; /* Reduced height of toggle button */
-
+    height: 30px; 
 }
-
 .form-inline input {
-    height: 30px; /* Reduced height of input */
-    padding: 0 10px; /* Adjusted padding */
-    font-size: 14px; /* Font size of input */
+    height: 30px;
+    padding: 0 10px;
+    font-size: 14px; 
 }
 
 .form-inline button {
-    height: 30px; /* Reduced height of button */
-    padding: 0 10px; /* Adjusted padding */
-    font-size: 14px; /* Font size of button */
+    height: 30px; 
+    padding: 0 10px; 
+    font-size: 14px; 
 }
 
 .card {
@@ -176,33 +172,31 @@ body {
   margin-bottom: 25px;
 }
 
-/* Custom Card Styles */
 .custom-card {
-    border-radius: 0.5rem; /* Rounded corners */
-    padding: 20px; /* Padding inside the card */
-    color: #333; /* Dark text color for better contrast */
-    transition: transform 0.2s; /* Smooth scaling on hover */
+    border-radius: 0.5rem;
+    padding: 20px; 
+    color: #333; 
+    transition: transform 0.2s; 
 }
 
 .custom-card:hover {
-    transform: scale(1.05); /* Scale effect on hover */
+    transform: scale(1.05); 
 }
 
-/* Light Background Colors for Different Card Types */
 .card-users {
-    background-color: #e7f1ff; /* Light blue */
+    background-color: #e7f1ff; 
 }
 
 .card-orders {
-    background-color: #d4edda; /* Light green */
+    background-color: #d4edda; 
 }
 
 .card-sales {
-    background-color: #d1ecf1; /* Light cyan */
+    background-color: #d1ecf1; 
 }
 
 .card-pending {
-    background-color: #fff3cd; /* Light yellow */
+    background-color: #fff3cd; 
 }
 .add-category , .add-product ,.create-offer ,.create-coupon{
     color: rgb(255, 255, 255);
@@ -210,3 +204,13 @@ body {
     border: 1px solid black;
     border-radius: 5px;
    }
+
+   .view-btn{
+    border: 1px solid rgb(196, 196, 196);
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    border-radius: 5px;
+}
+.view-btn:hover{
+    border: 1px solid rgb(0, 0, 0);
+}

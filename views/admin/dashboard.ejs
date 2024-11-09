@@ -1,5 +1,5 @@
         <%- include('partials/header') %>
-    <link rel="stylesheet" href="/styles/admin/dashboard.css"> <!-- Point to your custom CSS -->
+    <link rel="stylesheet" href="/styles/admin/dashboard.css"> 
 
 </head>
 <body>
@@ -129,67 +129,6 @@
     <%- include('partials/footer') %>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('page-content-wrapper').classList.toggle('toggled');
-        });
-
-        const salesData = JSON.parse(document.getElementById('sales-data').dataset.sales);
-console.log(salesData);
-
-
-    let currentChart; // Store the current chart instance
-
-    const ctx = document.getElementById('salesChart').getContext('2d');
-
-    function createChart(period) {
-        const labels = Object.keys(salesData[period]);
-        const data = Object.values(salesData[period]);
-
-        if (currentChart) {
-            currentChart.destroy(); // Destroy the previous chart instance
-        }
-
-        currentChart = new Chart(ctx, {
-            type: 'bar',// Change to 'bar' for bar chart
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: `${period.charAt(0).toUpperCase() + period.slice(1)} Sales`,
-                    data: data,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)', // Bar color
-                    borderColor: 'rgba(54, 162, 235, 1)', // Border color
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Sales Amount (₹)', // Y-axis title
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Time Period', // X-axis title
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function updateChart(period) {
-        createChart(period); // Call the createChart function with the selected period
-    }
-
-    // Initialize the chart with the default period
-    updateChart('weekly'); // Load weekly data by default
-    </script>
+    <script src="/js/admin/dashboard.js"></script>
 </body>
 </html>

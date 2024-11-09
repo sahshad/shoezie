@@ -500,53 +500,106 @@ async function takeReturnAction(req,res){
 
 }
 
-async function downloadInvoice(req,res) {
+const PDFDocument = require('pdfkit');
 
+async function downloadInvoice(req, res) {
   try {
-    const order = await Order.findById(req.params.orderId).populate('items.productId').populate('items.offerId')
+    const order = await Order.findById(req.params.orderId).populate('items.productId').populate('items.offerId');
     if (!order) return res.status(404).send('Order not found');
 
     const invoiceData = {
-        invoiceId: order._id,
-        orderDate: order.orderDate.toLocaleDateString(),
-        customerName: order.shippingAddress.fullname,
-        customerAddress: `${order.shippingAddress.address}`,
-        items: order.items.map(item => ({
-            productName: item.productId.name,
-            quantity: item.quantity,
-            offerId: item.offerId ? item.offerId : null,
-            price: item.price
-        })),
-        totalAmount: order.items.reduce((total, item) => total + (item.price * item.quantity), 0)
+      invoiceId: order._id,
+      orderDate: order.orderDate.toLocaleDateString(),
+      customerName: order.shippingAddress.fullname,
+      customerAddress: `${order.shippingAddress.address}`,
+      items: order.items.map(item => ({
+        productName: item.productId.name,
+        quantity: item.quantity,
+        offerId: item.offerId ? item.offerId : null,
+        price: item.price
+      })),
+      totalAmount: order.items.reduce((total, item) => total + (item.price * item.quantity), 0)
     };
 
-    console.log(invoiceData.items[0].offerId);
-    
+    const doc = new PDFDocument({ margin: 30, size: 'A4' });
 
-    ejs.renderFile('views/user/invoice/invoice-template.ejs', invoiceData, (err, html) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Error generating PDF');
-        }
-
-        const options = { format: 'A4' };
-        pdf.create(html, options).toBuffer((err, buffer) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).send('Error generating PDF');
-            }
-
-            res.setHeader('Content-Disposition', `attachment; filename=invoice-${order._id}.pdf`);
-            res.setHeader('Content-Type', 'application/pdf');
-            res.send(buffer);
-        });
+    let buffers = [];
+    doc.on('data', buffers.push.bind(buffers));
+    doc.on('end', () => {
+      const pdfData = Buffer.concat(buffers);
+      res.setHeader('Content-Disposition', `attachment; filename=invoice-${order._id}.pdf`);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.send(pdfData);
     });
-} catch (error) {
+
+    doc.fontSize(20).text('SHOEZIE', { align: 'center' });
+    doc.fontSize(14).text('Step into the world of comfort', { align: 'center' });
+    doc.text('Contact Us: shoezie47@gmail.com', { align: 'center' });
+    doc.moveDown();
+
+    doc.fontSize(12).text(`Invoice #: ${invoiceData.invoiceId}`);
+    doc.text(`Order Date: ${invoiceData.orderDate}`);
+    doc.text(`Customer: ${invoiceData.customerName}`);
+    doc.text(`Address: ${invoiceData.customerAddress}`);
+    doc.moveDown();
+
+    const tableTop = doc.y + 10;
+    const itemX = 50, quantityX = 250, priceX = 350, totalX = 450;
+
+    doc.fontSize(10)
+       .text('Product', itemX, tableTop)
+       .text('Quantity', quantityX, tableTop)
+       .text('Price ', priceX, tableTop)
+       .text('Total ', totalX, tableTop);
+
+    doc.moveDown().moveTo(itemX, doc.y).lineTo(totalX + 50, doc.y).stroke();
+
+    let totalAmount = 0;
+    let yPos = doc.y + 5;
+
+    invoiceData.items.forEach(item => {
+      const price = item.offerId ? calculateDiscountedPrice(item) : item.price;
+      const total = price * item.quantity;
+      totalAmount += total;
+
+      doc.text(item.productName, itemX, yPos);
+      doc.text(item.quantity, quantityX, yPos);
+      doc.text(` ${price.toFixed(2)}`, priceX, yPos);
+      doc.text(` ${total.toFixed(2)}`, totalX, yPos);
+      yPos += 20;
+    });
+
+
+doc.moveDown(2)
+   .fontSize(12)
+   .text(`Total Amount: ₹${totalAmount.toFixed(2)}`, totalX, yPos + 10, { align: 'right' });
+
+const footerYPosition = doc.page.height - 100; 
+doc.fontSize(10)
+   .text('Thank you for your purchase!', 0, footerYPosition, { align: 'center' });
+doc.text('Return Policy: You can return items within 7 days of receipt.', 0, footerYPosition + 15, { align: 'center' });
+
+    doc.end();
+  } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
+  }
 }
+
+function calculateDiscountedPrice(item) {
+  if (!item.offerId) return item.price;
+
+  let effectivePrice;
+  if (item.offerId.offerType === 'percentage') {
+    const discount = Math.min(item.price * item.offerId.value / 100, item.offerId.maxDiscount || Infinity);
+    effectivePrice = item.price - discount;
+  } else {
+    effectivePrice = item.price - item.offerId.value;
+  }
   
+  return effectivePrice;
 }
+
 
 
 async function checkProduct(req,res) {
@@ -557,7 +610,6 @@ try {
   const order = await Order.findById(orderId)
     const items = order.items
 console.log(order);
-
     for (const item of items) {
             const product = await Product.findById(item.productId);
             if (!product){
