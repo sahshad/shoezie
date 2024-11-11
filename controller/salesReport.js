@@ -105,7 +105,6 @@ async function downloadSalesReport(req,res){
     }
 }
 else if (format === 'excel') {
-  const ExcelJS = require('exceljs'); 
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Sales Report');
 

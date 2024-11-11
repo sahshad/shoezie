@@ -42,11 +42,6 @@ async function getHome(req, res) {
     }
 }
 
-// async function getUsers(req, res) {
-//     const user = await User.find()  
-//     res.render('admin/usersList',{user , activePage:'users'})
-// }
-
 async function getUsers(req, res) {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -193,8 +188,6 @@ const getTopSellingProducts = async () => {
         throw error;
     }
 };
-
-
 
 async function getDashboard(req, res) {
     try {

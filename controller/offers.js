@@ -101,8 +101,6 @@ async function createOffer(req, res) {
             const category = await Category.findById(target._id)
 
             addOfferReferenceToCategory(category._id, offer._id)
-           
-        
                 // const products = await Product.find({ category: target._id });
                 // // const offer = await Offer.findOne({targetId:target._id})
                 // await Promise.all(products.map(product => addOfferReference(product._id, offer._id,minProductPrice)));
@@ -119,7 +117,6 @@ async function createOffer(req, res) {
         res.status(500).json({ success: false, message: 'An error occurred while creating the offer.' });
     }
 }
-
 
 async function addOfferReference(productId, offerId) {
     try {
@@ -328,7 +325,5 @@ async function addOfferReferenceToCategory(categoryId, offerId) {
         throw new Error('Error adding offer reference to category');
     }
 }
-
-
 
 module.exports = { getOffers,createOffer,changeOfferStatus,editOffer }

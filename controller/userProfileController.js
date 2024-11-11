@@ -18,21 +18,6 @@ async function getAddress(req,res){
     res.render('user/address',{address,user})
 }
 
-// async function getOrders(req,res){
-//   const userId = req.session.user
-//   try { 
-//     const user = await User.findById(userId) 
-//     const order = await Order.find({userId}).sort({createdAt:-1}).populate('items.productId')
-//     if(!order){
-//       throw new Error('Order not found')
-//     }
-//     res.render('user/order',{order,user})
-//   } catch (error) {
-//     console.log(error)
-//   }
-    
-// }
-
 async function getOrders(req, res) {
   const userId = req.session.user;
   const page = parseInt(req.query.page) || 1; 
@@ -63,7 +48,6 @@ async function getOrders(req, res) {
   }
 }
 
-
 async function getOrderDetails(req, res) {
   const { orderId} = req.params; 
   try {
@@ -80,7 +64,6 @@ async function getOrderDetails(req, res) {
   }
 }
 
-
 function userLogOut(req,res){
   
       if(req.session.user){
@@ -92,7 +75,6 @@ function userLogOut(req,res){
 }
 
 async function updateUserDetails(req,res){
-
     const userId = req.session.user  
     const { firstname, lastname, email, phone } = req.body; 
     try {

@@ -7,7 +7,6 @@ const speakeasy = require('speakeasy')
 const nodemailer = require('nodemailer')
 const crypto = require('crypto')
 const {sendOTP} = require('../utils/emailUtils')
-
 const  { getBestOffer } = require('../utils/offerUtils')
 
 function getLogin(req,res){

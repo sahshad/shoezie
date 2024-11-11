@@ -47,10 +47,8 @@ async function addProductToWishlist(req,res){
             return res.json({ success: false, message: 'Product already in wishlist' });
         }
 
-        // Add the product to the wishlist
         wishlist.items.push({ productId });
 
-        // Save the updated wishlist
         await wishlist.save();
 
         res.json({ success: true, message: 'Product added to wishlist' });

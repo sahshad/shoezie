@@ -107,6 +107,17 @@ offerDiscount = parseFloat(offerDiscount.replace(/[₹\s]/g, ''));
 const cartElement = document.getElementById('cartData');
 const cart = JSON.parse(cartElement.getAttribute('data-cart'));
 
+if(cart.products.length === 0){
+    Swal.fire({
+        icon:'error',
+        title:'Oops..!',
+        confirmButtonText:'Ok',
+        confirmButtonColor:'#000',
+        text:'No products to creata a order',
+    })
+    return 
+}
+
 const items = cart.products.map(item => ({
     productId: item.productId._id,
     sizeId: item.sizeId,
@@ -176,6 +187,7 @@ try {
     console.error('Error creating order:', error);
     alert('Failed to create order. Please try again.');
 }
+
 }
 
 function redirectToOrdersPage(orderId) {
@@ -202,7 +214,7 @@ const options = {
     name: "SHOEZIE",
     description: "Order Payment",
     handler: async function (response) {
-        await updateOrderStatus(orderId, response, 'Paid');
+        await updateOrderStatus(orderId, response, 'Paid',orderData);
     },
     prefill: {
         name: orderData.shippingAddress.fullname,
@@ -211,18 +223,16 @@ const options = {
     theme: { color: "#3399cc" },
     modal: {
         ondismiss: async function () {
-
-            await updateOrderStatus(orderId, null, 'Failed');
+            await updateOrderStatus(orderId, null, 'Failed',orderData);
         },
     }
-};
-
+}
 const rzp = new Razorpay(options);
 rzp.open();
 }
 
-async function updateOrderStatus(orderId, razorpayResponse, status) {
-const data = { status, razorpayResponse };
+async function updateOrderStatus(orderId, razorpayResponse, status,orderData) {
+const data = { status, razorpayResponse }
 try {
     const response = await fetch(`/user/cart/checkout/update-order/${orderId}`, {
         method: 'PATCH',
@@ -247,13 +257,21 @@ try {
             Swal.fire({
             title: 'Payment Failed',
             text: res.message,
-            icon: 'error', 
+            icon: 'error',
+            showCancelButton: true, 
             confirmButtonText: 'Try Again',
-            confirmButtonColor: '#d9534f' 
+            confirmButtonColor: '#000',
+            cancelButtonText:'cancel' ,
+            cancelButtonColor:'#000',
         })
-        .then(()=>{
-            redirectToOrdersPage(orderId);
+        .then((result) =>{
+            if(result.isConfirmed){
+                launchRazorpay(orderId, orderData)
+            }else{
+                redirectToOrdersPage(orderId);
+            }
         })
+        
     }
 } catch (error) {
     console.error('Error updating order status:', error);

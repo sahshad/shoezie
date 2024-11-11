@@ -85,7 +85,7 @@ const addProduct = (req, res) => {
             console.error(uploadError);
             return res.status(500).json({ success:false , message: 'Error uploading images to Cloudinary', uploadError });
         });
-};
+}
 
 async function editProduct(req, res) {
     const{id} = req.params
@@ -117,11 +117,15 @@ async function editProduct(req, res) {
             });
             updates.sizes = product.sizes;
         }
+        console.log('before deleting '+updates.sizes);
+        
 
         if (deletedSizes && deletedSizes.length > 0) {
             product.sizes = product.sizes.filter(size => !deletedSizes.includes(size._id.toString()));
             updates.sizes = product.sizes; 
         }
+
+        console.log('after deleting'+updates.sizes);
 
  if (newImages && newImages.length > 0) {
     const uploadPromises = newImages.map(image => {
@@ -145,9 +149,14 @@ if (deletedImages && deletedImages.length > 0) {
 
     await Promise.all(deletePromises);
 
-    product.imageUrls = product.imageUrls.filter(url => !deletedImages.includes(url));
-    updates.imageUrls = product.imageUrls; 
+    if(updates.imageUrls){
+        updates.imageUrls = updates.imageUrls.filter(url => !deletedImages.includes(url)) 
+    }else{
+        updates.imageUrls = product.imageUrls.filter(url => !deletedImages.includes(url)) 
+    }
+
 }
+
         const result = await Product.findByIdAndUpdate(id, updates, { new: true });
         
       if(result){

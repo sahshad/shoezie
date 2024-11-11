@@ -6,11 +6,6 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const streamifier = require('streamifier')
 
-// async function getCategory(req, res) {
-//     const category = await Category.find({})
-//     res.render('admin/category',{category, activePage : 'category'});
-// }
-
 async function getCategory(req, res) {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -36,7 +31,6 @@ async function getCategory(req, res) {
         res.status(500).send('Internal Server Error');
     }
 }
-
 
 async function addCategory(req, res) {
     const { categoryName } = req.body;
@@ -146,7 +140,6 @@ async function editCategory(req, res) {
         return res.status(500).json({ success:false , message: 'Server error', error });
     }
 }
-
 
 module.exports = {getCategory,addCategory, 
     uploadCategory:upload.single('categoryImage'),

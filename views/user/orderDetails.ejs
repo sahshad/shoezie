@@ -12,12 +12,12 @@
     <link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
 </head>
 <style>
-.card-body{
-    padding: 10px;
-}
-main{
-    padding-bottom: 100px;
-}
+    .card-body{
+        padding: 10px;
+    }
+    main{
+        padding-bottom: 100px;
+    }
 </style>
 <body>
 <%- include('partials/navbar') %>
@@ -234,10 +234,7 @@ console.log(deliveredDate);
         }
     });
 
-
-  
 async function returnOrder(){
-        // if (!validateReason()) return;  
 
         const reason = reasonInput.value.trim();
         const orderId = document.getElementById('orderId').value
@@ -275,9 +272,7 @@ async function returnOrder(){
         });
     }
 
-
     function cancelOrder(orderId) {
-            console.log(`Cancelling order ${orderId}`);
 
             fetch(`/user/profile/orders/cancel/${orderId}`,{
                 method:'PATCH',
@@ -298,7 +293,6 @@ async function returnOrder(){
             console.error('There was a problem with the fetch operation:', error);
         });
         }
-
 
         async function fetchRazorpayKey() {
     try {
@@ -342,8 +336,7 @@ async function checkProduct(orderId) {
     }
 }
 
-
-async function updateOrderStatus(orderId, razorpayResponse, status) {
+async function updateOrderStatus(orderId, razorpayResponse, status,totalAmount) {
     const repay=true
 const data = { status, razorpayResponse, repay }
 try {
@@ -353,16 +346,25 @@ try {
         body: JSON.stringify(data)
     })
 
-    const res = response.json()
-    
-    if (res.success) {
-        // showSuccessToast(`Order ${status === 'Paid' ? 'completed' : 'failed'}!`);
-        // redirectToOrdersPage();
-        Swal.fire({icon:'success',title:'payment done!',text:res.message})
+    const res = await response.json()
 
+    if (res.success) {
+        Swal.fire({icon:'success',title:'payment done!',text:res.message})
+        .then(()=> window.location.href = '/user/profile/orders')
     } else {
-        Swal.fire({icon:'error',title:'error!',text:res.message})
-        // alert('Error updating order status.');
+        Swal.fire({icon:'error',title:'Oops..!',text:res.message,
+        showCancelButton:true,
+        confirmButtonText:'Try Again',
+        cancelButtonText:'Cancel',
+        reverseButtons:true,
+        confirmButtonColor:'#000',
+        cancelButtonColor:'#000'
+        })
+        .then((result) => {
+            if(result.isConfirmed){
+                repayOrder(orderId , totalAmount)
+            }
+        })
     }
 } catch (error) {
     console.error('Error updating order status:', error);
@@ -386,7 +388,7 @@ try {
             description: "Retry Payment",
             handler: async function (response) {
                 // On successful payment, update the order status to 'Paid'
-                await updateOrderStatus(orderId, response, 'Paid');
+                await updateOrderStatus(orderId, response, 'Paid',totalAmount);
             },
             theme: { color: "#3399cc" },
             modal: {
@@ -397,7 +399,7 @@ try {
                     //     backgroundColor: "#f44336",
                     // }).showToast();
                     // Mark order as 'Cancelled' if user cancels payment again
-                    await updateOrderStatus(orderId, null, 'Failed');
+                    await updateOrderStatus(orderId, null, 'Failed',totalAmount);
                 },
             },
         };

@@ -2,6 +2,7 @@ require('dotenv').config();
 const Razorpay = require('razorpay')
 const crypto = require('crypto')
 const pdf = require('html-pdf');
+const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const ejs = require('ejs');
 const mongoose = require('mongoose')
@@ -11,7 +12,6 @@ const Cart = require('../model/cart')
 const Wallet = require('../model/wallet')
 const Coupon = require('../model/coupon')
 const User = require('../model/user')
-
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_ID_KEY,
@@ -500,8 +500,6 @@ async function takeReturnAction(req,res){
 
 }
 
-const PDFDocument = require('pdfkit');
-
 async function downloadInvoice(req, res) {
   try {
     const order = await Order.findById(req.params.orderId).populate('items.productId').populate('items.offerId');
@@ -600,8 +598,6 @@ function calculateDiscountedPrice(item) {
   return effectivePrice;
 }
 
-
-
 async function checkProduct(req,res) {
 const {orderId} = req.params
 console.log(orderId);
@@ -634,7 +630,6 @@ console.log(order);
         res.status(200).json({success:true })
 } catch (error) {
   console.log(error);
-  
 }
   
 }

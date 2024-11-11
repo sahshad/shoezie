@@ -30,7 +30,6 @@ const description = descriptionElement.getAttribute('data-description');
         sizes: sizes,
         images: imageUrls,
         id
-
     };
 
     const sizeStockContainer = document.getElementById('editSizeStockContainer');
@@ -48,7 +47,7 @@ const description = descriptionElement.getAttribute('data-description');
                 <input type="text" class="form-control" name="editProductStock[]" value="${sizeStock.stock}" placeholder="Enter stock" min="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
             </div>
             <div class="col-md-2">
-                <button type="button" class="btn btn-success add-size-stock">
+                <button type="button" class="btn btn-success add-size-stock" value="${sizeStock._id}">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -75,7 +74,10 @@ const description = descriptionElement.getAttribute('data-description');
         sizeStockContainer.appendChild(newPair);
         
         newPair.querySelector('.remove-size-stock').addEventListener('click', function() {
-            deletedSizes.push(sizeStock._id)
+            if(this.value !== ''){
+            console.log(this.value);  
+                deletedSizes.push(this.value)
+            }
             sizeStockContainer.removeChild(newPair);
         });
         
@@ -91,7 +93,7 @@ const description = descriptionElement.getAttribute('data-description');
                 <input type="text" class="form-control" name="editProductStock[]" value="${sizeStock.stock}" placeholder="Enter stock" min="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  required>
             </div>
             <div class="col-md-2">
-                <button type="button" class="btn btn-danger remove-size-stock">
+                <button type="button" class="btn btn-danger remove-size-stock" value="${sizeStock._id}">
                     <i class="fas fa-minus"></i>
                 </button>
             </div>
@@ -99,7 +101,11 @@ const description = descriptionElement.getAttribute('data-description');
         sizeStockContainer.appendChild(newPair);
 
         newPair.querySelector('.remove-size-stock').addEventListener('click', function() {
-            deletedSizes.push(sizeStock._id)
+
+            if(this.value !== ''){
+            console.log(this.value );  
+                deletedSizes.push(this.value)
+            }
             sizeStockContainer.removeChild(newPair);
         });}
     });
@@ -196,15 +202,23 @@ function openCropper(imageUrl, imageWrapper) {
     currentImageWrapper = imageWrapper; 
 
     document.getElementById('editCropImageButton').onclick = function() {
+        if(imageUrl.startsWith('https://res.cloudinary.com/')){
+            deletedImages.push(imageUrl)
+        }
         if (cropper) {
             const canvas = cropper.getCroppedCanvas();
             const croppedImageUrl = canvas.toDataURL(); 
 
             const imgElement = currentImageWrapper.querySelector('img');
             imgElement.src = croppedImageUrl; 
-            const index =newImages.indexOf(imageUrl)
-            newImages.splice(index,1)
+
+            imgElement.onclick = () => {
+                openCropper(croppedImageUrl,imageWrapper);
+            };
+
+            newImages = newImages.filter((url) => url !== imageUrl)
             newImages.push(croppedImageUrl)
+            console.log(newImages);
             
             cropper.destroy();
             cropper = null;
@@ -428,7 +442,6 @@ document.getElementById('editProductButton').addEventListener('click', function(
     if (!currentPrice) {
         return showErrorAlert('Product Price is required.');
     }
-   
 
     const payload = {}; 
 
@@ -456,12 +469,13 @@ document.getElementById('editProductButton').addEventListener('click', function(
         return showErrorAlert('Product Image is required');
     }
     if((currentImagesLength + newImages.length)-deletedImages.length < 3){
+        console.log(currentImagesLength,newImages.length,deletedImages.length); 
         return showErrorAlert('You have to upload atleast 3 images');
     }
     if((currentImagesLength + newImages.length)-deletedImages.length > 5){
         return showErrorAlert('You can upload a maximum of 5 images')
     }
-
+    
     const sizeChanged = JSON.stringify(updatedSizes) !== JSON.stringify(originalData.sizes.map(size => ({
         size: size.size,
         stock: size.stock,
