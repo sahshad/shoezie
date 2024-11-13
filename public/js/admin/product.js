@@ -368,6 +368,9 @@ document.getElementById('addProductButton').addEventListener('click', function (
           formData.append('productStock[]', stockInput.value);
       });
 
+      document.getElementById("addProductOverlay").style.display = "block";
+      document.getElementById("addProductSpinner").style.display = "block";
+
     fetch('/admin/products/add', {
         method: 'POST',
         body: formData,
@@ -379,7 +382,7 @@ document.getElementById('addProductButton').addEventListener('click', function (
                title: 'Product Added!',
                text: data.message,
                icon: 'success',
-               confirmButtonColor: '#3085d6',
+               confirmButtonColor: '#000',
                confirmButtonText: 'OK',
              })
              .then(()=>{
@@ -404,10 +407,14 @@ document.getElementById('addProductButton').addEventListener('click', function (
            title: 'Error!',
            text: + error.message,
            icon: 'error',
-           confirmButtonColor: '#d33',
+           confirmButtonColor: '#000',
            confirmButtonText: 'Try Again',
        });
        console.error('Error:', error);
+       })
+       .finally(()=>{
+        document.getElementById("addProductOverlay").style.display = "none";
+      document.getElementById("addProductSpinner").style.display = "none";
        })
 });
 
@@ -512,6 +519,8 @@ document.getElementById('editProductButton').addEventListener('click', function(
 
     if (Object.keys(payload).length > 0) {
         console.log('Sending data to backend:', payload); 
+        document.getElementById("eidtProductOverlay").style.display = "block";
+    document.getElementById("editProductSpinner").style.display = "block";
 
         fetch(`/admin/products/edit/${originalData.id}`, {
             method: 'POST',
@@ -529,7 +538,7 @@ document.getElementById('editProductButton').addEventListener('click', function(
                    title: 'Product Edited!',
                    text: data.message,
                    icon: 'success',
-                   confirmButtonColor: '#3085d6',
+                   confirmButtonColor: '#000',
                    confirmButtonText: 'OK',
                  })
                  .then(()=>{
@@ -554,10 +563,14 @@ document.getElementById('editProductButton').addEventListener('click', function(
                title: 'Error!',
                text: + error.message,
                icon: 'error',
-               confirmButtonColor: '#d33',
+               confirmButtonColor: '#000',
                confirmButtonText: 'Try Again',
            });
            console.error('Error:', error);
+           })
+           .finally(()=>{
+            document.getElementById("eidtProductOverlay").style.display = "none";
+            document.getElementById("editProductSpinner").style.display = "none";
            })
         
     } else {
