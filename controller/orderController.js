@@ -21,17 +21,17 @@ const razorpay = new Razorpay({
 async function createRazorpayOrder(amount) {
   try {
     const options = {
-      amount: amount * 100, // Convert to paisa
+      amount: amount * 100,
       currency: "INR",
-      receipt: `receipt_${new Date().getTime()}`, // Unique receipt ID
-      payment_capture: 1, // Auto capture payment (1: Yes, 0: No)
+      receipt: `receipt_${new Date().getTime()}`,
+      payment_capture: 1, 
     };
 
     const order = await razorpayInstance.orders.create(options);
     return {
-      id: order.id, // Order ID from Razorpay
-      amount: order.amount, // Amount in paisa
-      currency: order.currency, // Currency (INR)
+      id: order.id,
+      amount: order.amount, 
+      currency: order.currency, 
     };
   } catch (error) {
     console.error('Error creating Razorpay order:', error);
@@ -279,7 +279,7 @@ async function getAllOrders(req, res) {
       .populate('userId')
       .populate('items.productId')
       .sort({ createdAt: -1 })
-      .skip(skip) 
+      .skip(skip)
       .limit(limit); 
 
     const totalPages = Math.ceil(totalOrders / limit); 

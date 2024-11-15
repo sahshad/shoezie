@@ -11,12 +11,20 @@ async function getSalesReport(req,res){
 }
 
 async function getCustomSalesReport(req,res) {
-  const { reportType, startDate, endDate } = req.body;
+  let { reportType, startDate, endDate } = req.body;
+
+  startDate  = new Date(startDate); 
+  startDate = startDate.toISOString(); 
+
+  endDate = new Date(endDate); 
+  endDate.setDate(endDate.getDate() + 1);  
+  endDate = endDate.toISOString();
 
 const  sales = await Order.find({
     orderStatus: 'Delivered',
     orderDate: { $gte: new Date(startDate), $lte: new Date(endDate) }
 });
+
 
 if(sales){
 res.render('admin/salesReport',{sales,reportType,startDate,endDate , activePage:'sales-report'})

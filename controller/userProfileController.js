@@ -172,13 +172,17 @@ async function updatePassword(req,res){
    try {
       const user = await User.findById(userId)
 
+      if(!user.password){
+        return res.status(400).json({success:false , title:'Password not found' , message:'please set a password via forgot password'})
+      }
+
       const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
-          return res.status(400).json({ message: 'Current password is incorrect.' });
+          return res.status(400).json({ success: false , message: 'Current password is incorrect.' });
       }
 
       if (newPassword.length < 6) {
-        return res.status(400).json({ message: 'New password must be at least 6 characters long.' });
+        return res.status(400).json({success:false , message: 'New password must be at least 6 characters long.' });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -186,11 +190,11 @@ async function updatePassword(req,res){
 
     await user.save();
 
-    res.status(200).json({ message: 'Password updated successfully.' });
+    res.status(200).json({ success:true , message: 'Password updated successfully.' });
 
    } catch (error) {
     console.error(error);
-        res.status(500).json({ message: 'Server error.' });
+        res.status(500).json({success:false , message: 'Server error.' });
    }
 }
 

@@ -228,19 +228,19 @@ document.getElementById('savePasswordChanges').addEventListener('click', async f
             body: JSON.stringify(passwordData)
         });
 
-        const result = await response.json();
-        if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
             Swal.fire({
                 icon: 'success',
                 title: 'Success!',
-                text: "Password changed successfully!",
+                text: data.message,
             });
             $('#changePasswordModal').modal('hide');
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Error!',
-                text: result.message || "Failed to change password.",
+                title: data.title || 'Error!',
+                text: data.message || "Failed to change password.",
             });
         }
     } catch (error) {

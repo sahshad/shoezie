@@ -10,19 +10,18 @@ document.getElementById('reportType').addEventListener('change', function() {
         dateFields.style.display = 'none';
         endDateField.style.display = 'none';
     }
-});
-
+})
         function generateReport() {
             const reportType = document.getElementById('reportType').value;
             let startDate, endDate;
 
             if (reportType === 'daily') {
                 const today = new Date();
-        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); // Start of the day
-        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59); // End of the day
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0); 
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
             } else if (reportType === 'weekly') {
                 const today = new Date();
-                const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 1)); // Monday
+                const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 1));
                 const lastDayOfWeek = new Date(today.setDate(firstDayOfWeek.getDate() + 6));
                 startDate = firstDayOfWeek.toISOString().split('T')[0];
                 endDate = lastDayOfWeek.toISOString().split('T')[0];
@@ -56,8 +55,8 @@ document.getElementById('reportType').addEventListener('change', function() {
                 reportType,
                 startDate,
                 endDate,
-            };
-
+            };            
+            
             fetch(`/admin/sales-report/${startDate}`, {
         method: 'POST',
         headers: {

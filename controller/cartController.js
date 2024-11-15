@@ -115,7 +115,6 @@ const productsWithBestOffers = await Promise.all(
 async function addProductToCart(req, res) {
     const { productId, sizeId } = req.params;
     const userId = req.session.user;
-    console.log(sizeId);
     
     const quantity = 1;
     try {
@@ -131,7 +130,7 @@ async function addProductToCart(req, res) {
        
         const size = product.sizes.find(size => size._id.toString() === sizeId);
         if (!size) {
-            return res.status(404).json({success:false, message: 'Size not found' });
+            return res.status(404).json({success:false, message: 'Please select a size' });
         }
 
        let cart = await Cart.findOne({ user: userId });
@@ -161,7 +160,6 @@ async function addProductToCart(req, res) {
         }
 
         await cart.save();
-        console.log(`Product added to cart: ${productId} with size ${sizeId}`);
 
         return res.status(200).json({ success:true, message: 'Product added to cart successfully' });
     } catch (error) {
