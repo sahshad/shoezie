@@ -69,7 +69,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="addAddressForm" action="/user/profile/address/add" method="post">
+                <form id="addAddressForm" action="/profile/address/add" method="post">
 
                     <div class="form-group">
                         <label for="fullName">Fullname</label>
@@ -138,7 +138,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="editAddressForm" action="/user/profile/address/update" method="post">
+                <form id="editAddressForm" action="/profile/address/update" method="post">
                     <div class="form-group">
                         <label for="editFullName">Fullname</label>
                         <input type="text" class="form-control" id="editFullName" name="fullname" required>
@@ -327,7 +327,7 @@
     }).then((result) =>{
         if(result.isConfirmed){
 
-            fetch(`/user/profile/address/delete/${addressId}`, {
+            fetch(`/profile/address/delete/${addressId}`, {
                  method: 'DELETE',
                  headers: {
                  'Content-Type': 'application/json' 

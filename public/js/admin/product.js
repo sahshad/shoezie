@@ -325,15 +325,40 @@ document.getElementById('addProductButton').addEventListener('click', function (
       const sizes = document.querySelectorAll('input[name="productSize[]"]');
       const stocks = document.querySelectorAll('input[name="productStock[]"]');
   
-      const allSizesFilled = Array.from(sizes).every(sizeInput => sizeInput.value);
-      const allStocksFilled = Array.from(stocks).every(stockInput => stockInput.value);
-  
-      if (!allSizesFilled) {
-          return showErrorAlert('Product Size is required.');
-      }
-      if (!allStocksFilled) {
-          return showErrorAlert('Product Stock is required.');
-      }
+      const allSizesFilled = Array.from(sizes).every(sizeInput => sizeInput.value.trim() !== '');
+      const allStocksFilled = Array.from(stocks).every(stockInput => stockInput.value.trim() !== '');
+
+        if (!allSizesFilled) {
+            return showErrorAlert('Product Size is required.');
+        }
+        if (!allStocksFilled) {
+            return showErrorAlert('Product Stock is required.');
+        }
+
+        const hasInvalidSize = Array.from(sizes).some(sizeInput => {
+            const num = Number(sizeInput.value);
+            return sizeInput.value === '' || num === 0 || num > 18 || num < 1;
+        });
+
+        const hasInvalidStock = Array.from(stocks).some(stockInput => {
+            const num = Number(stockInput.value);
+            return stockInput.value === '' || num < 1 || num > 10000;
+        });
+
+        if (hasInvalidSize) {
+            return showErrorAlert("Size must be between 1 and 18");
+        }
+
+        if (hasInvalidStock) {
+            return showErrorAlert("Stock must be between 1 and 10,000");
+        }
+
+        const sizeValues = Array.from(sizes).map(input => input.value.trim());
+        const uniqueSizes = new Set(sizeValues);
+
+        if (uniqueSizes.size !== sizeValues.length) {
+            return showErrorAlert("Sizes must be unique.");
+        }
   
       const totalImages = croppedFiles.length + originalFiles.length;
       if(totalImages === 0){
@@ -471,6 +496,27 @@ document.getElementById('editProductButton').addEventListener('click', function(
     if (updatedSizes.includes(null)) {
         return showErrorAlert('All Product Sizes and Stocks must be filled.');
     }
+    
+    if (updatedSizes) {
+      for (const size of updatedSizes) {
+            const sizeValue = parseInt(size.size);
+            const stockValue = parseInt(size.stock);
+        if (isNaN(sizeValue) || sizeValue < 1 || sizeValue > 18) {
+           return showErrorAlert("Size must be between 1 and 18");
+        }
+        
+        if (isNaN(stockValue) || stockValue < 0 || stockValue > 10000) {
+            return showErrorAlert("Stock must be between 0 and 10,000");
+        }
+      }
+    }
+
+        const sizeValues = Array.from(sizeInputs).map(input => input.value.trim());
+        const uniqueSizes = new Set(sizeValues);
+
+        if (uniqueSizes.size !== sizeValues.length) {
+            return showErrorAlert("Sizes must be unique.");
+        }
 
     if((currentImagesLength + newImages.length)-deletedImages.length === 0){
         return showErrorAlert('Product Image is required');

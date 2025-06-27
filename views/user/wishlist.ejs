@@ -78,7 +78,7 @@
             <% if(wishlist.items.length > 0){%>
                 <% wishlist.items.forEach(item => {%>
                     <div id="productCard" class="col-md-3 mb-4 productCard">
-                        <a href="/user/shop/<%= item.productId._id %>" class="card-link">
+                        <a href="/shop/<%= item.productId._id %>" class="card-link">
                             <div class="card">
                                 <img src="<%= item.productId.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
                                 <div class="card-body p-0 ml-2 mr-2" style="text-align: left;">
@@ -131,7 +131,7 @@
         if (result.isConfirmed) {
             console.log(itemId);
             
-            fetch('/user/wishlist/delete', {
+            fetch('/wishlist/delete', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -169,7 +169,7 @@
 function addToCart(productId,sizeId) {
     console.log('hi');
     
-    fetch(`/user/cart/add/${productId}/${sizeId}`, {
+    fetch(`/cart/add/${productId}/${sizeId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

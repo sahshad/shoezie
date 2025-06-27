@@ -12,7 +12,7 @@ const  { getBestOffer } = require('../utils/offerUtils')
 function getLogin(req,res){
     let error
     if(req.session.user){
-      return  res.redirect('/user/home')
+      return  res.redirect('/')
     }
    if(req.session.error){
      error = req.session.error
@@ -40,21 +40,21 @@ async function userLogIn(req,res){
         const user = await User.findOne({ email });
         if (!user) {
             req.session.error = 'user not found'
-            return res.redirect('/user/login') 
+            return res.redirect('/login') 
         }
         const isMatch = await bcrypt.compare(password, user.password);
     
         if(user.status === false){
             req.session.error = 'you have been blocked'
-            return res.redirect('/user/login') 
+            return res.redirect('/login') 
         }
 
         if (isMatch) {
             req.session.user = user.id;
-            return res.redirect('/user/home');
+            return res.redirect('/');
         } else {
             req.session.error = 'incorrect password'
-            return res.redirect('/user/login') 
+            return res.redirect('/login') 
         }
  
     } catch (error) {
@@ -70,7 +70,7 @@ async function addUser(req, res) {
         const user = await User.findOne({ email });
         if (user) {
             req.session.error = 'Email already exists';
-            return res.redirect('/user/signup');
+            return res.redirect('/signup');
         }
 
         req.session.firstname = firstname;
@@ -104,12 +104,12 @@ async function addUser(req, res) {
         await transporter.sendMail(mailOptions);
         req.session.otpEmail = email;
 
-        return res.redirect('/user/verify-otp');
+        return res.redirect('/verify-otp');
         
     } catch (error) {
         console.error(error);
         req.session.error = 'Error registering user';
-        return res.redirect('/user/signup');
+        return res.redirect('/signup');
     }
 }
 
@@ -204,6 +204,10 @@ async function getHome(req,res){
     res.render('user/home',{product:productsWithBestOffers,category})
 }
 
+async function getAbout(req, res){
+    res.render('user/about')
+}
+
 async function findBestOffer(products){
     
   const productsWithBestOffers = await Promise.all(products.map(async product => {
@@ -238,10 +242,16 @@ async function findBestOffer(products){
 
 async function getShop(req, res) {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 12;
+        const skip = (page - 1) * limit;
+
         const categories = await Category.find({});
         const products = await Product.find({ status: true })
             .populate('category')
-            .populate('offers');
+            .populate('offers').skip(skip).limit(limit);
+        const totalProducts = await Product.countDocuments();
+        const totalPages = Math.ceil(totalProducts / limit);
         const productsWithBestOffers = await Promise.all(products.map(async product => {
             const category = await Category.findById(product.category).populate('offers');
             const categoryOffers = category ? category.offers : [];
@@ -272,10 +282,13 @@ async function getShop(req, res) {
         }));
         
         if (req.headers.accept && req.headers.accept.includes('application/json')) {
-            return res.json({ products: productsWithBestOffers, category: categories });
+            return res.json({ products: productsWithBestOffers, category: categories, currentPage: page,
+      totalPages,limit });
         }
 
-        res.render('user/shop', { product: productsWithBestOffers, category: categories });
+        res.render('user/shop', { product: productsWithBestOffers, category: categories,currentPage: page,
+      totalPages,
+      limit, });
     } catch (error) {
         console.error('Error fetching products:', error);
         res.status(500).send('Server error');
@@ -332,6 +345,10 @@ async function sortProducts(req, res) {
     const categories = req.query.categories ? JSON.parse(req.query.categories) : [];
     const search = req.query.search
     
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit;
+
     let sortOptions
 
     switch (sort) {
@@ -383,7 +400,12 @@ async function sortProducts(req, res) {
         }
       
     try {
-        const products = await Product.find(query).sort(sortOptions).populate('category')
+
+        const totalProducts = await Product.countDocuments(query);
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        const products = await Product.find(query).sort(sortOptions).skip(skip)
+            .limit(limit).populate('category')
         const category = await Category.find({})
 
         const productsWithBestOffers = await Promise.all(products.map(async product => {
@@ -416,10 +438,122 @@ async function sortProducts(req, res) {
         }));
        
         if (req.headers.accept && req.headers.accept.includes('application/json')) {
-            return  res.status(200).json({products:productsWithBestOffers,category})
+            return  res.status(200).json({products:productsWithBestOffers,category, currentPage: page,
+                totalPages,
+                limit})
         }
 
-        res.render('user/shop',{product:productsWithBestOffers,category})
+        res.render('user/shop',{product:productsWithBestOffers,category, currentPage: page,
+                totalPages,
+                limit})
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while fetching products' });
+    }
+}
+
+async function paginateProducts(req, res) {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit;
+
+    const sort = req.query.sortedby;
+    const sizes = req.query.sizes ? JSON.parse(req.query.sizes) : [];
+    const categories = req.query.categories ? JSON.parse(req.query.categories) : [];
+    const search = req.query.search
+
+    let sortOptions
+
+    switch (sort) {
+        case 'popularity':
+            sortOptions = { popularity: -1 }; 
+            break;
+        case 'priceLowToHigh':
+            sortOptions = { price: 1 }; 
+            break;
+        case 'priceHighToLow':
+            sortOptions = { price: -1 }; 
+            break;
+        case 'averageRating':
+            sortOptions = { averageRating: -1 }; 
+            break;
+        case 'newArrivals':
+            sortOptions = { createdAt: -1 }; 
+            break;
+        case 'featured':
+            sortOptions = { isFeatured: -1 }; 
+            break;
+        case 'aToz':
+            sortOptions = { name: 1 }; 
+            break;
+        case 'zToa':
+            sortOptions = { name: -1 }; 
+            break;
+        default:
+            sortOptions= {}
+    }
+    const query = {};
+     
+        query.status = 'true'
+
+        if (categories.length > 0) {
+            query.category = { $in: categories }; 
+        }
+
+        if (sizes.length > 0) {
+            query.sizes = {
+                $elemMatch: {
+                    size: { $in: sizes } 
+                }
+            };
+        }
+
+        if (search) {
+            query.name = { $regex: search, $options: 'i' }; 
+        }
+
+            try {
+        const products = await Product.find(query).sort(sortOptions).populate('category').skip(skip).limit(limit);
+        const category = await Category.find({})
+            const totalProducts = await Product.countDocuments();
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        const productsWithBestOffers = await Promise.all(products.map(async product => {
+            const category = await Category.findById(product.category).populate('offers');
+            const categoryOffers = category ? category.offers : [];
+
+            const combinedOffers = [...product.offers, ...categoryOffers];
+        
+            const validOffers = combinedOffers.filter(offer => {
+                if (offer.offerType === 'flat' && offer.value > product.price || new Date(offer.expiresAt) < new Date()) {
+                    return false; 
+                }
+                return true; 
+            });
+        
+            const hasValidOffer = validOffers.some(offer => {
+                return offer.minProductPrice && offer.minProductPrice >= product.price;
+            });
+        
+            let bestOffer = null;
+        
+            if (!hasValidOffer) {
+                bestOffer = await getBestOffer(validOffers, product.price);
+            }
+        
+            return {
+                ...product.toObject(),
+                bestOffer
+            };
+        }));
+       
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return  res.status(200).json({products:productsWithBestOffers,category,currentPage: page,
+      totalPages,limit})
+        }
+
+        res.render('user/shop',{product:productsWithBestOffers,category,currentPage: page,
+      totalPages,limit})
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while fetching products' });
@@ -518,5 +652,5 @@ async function forgotPasswordResendOtp(req, res){
 module.exports ={
     getLogin,getSignup,addUser,getHome,getShop,
     getProduct,userLogIn,sortProducts,getBestOffer,verifyOtp,getOtpPage,resendOtp,forgotPassword,sendOtp,
-    forgotPasswordVerifyOtp,resetPassword,forgotPasswordResendOtp
+    forgotPasswordVerifyOtp,resetPassword,forgotPasswordResendOtp,getAbout
 }

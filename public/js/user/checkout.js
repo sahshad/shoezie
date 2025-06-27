@@ -157,7 +157,7 @@ try {
         });
         return;
     }
-    const response = await fetch('/user/cart/checkout/confirm-order', {
+    const response = await fetch('/cart/checkout/confirm-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
@@ -191,7 +191,7 @@ try {
 }
 
 function redirectToOrdersPage(orderId) {
-    window.location.href = `/user/cart/checkout/order-created/${orderId}`
+    window.location.href = `/cart/checkout/order-created/${orderId}`
 }
 
 function showSuccessToast(message) {
@@ -234,7 +234,7 @@ rzp.open();
 async function updateOrderStatus(orderId, razorpayResponse, status,orderData) {
 const data = { status, razorpayResponse }
 try {
-    const response = await fetch(`/user/cart/checkout/update-order/${orderId}`, {
+    const response = await fetch(`/cart/checkout/update-order/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -307,7 +307,7 @@ if (!couponCode) {
     return;
 }
 
-fetch(`/user/cart/coupon/validate`, {
+fetch(`/cart/coupon/validate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code: couponCode, subtotal })

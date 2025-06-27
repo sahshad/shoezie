@@ -2,6 +2,7 @@
 
     <link rel="stylesheet" href="/styles/user/partials/navbar.css">
     <link rel="stylesheet" href="/styles/user/shop.css">
+        <link rel="stylesheet" href="/styles/pagination.css">
 </head>
 <style>
 
@@ -30,10 +31,10 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-            <li class="nav-item"><a class="nav-link" href="/user/home">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="/user/shop">Shop</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-            <li class="nav-item"><a class="nav-link" href="/user/login">Sign In</a></li>
+            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+            <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+            <li class="nav-item"><a class="nav-link" href="/login">Sign In</a></li>
         </ul>
         <form class="form-inline ml-auto search-container" oninput="performSearch(event)">
             <input id="searchInput" class="form-control mr-2" type="search" placeholder="Search for products..." >
@@ -43,9 +44,9 @@
         </form>
         
         <div class="ml-3 icons">
-            <a href="/user/wishlist" class="icon pr-3"><i class="fas fa-heart"></i></a>
-            <a href="/user/cart" class="icon pr-3"><i class="fas fa-shopping-cart"></i></a>
-            <a href="/user/profile" class="icon"><i class="fas fa-user"></i></a>
+            <a href="/wishlist" class="icon pr-3"><i class="fas fa-heart"></i></a>
+            <a href="/cart" class="icon pr-3"><i class="fas fa-shopping-cart"></i></a>
+            <a href="/profile" class="icon"><i class="fas fa-user"></i></a>
         </div>
     </div>
 </nav>
@@ -55,7 +56,7 @@
         <div class="col-md-12 d-flex sort-options">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/user/home">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Shop</li>
                 </ol>
             </nav>
@@ -111,9 +112,9 @@
                     <% product.forEach(product => { %>
                         <% if (product.status) { %>
                             <div id="productCard" class="col-md-3 mb-4 productCard">
-                                <a href="/user/shop/<%= product._id %>" class="card-link">
+                                <a href="/shop/<%= product._id %>" class="card-link">
                                     <div class="card">
-                                        <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" alt="Product 1">
+                                        <img src="<%= product.imageUrls[0] %>" class="card-img-top fixed-height" style="height: 255px; object-fit: cover;" alt="Product 1">
                                         <div class="card-body p-0" style="text-align: left;">
                                             <div>
                                                 <p class="card-title font-weight-bold my-2"><%= product.name %></p>
@@ -160,10 +161,61 @@
                     <p>no products found</p>
                 <% } %>
            </div>
+
+        <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination" id="paginationContainer">
+            <%
+                const maxPagesToShow = 5;
+                const startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+                const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+            %>
+
+            <% if (currentPage > 1) { %>
+                <li class="page-item">
+                <a class="page-link" onclick="handlePaginagation('<%= currentPage - 1 %>', '<%= limit %>')">Previous</a>
+                </li>
+            <% } %>
+
+            <% if (startPage > 1) { %>
+                <li class="page-item">
+                <a class="page-link" onclick="handlePaginagation(1, '<%= limit %>')">1</a>
+                </li>
+                <% if (startPage > 2) { %>
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                <% } %>
+            <% } %>
+
+            <% for (let i = startPage; i <= endPage; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                <a class="page-link" onclick="handlePaginagation('<%= i %>', '<%= limit %>')"><%= i %></a>
+                </li>
+            <% } %>
+
+            <% if (endPage < totalPages) { %>
+                <% if (endPage < totalPages - 1) { %>
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                <% } %>
+                <li class="page-item">
+                <a class="page-link" onclick="handlePaginagation('<%= totalPages %>', '<%= limit %>')"><%= totalPages %></a>
+                </li>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                <a class="page-link" onclick="handlePaginagation('<%= currentPage + 1 %>', '<%= limit %>')">Next</a>
+                </li>
+            <% } %>
+            </ul>
+        </nav>
         </div>
+
+        </div>
+        
     </div>
 </div>
 
+<%- include('component/footer')  %>
 <%- include('partials/footer') %>
 
 <script src="/js/user/shop.js"></script>

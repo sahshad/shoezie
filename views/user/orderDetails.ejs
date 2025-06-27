@@ -18,7 +18,7 @@
         <div class="row d-flex justify-content-between">
             <h5 class="mb-4">Order Details</h5>
             <div>
-                <a href="/user/profile/orders" class="mr-3">Back to Orders</a>
+                <a href="/profile/orders" class="mr-3">Back to Orders</a>
             </div>           
         </div>
        
@@ -184,7 +184,7 @@
 <script>
 
 function downloadInvoice(orderId) {
-    window.location.href = `/user/profile/order/invoice/${orderId}`
+    window.location.href = `/profile/order/invoice/${orderId}`
 }
 
      function openReturnModal(orderId,deliveredDate) {
@@ -229,7 +229,7 @@ async function returnOrder(){
         const reason = reasonInput.value.trim();
         const orderId = document.getElementById('orderId').value
 
-        fetch(`/user/profile/order/return/${orderId}`, {
+        fetch(`/profile/order/return/${orderId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reason })
@@ -264,7 +264,7 @@ async function returnOrder(){
 
     function cancelOrder(orderId) {
 
-            fetch(`/user/profile/orders/cancel/${orderId}`,{
+            fetch(`/profile/orders/cancel/${orderId}`,{
                 method:'PATCH',
                 headers: {
             'Content-Type': 'application/json'}
@@ -277,7 +277,7 @@ async function returnOrder(){
         })
         .then(data => {
             console.log('Order canceled successfully:', data);
-            window.location.href='/user/profile/orders'
+            window.location.href='/profile/orders'
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
@@ -296,7 +296,7 @@ async function returnOrder(){
 
 async function checkProduct(orderId) {
     try {
-        const response = await fetch(`/user/profile/order/repay/check-product/${orderId}`, {
+        const response = await fetch(`/profile/order/repay/check-product/${orderId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -330,7 +330,7 @@ async function updateOrderStatus(orderId, razorpayResponse, status,totalAmount) 
     const repay=true
 const data = { status, razorpayResponse, repay }
 try {
-    const response = await fetch(`/user/profile/order/repay/${orderId}`, {
+    const response = await fetch(`/profile/order/repay/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -340,7 +340,7 @@ try {
 
     if (res.success) {
         Swal.fire({icon:'success',title:'payment done!',text:res.message})
-        .then(()=> window.location.href = '/user/profile/orders')
+        .then(()=> window.location.href = '/profile/orders')
     } else {
         Swal.fire({icon:'error',title:'Oops..!',text:res.message,
         showCancelButton:true,

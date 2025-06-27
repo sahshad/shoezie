@@ -16,10 +16,10 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
   
   if (user && user.isNew) {
     // If the user is newly created, redirect to login
-    res.redirect('/user/login');
+    res.redirect('/login');
   } else {
     // If the user already exists, redirect to profile
-    res.redirect('/user/profile');
+    res.redirect('/profile');
   }
 });
 
