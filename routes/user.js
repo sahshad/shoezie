@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router()
 const {addUser,getSignup,getLogin,getHome,getShop,getProduct,sortProducts,
 userLogIn,verifyOtp,getOtpPage,resendOtp,forgotPassword,sendOtp,
-forgotPasswordVerifyOtp,resetPassword,forgotPasswordResendOtp} = require('../controller/userController')
+forgotPasswordVerifyOtp,resetPassword,forgotPasswordResendOtp,
+getAbout} = require('../controller/userController')
 
  const{getProfile,userLogOut,
     getAddress,getOrders,getOrderDetails,
@@ -57,7 +58,7 @@ router.get('/verify-otp',getOtpPage)
 router.post('/verify-otp',verifyOtp)
 router.post('/resend-otp',resendOtp)
 
-router.get('/home',getHome)
+router.get('/',getHome)
 router.get('/shop',getShop)
 router.get('/shop/filter',sortProducts)
 router.get('/shop/:id',getProduct)
@@ -78,6 +79,7 @@ router.post('/wishlist/add',addProductToWishlist)
 router.delete('/wishlist/delete',deleteProductFromWishlist)
 
 router.get('/profile/wallet',userAuthenticated,getWallet)
+router.get('/about', getAbout)
 
 router.get('/logout',userLogOut)
 

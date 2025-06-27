@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <img src="/images/_liadscostaa_on_ig-removebg-preview new.png" style="width: 350px;" alt="Shoe Image" class="img-fluid">
+                    <img src="/images/home-hero.png" style="width: 400px;" alt="Shoe Image" class="img-fluid">
                 </div>
             </div>
         </div>
@@ -148,7 +148,7 @@
                  <% category.forEach(category =>{%>
                     <% if(category.status){ %> 
                     <div class="col-md-4">
-                        <a href="/user/shop/filter?categories=%5B&quot;<%= category._id %>&quot;%5D">
+                        <a href="/shop/filter?categories=%5B&quot;<%= category._id %>&quot;%5D">
                         <div class="category-card vertical">
                             <h5 class="category-title"><%= category.name %></h5>
                             <img src="<%= category.imageUrl %>" class="category-img" alt="Men's Fashion">
@@ -164,101 +164,7 @@
         </div>
     <%} %>
 </section>
-
-<!-- <div class="reviews-section">
-    <h2>Our Happy Customers</h2>
-    <div class="review-slider">
-        <div class="review-container">
-            <div class="review-card">
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                </div>
-                <h3>Sufail</h3>
-                <p>"I'm blown away by the quality and style of the clothes I received from Shop.co. Every piece I've bought has exceeded my expectations."</p>
-            </div>
-            <div class="review-card">
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                </div>
-                <h3>Sufail</h3>
-                <p>"Finding clothes that align with my personal style used to be a challenge until I discovered Shop.co. The variety is remarkable."</p>
-            </div>
-            <div class="review-card">
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                    <i class="fas fa-star"></i>
-                </div>
-                <h3>Sufail</h3>
-                <p>"As someone always on the lookout for unique fashion pieces, I’m thrilled to have stumbled upon Shop.co. The selection is diverse and trendy."</p>
-            </div>
-        </div>
-    </div>
-    <div class="slider-controls">
-        <button class="prev-btn" disabled>←</button>
-        <button class="next-btn">→</button>
-    </div>
-</div> -->
-
-
-<!-- footer -->
-<footer class="footer pt-5">
-    <div class="container">
-        <div class="footer-content">
-            <div class="brand-section">
-                <h2>SHOEZIE</h2>
-                <p>We have shoes that suit your style and which you’re proud to wear. From women to men.</p>
-                <div class="social-icons">
-                    <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
-                    <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <a href="https://github.com" target="_blank"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
-            <div class="company">
-                <h3>COMPANY</h3>
-                <ul>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Features</a></li>
-                    <li><a href="#">Works</a></li>
-                    <li><a href="#">Career</a></li>
-                </ul>
-            </div>
-            <div class="help">
-                <h3>HELP</h3>
-                <ul>
-                    <li><a href="#">Customer Support</a></li>
-                    <li><a href="#">Delivery Details</a></li>
-                    <li><a href="#">Terms & Conditions</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                </ul>
-            </div>
-            <div class="faq">
-                <h3>F A Q</h3>
-                <ul>
-                    <li><a href="#">Account</a></li>
-                    <li><a href="#">Manage Deliveries</a></li>
-                    <li><a href="#">Orders</a></li>
-                    <li><a href="#">Payments</a></li>
-                </ul>
-            </div>
-        </div>
-        <hr class="footer-divider">
-        <div class="copyright">
-            <p>&copy; 2024 SHOEZIE. All rights reserved.</p>
-        </div>
-    </div>
-</footer>
+<%- include('component/footer')  %>
 
 <%- include('partials/footer') %>
 </body>

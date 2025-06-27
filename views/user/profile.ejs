@@ -220,7 +220,7 @@ document.getElementById('savePasswordChanges').addEventListener('click', async f
     };
 
     try {
-        const response = await fetch('/user/profile/password/update', {
+        const response = await fetch('/profile/password/update', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -290,7 +290,7 @@ document.getElementById('savePasswordChanges').addEventListener('click', async f
         email: updatedEmail
       };
 
-      fetch('/user/profile/update', {
+      fetch('/profile/update', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

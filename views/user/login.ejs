@@ -20,7 +20,7 @@
         <p id="error-message" class="text-center" style="color: red;"><small><%= error %></small></p>
            <% } %>
             <h5 class="text-center mb-4"><small>Login</small></h5>
-            <form id="loginForm" action="/user/login" method="post">
+            <form id="loginForm" action="/login" method="post">
                 <div class="form-group">
                     <label for="email"><small>Email</small></label>
                     <input type="email" class="form-control rounded-pill" id="email" name="email" placeholder="Enter email" required>
@@ -38,14 +38,14 @@
             <p class="text-center or">or</p>
             <div>
                 <a href="/auth/google" class="btn btn-sm btn-outline-dark btn-block rounded-pill">
-                    <i class="fa-brands fa-google fa-beat-fade" style="color: #000000;"></i> Login with Google
+                    <i class="fa-brands fa-google" style="color: #000000; margin-right: 5px ;"></i> Login with Google
                 </a>
             </div>
             <div>
-                <p class="text-center mt-3 text-sm"><small><a href="/user/forgot-password">Forgot Password?</a></small></p>
+                <p class="text-center mt-3 text-sm"><small><a href="/forgot-password">Forgot Password?</a></small></p>
             </div>
             <div class="text-center">
-                <a href="/user/home"><small<i class="fa-solid fa-house " style="color: #000000;"></i></small></a>
+                <a href="/"><small<i class="fa-solid fa-house " style="color: #000000;"></i></small></a>
             </div>
         </div>
 
@@ -53,7 +53,7 @@
             <h2 class="text-left"><small>SHOEZIE</small></h2>
             <img src="/images/userlogin2.png" alt="Brand Image" class="img-fluid mt-3 w-75">
             <div>
-                <p class="text-center mt-3"><small>Don't have an account? </small><a href="/user/signup"><small>Sign Up</small></a></p>
+                <p class="text-center mt-3"><small>Don't have an account? </small><a href="/signup"><small>Sign Up</small></a></p>
             </div>
         </div>
     </div>

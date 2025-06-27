@@ -73,7 +73,7 @@ const cart = await Cart.findOne({user:userId})
 cart.products.forEach(product => {
      const productSize =  product.productId.sizes.find(size => size._id.toString() === product.sizeId.toString())
      if(productSize.stock === 0){
-        return res.redirect('/user/cart')
+        return res.redirect('/cart')
      }
 })
 

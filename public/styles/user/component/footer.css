@@ -1,0 +1,87 @@
+.footer {
+    background-color: #f0f0f0; 
+    color: rgb(0, 0, 0);
+    padding: 20px 0;
+    text-align: left;
+}
+
+.footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.footer-content > div {
+    flex: 1; /* Equal space for all sections */
+    margin-right: 20px; /* Space between sections */
+}
+
+.footer-content > div:last-child {
+    margin-right: 0; /* Remove margin from the last section */
+}
+
+.brand-section {
+    flex: 1.5; /* Increased width for brand section */
+}
+
+.brand-section h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.brand-section p {
+    font-size: 14px;
+    color: #555;
+    margin: 5px 0 15px;
+}
+
+.brand-section .social-icons a {
+    color: #000000;
+    margin-right: 10px;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.brand-section .social-icons a:hover {
+    color: #818181; 
+}
+
+.footer-content h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.footer-content ul {
+    list-style: none; 
+    padding: 0;
+}
+
+.footer-content ul li {
+    margin-bottom: 5px;
+}
+
+.footer-content a {
+    color: #000000;
+    text-decoration: none;
+}
+
+.footer-content a:hover {
+    text-decoration: underline;
+}
+
+.footer-divider {
+    border: 1px solid #ccc; 
+    margin: 20px 0; 
+}
+
+.copyright {
+    text-align: center;
+    font-size: 14px; 
+    color: #555;
+}

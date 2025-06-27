@@ -1,0 +1,76 @@
+
+.hero-section.about {
+    background-color: #fff;
+    padding: 60px 0;
+}
+
+.hero-section.about h1 {
+    font-size: 2.8em;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 20px;
+}
+
+.hero-section.about p {
+    font-size: 1.1em;
+    color: #444;
+    line-height: 1.7;
+}
+
+/* Mission statement section */
+.new-arrivals.about {
+    background-color: #f9f9f9;
+    padding: 60px 0;
+}
+
+/* Top selling section reused for brand values */
+.top-selling.about {
+    background-color: #fff;
+    padding: 60px 0;
+}
+
+.top-selling.about h4 {
+    margin-top: 15px;
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #000;
+}
+
+.top-selling.about p {
+    font-size: 0.95em;
+    color: #555;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* Team section using categories layout */
+.categories.about {
+    background-color: #f9f9f9;
+    padding: 60px 0;
+}
+
+.categories.about p {
+    font-size: 0.95em;
+    color: #555;
+    margin-top: 10px;
+}
+
+.categories.about .category-title {
+    top: 70%;
+    background: rgba(0, 0, 0, 0.6);
+    width: 90%;
+    text-align: center;
+    font-size: 1.2em;
+    padding: 5px 0;
+}
+
+@media (max-width: 768px) {
+    .hero-section.about h1 {
+        font-size: 2.2em;
+    }
+
+    .top-selling.about .col-md-4,
+    .categories.about .col-md-4 {
+        margin-bottom: 30px;
+    }
+}

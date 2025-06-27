@@ -68,9 +68,9 @@ function userLogOut(req,res){
   
       if(req.session.user){
         delete req.session.user
-        return res.redirect('/user/login');
+        return res.redirect('/login');
       }else{
-        return res.redirect('/user/profile');
+        return res.redirect('/profile');
       }
 }
 
@@ -121,7 +121,7 @@ async function addAddress(req,res){
         }); 
          await newAddress.save();
 
-         return res.status(201).redirect('/user/profile/address')
+         return res.status(201).redirect('/profile/address')
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: 'Error adding address', error });
@@ -138,7 +138,7 @@ try {
         updatedData, {new:true , runValidators:true}
      ) 
      if(updateAddress){
-     return res.status(201).redirect('/user/profile/address')
+     return res.status(201).redirect('/profile/address')
      }
 
     } catch (error) {

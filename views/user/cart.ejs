@@ -157,7 +157,7 @@
         </div>
     
         <% } else { %>
-            <p class="text-center">There are no items in your cart. <a href="/user/shop">Shop</a> now</p>
+            <p class="text-center">There are no items in your cart. <a href="/shop">Shop</a> now</p>
         <% } %>
     
         <% if (cart.products.length > 0) { %>
@@ -204,7 +204,7 @@
         confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
         if (result.isConfirmed) {
-            fetch(`/user/cart/remove/${productId}`, {
+            fetch(`/cart/remove/${productId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -278,7 +278,7 @@ function updateQuantity(cartId , newQuantity,currentQuantityElement) {
 
     const data = { quantity: newQuantity };
 
-    fetch(`/user/cart/update/${cartId}`, {
+    fetch(`/cart/update/${cartId}`, {
         method: 'PUT', 
         headers: {
             'Content-Type': 'application/json',

@@ -298,7 +298,7 @@
         <button class="scroll-button scroll-left" onclick="scrollLeft()">&#10094;</button>
         <% relatedProducts.forEach(product =>{ %>
             <div class="related-product">
-                <a href="/user/shop/<%= product._id %>">
+                <a href="/shop/<%= product._id %>">
                 <img src="<%= product.imageUrls[0] %>" alt="Related Product 1">
                 <h6><%= product.name %></h6>
                 <p class="rating">★★★★☆ (4.0)</p>
@@ -403,7 +403,7 @@ let sizeId=0
         //     sizeBox.style.borderRadius = '10px'       
         // }
 
-    fetch(`/user/cart/add/${productId}/${sizeId}`, {
+    fetch(`/cart/add/${productId}/${sizeId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -425,7 +425,7 @@ let sizeId=0
             })
             .then((result) =>{
                 if(result.isDismissed){
-                    window.location.href = '/user/cart'
+                    window.location.href = '/cart'
                 }
             })
         }else{
@@ -451,7 +451,7 @@ let sizeId=0
 }
 
 function addToWishlist(productId) {
-    fetch('/user/wishlist/add', {
+    fetch('/wishlist/add', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -75,7 +75,7 @@ const sizes = [
         queryParams.delete('sortedby');
         if (sortOption) queryParams.append('sortedby', sortOption);
        
-        const requestUrl = `/user/shop/filter?${queryParams.toString()}`
+        const requestUrl = `/shop/filter?${queryParams.toString()}`
 
         window.history.pushState({},'',requestUrl)
     
@@ -93,6 +93,7 @@ const sizes = [
             const data = await response.json();
     
             displayProducts(data.products); 
+            updatePaginationUI(data.currentPage, data.totalPages, data.limit);
         } catch (error) {
             console.error('Error fetching sorted products:', error);
         }
@@ -136,7 +137,7 @@ async function clearFilter(){
         queryParams.delete('sizes');
         queryParams.delete('categories');
 
-        const requestUrl = `/user/shop/filter?${queryParams.toString()}`
+        const requestUrl = `/shop/filter?${queryParams.toString()}`
         window.history.pushState({},'',requestUrl)
 
         try {
@@ -177,7 +178,8 @@ async function clearFilter(){
            
             const data = await response.json();
     
-            displayProducts(data.products); 
+            displayProducts(data.products);
+            updatePaginationUI(data.currentPage, data.totalPages, data.limit);
         } catch (error) {
             console.error('Error fetching filtered products:', error);
         }
@@ -196,7 +198,7 @@ async function clearFilter(){
         if (selectedCategories.length > 0) {
             queryParams.append('categories', JSON.stringify(selectedCategories));
         }
-        const requestUrl = `/user/shop/filter?${queryParams.toString()}`
+        const requestUrl = `/shop/filter?${queryParams.toString()}`
         window.history.pushState({},'',requestUrl)
         try {
             const response = await fetch(requestUrl, {
@@ -213,6 +215,7 @@ async function clearFilter(){
             const data = await response.json();
     
             displayProducts(data.products);
+            updatePaginationUI(data.currentPage, data.totalPages, data.limit);
         } catch (error) {
             console.error('Error fetching filtered products:', error);
         }
@@ -263,8 +266,8 @@ function performSearch(event) {
     debounceTimer = setTimeout(() => {
         if (searchInput) {
             const queryParams = new URLSearchParams(window.location.search);
-        queryParams.set('search', searchInput) 
-            const requestUrl = `/user/shop/filter?${queryParams.toString()}`;
+            queryParams.set('search', searchInput)
+            const requestUrl = `/shop/filter?${queryParams.toString()}`;
 
             window.history.pushState({}, '', requestUrl);
             
@@ -277,13 +280,14 @@ function performSearch(event) {
                 .then(response => response.json())
                 .then(data => {
                     displayProducts(data.products); 
+                    updatePaginationUI(data.currentPage, data.totalPages, data.limit);
                 })
                 .catch(error => console.error('Error:', error));
         } else {
  
             const queryParams = new URLSearchParams(window.location.search);
             queryParams.delete('search');
-            const requestUrl = `/user/shop/filter?${queryParams.toString()}`
+            const requestUrl = `/shop/filter?${queryParams.toString()}`
             window.history.pushState({}, '', requestUrl);
 
             fetch(requestUrl,{
@@ -294,6 +298,7 @@ function performSearch(event) {
                 .then(response => response.json())
                 .then(data => {
                     displayProducts(data.products); 
+                    updatePaginationUI(data.currentPage, data.totalPages, data.limit);
                 })
                 .catch(error => console.error('Error fetching all products:', error));
         }
@@ -315,9 +320,9 @@ function displayProducts(products) {
         const productElement = document.createElement('div');
         productElement.className = filterToggleOpened ? 'col-md-4 mb-4 productCard':'col-md-3 mb-4 productCard'
         productElement.innerHTML = 
-        `<a href="/user/shop/${product._id}  " class="card-link">
+        `<a href="/shop/${product._id}  " class="card-link">
         <div class="card">
-            <img src="${product.imageUrls[0]} " class="card-img-top fixed-height" alt="Product 1">
+            <img src="${product.imageUrls[0]} " class="card-img-top fixed-height" style="height: 255px; object-fit: cover;" alt="Product 1">
             <div class="card-body p-0" style="text-align: left;">
                 <div>
                     <p class="card-title font-weight-bold my-2">${product.name} </p>
@@ -355,4 +360,75 @@ function displayProducts(products) {
     </a>`
         productsContainer.appendChild(productElement);
     });
+}
+
+async function handlePaginagation(page, limit) {
+  const urlParams = new URLSearchParams(window.location.search);
+  urlParams.set('page', page);
+  urlParams.set('limit', limit);
+
+  const requestUrl = `/shop/filter?${urlParams.toString()}`;
+  window.history.pushState({}, '', requestUrl);
+
+  try {
+    const response = await fetch(requestUrl, {
+      headers: { 'Accept': 'application/json' }
+    });
+
+    const data = await response.json();
+    displayProducts(data.products);
+    updatePaginationUI(data.currentPage, data.totalPages, data.limit);
+  } catch (err) {
+    console.error('Error during pagination fetch:', err);
+  }
+}
+
+function updatePaginationUI(currentPage, totalPages, limit) {
+  const paginationContainer = document.getElementById('paginationContainer');
+  paginationContainer.innerHTML = ''; // Clear existing buttons
+
+  const maxPagesToShow = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+  let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+  if (currentPage > 1) {
+    paginationContainer.innerHTML += `
+      <li class="page-item">
+        <a class="page-link" onclick="handlePaginagation(${currentPage - 1}, ${limit})">Previous</a>
+      </li>`;
+  }
+
+  if (startPage > 1) {
+    paginationContainer.innerHTML += `
+      <li class="page-item"><a class="page-link" onclick="handlePaginagation(1, ${limit})">1</a></li>`;
+    if (startPage > 2) {
+      paginationContainer.innerHTML += `
+        <li class="page-item disabled"><span class="page-link">...</span></li>`;
+    }
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    paginationContainer.innerHTML += `
+      <li class="page-item ${i === currentPage ? 'active' : ''}">
+        <a class="page-link" onclick="handlePaginagation(${i}, ${limit})">${i}</a>
+      </li>`;
+  }
+
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      paginationContainer.innerHTML += `
+        <li class="page-item disabled"><span class="page-link">...</span></li>`;
+    }
+    paginationContainer.innerHTML += `
+      <li class="page-item">
+        <a class="page-link" onclick="handlePaginagation(${totalPages}, ${limit})">${totalPages}</a>
+      </li>`;
+  }
+
+  if (currentPage < totalPages) {
+    paginationContainer.innerHTML += `
+      <li class="page-item">
+        <a class="page-link" onclick="handlePaginagation(${currentPage + 1}, ${limit})">Next</a>
+      </li>`;
+  }
 }

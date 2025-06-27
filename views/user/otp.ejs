@@ -112,7 +112,7 @@
                 return; 
             }
            
-            fetch('/user/verify-otp', { 
+            fetch('/verify-otp', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -130,7 +130,7 @@
                 title: 'Success!',
                 text: data.message,
                 }).then(() => {
-                    window.location.href = '/user/login'; 
+                    window.location.href = '/login'; 
                 });
              }else{
                 Swal.fire({
@@ -152,7 +152,7 @@
 
             function resendOTP() {
             document.getElementById('resendBtn').disabled = true;
-        fetch('/user/resend-otp', {  
+        fetch('/resend-otp', {  
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

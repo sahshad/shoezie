@@ -102,7 +102,7 @@ function getLogout(req,res){
         delete req.session.admin
         return res.redirect('/admin/login');
       }else{
-        return res.redirect('/user/profile');
+        return res.redirect('/profile');
       }
 }
 
