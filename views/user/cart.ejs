@@ -332,7 +332,7 @@ function updateOrderSummary(newQuantity,currentQuantityElement) {
             const discountPriceElement = productCard.querySelector('.discounted-price');
             const quantityElement = productCard.querySelector('.current-quantity');
             const originalPriceElement = productCard.querySelector('.original-price')
-console.log(discountPriceElement);
+            console.log(discountPriceElement);
 
             const originalPrice = parseFloat(originalPriceElement.innerText.replace('₹' ,'').trim())
             const discountPrice = discountPriceElement ? parseFloat(discountPriceElement.innerText.replace('₹', '').trim()) : 0
