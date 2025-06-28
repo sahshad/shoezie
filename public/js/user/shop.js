@@ -136,6 +136,8 @@ async function clearFilter(){
     const queryParams = new URLSearchParams(window.location.search);
         queryParams.delete('sizes');
         queryParams.delete('categories');
+        queryParams.delete('limit')
+        queryParams.delete('page')
 
         const requestUrl = `/shop/filter?${queryParams.toString()}`
         window.history.pushState({},'',requestUrl)
@@ -190,6 +192,8 @@ async function clearFilter(){
         const queryParams = new URLSearchParams(window.location.search);
         queryParams.delete('sizes');
         queryParams.delete('categories');
+        queryParams.delete('limit')
+        queryParams.delete('page')
     
         if (selectedSizes.length > 0) {
             queryParams.append('sizes', JSON.stringify(selectedSizes));
@@ -266,6 +270,8 @@ function performSearch(event) {
     debounceTimer = setTimeout(() => {
         if (searchInput) {
             const queryParams = new URLSearchParams(window.location.search);
+            queryParams.delete('limit')
+            queryParams.delete('page')
             queryParams.set('search', searchInput)
             const requestUrl = `/shop/filter?${queryParams.toString()}`;
 
