@@ -4,6 +4,7 @@ const Category = require("../model/category");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 const multer = require("multer");
+const category = require("../model/category");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -39,10 +40,10 @@ const addProduct = async (req, res) => {
     return res.status(400).json({ success: false, message: "No images uploaded" });
   }
 
-  const product = await Product.findOne({name: productName})
+  const product = await Product.findOne({ name: productName });
 
-  if(product){
-    return res.status(409).json({success: false, message: "Name already exits. please choose different name"})
+  if (product) {
+    return res.status(409).json({ success: false, message: "Name already exits. please choose different name" });
   }
 
   const uploadPromises = req.files.map((file) => {
@@ -90,18 +91,40 @@ const addProduct = async (req, res) => {
 async function editProduct(req, res) {
   const { id } = req.params;
   const { name, description, category, price, sizes, newImages, deletedImages, deletedSizes } = req.body;
-
   try {
-
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
+
     const updates = {};
 
-    if (name && name !== product.name) updates.name = name;
+    if (name && name !== product.name) {
+      const existingProduct = await Product.findOne({
+        name: { $regex: `^${name.trim()}$`, $options: "i" },
+        _id: { $ne: id },
+      });
+
+      if (existingProduct) {
+        return res.status(400).json({
+          success: false,
+          message: "A product with this name already exists",
+        });
+      }
+
+      updates.name = name;
+    }
+
+    if (category) {
+      const productCategory = await Category.findOne({ name: category });
+      if (!productCategory) {
+        return res.status(404).json({ success: false, message: "Category not found" });
+      } else {
+        updates.category = productCategory._id;
+      }
+    }
+
     if (description && description !== product.description) updates.description = description;
-    if (category && category !== product.category) updates.category = category;
     if (price && price !== product.price) updates.price = price;
 
     if (sizes) {
@@ -118,14 +141,11 @@ async function editProduct(req, res) {
       });
       updates.sizes = product.sizes;
     }
-    console.log("before deleting " + updates.sizes);
 
     if (deletedSizes && deletedSizes.length > 0) {
       product.sizes = product.sizes.filter((size) => !deletedSizes.includes(size._id.toString()));
       updates.sizes = product.sizes;
     }
-
-    console.log("after deleting" + updates.sizes);
 
     if (newImages && newImages.length > 0) {
       const uploadPromises = newImages.map((image) => {
