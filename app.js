@@ -1,4 +1,5 @@
 const express = require("express");
+const MongoStore = require("connect-mongo")
 const path = require("path");
 const app = express();
 const session = require("express-session");
@@ -22,6 +23,10 @@ app.use(
     secret: "key",
     resave: false,
     saveUninitialized: false,
+     store: MongoStore.create({
+    mongoUrl: process.env.dbURI ,
+    collectionName: 'sessions'
+  }),
     cookie: { secure: false },
   })
 );
