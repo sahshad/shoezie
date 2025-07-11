@@ -235,20 +235,52 @@ imageInput.addEventListener("change", function (event) {
   const files = event.target.files;
   console.log(files);
 
+  if (files.length > 5) {
+    showErrorAlert("cannot add more than five images");
+    return;
+  }
+
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     originalFiles[i] = file;
     const reader = new FileReader();
 
     reader.onload = function (e) {
+      const imageWrapper = document.createElement("div");
+      imageWrapper.classList.add("image-wrapper");
+
       const img = document.createElement("img");
       img.src = e.target.result;
       img.alt = `Image ${i + 1}`;
-      img.style.maxWidth = "100px";
-      img.style.marginRight = "10px";
-      img.style.border = "1px solid #ccc";
+      img.style = "margin-right:10px; max-width: 70px; border: 1px solid #ccc; margin-bottom:10px; border-radius:6px;";
 
-      imageGroup.appendChild(img);
+      const deleteButton = document.createElement("button");
+      deleteButton.innerHTML = "✕";
+      deleteButton.classList.add("product-image-remove-button");
+
+      const deleteIcon = document.createElement("i");
+      deleteButton.appendChild(deleteIcon);
+
+      deleteButton.onclick = () => {
+        imageWrapper.remove();
+        const index = originalFiles.indexOf(file);
+        if (index !== -1) originalFiles.splice(index, 1);
+
+        const dataTransfer = new DataTransfer();
+        originalFiles.forEach((f) => dataTransfer.items.add(f));
+        imageInput.files = dataTransfer.files;
+      };
+
+      imageWrapper.onmouseenter = () => {
+        deleteButton.style.display = "block";
+      };
+      imageWrapper.onmouseleave = () => {
+        deleteButton.style.display = "none";
+      };
+
+      imageWrapper.appendChild(img);
+      imageWrapper.appendChild(deleteButton);
+      imageGroup.appendChild(imageWrapper);
 
       img.addEventListener("click", function () {
         if (cropper) {
@@ -281,7 +313,11 @@ imageInput.addEventListener("change", function (event) {
 
             img.src = URL.createObjectURL(croppedFile);
 
-            croppedFiles[i] = croppedFile;
+            originalFiles[i] = croppedFile;
+
+            const dataTransfer = new DataTransfer();
+            originalFiles.forEach((f) => dataTransfer.items.add(f));
+            imageInput.files = dataTransfer.files;
           });
         };
       });
