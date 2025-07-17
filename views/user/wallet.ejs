@@ -1,70 +1,75 @@
 <%- include('partials/header') %>
 
-    <link rel="stylesheet" href="/styles/user/partials/navbar.css">
-    <link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
-    
+<link rel="stylesheet" href="/styles/user/partials/navbar.css">
+<link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
+
 </head>
+
 <body>
 
-<!-- Navbar -->
-<%- include('partials/navbar') %>
+  <!-- Navbar -->
+  <%- include('partials/navbar') %>
 
-<!-- User Wallet Section -->
-<main>
+  <!-- User Wallet Section -->
+  <main>
     <div class="container mt-5">
-        <div class="row">
-            <%- include('partials/profileSidebar') %>
-            <div class="col-md-9 pl-5 mt-4">
-                <h5 class="mb-4">My Wallet</h5>
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Wallet Balance</h6>
-                        <h4 class="card-text">₹ <%= wallet.balance.toFixed(2) %></h4>
-                    </div>
-                </div>
-
-                <h5 class="mt-4">Transaction History</h5>
-                <div class="table-responsive">
-                    <% if (wallet.transactions && wallet.transactions.length > 0) { %>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% wallet.transactions.forEach((transaction, index) => { %>
-                                <tr>
-                                    <td><%= index + 1 %></td>
-                                    <td><%= new Date(transaction.date).toLocaleDateString() %></td>
-                                    <td>₹ <%= transaction.amount.toFixed(2) %></td>
-                                    <td>
-                                        <span class="badge <%= 
-                                            transaction.status === 'Completed' ? 'badge-success' :
-                                            transaction.status === 'Pending' ? 'badge-warning' :
-                                            transaction.status === 'Failed' ? 'badge-danger' :
-                                            '' // fallback class if needed
-                                        %>">
-                                            <%= transaction.type %>
-                                        </span>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
-                    <% } else { %>
-                        <p>No transactions available.</p>
-                    <% } %>
-                </div>
+      <div class="row">
+        <%- include('partials/profileSidebar') %>
+        <div class="col-md-9 pl-5 mt-4">
+          <h5 class="mb-4">My Wallet</h5>
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">Wallet Balance</h6>
+              <h4 class="card-text">₹ <%= wallet.balance.toFixed(2) %></h4>
             </div>
-        </div>
-    </div>
-</main>
+          </div>
 
-<%- include('partials/footer') %>
+          <h5 class="mt-4">Transaction History</h5>
+          <div class="table-responsive">
+            <% if (transactions && transactions.length > 0) { %>
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Reference ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% transactions.forEach((transaction, index) => { %>
+                <tr>
+                  <td><%= (page - 1) * limit + index + 1 %></td>
+                  <td><%= new Date(transaction.createdAt).toLocaleDateString() %></td>
+                  <td>₹ <%= transaction.amount.toFixed(2) %></td>
+                  <td><%= transaction.type %></td>
+                  <td>
+                    <span class="badge <%= 
+                        transaction.status === 'Completed' ? 'badge-success' :
+                        transaction.status === 'Pending' ? 'badge-warning' :
+                        transaction.status === 'Failed' ? 'badge-danger' :
+                        '' %>">
+                      <%= transaction.status %>
+                    </span>
+                  </td>
+                  <td><%= transaction.referenceId || '-' %></td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+            <% } else { %>
+            <p>No transactions available.</p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
 
 </body>
+
 </html>
