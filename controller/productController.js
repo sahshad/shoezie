@@ -5,6 +5,8 @@ const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 const multer = require("multer");
 const category = require("../model/category");
+const { extractPublicId } = require("../utils/cloudinaryUtils");
+const { StatusCodes } = require("http-status-codes");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -37,13 +39,15 @@ const addProduct = async (req, res) => {
   const { productName, productDescription, productCategory, productPrice, productSize, productStock } = req.body;
 
   if (!req.files || !Array.isArray(req.files)) {
-    return res.status(400).json({ success: false, message: "No images uploaded" });
+    return res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: "No images uploaded" });
   }
 
   const product = await Product.findOne({ name: productName });
 
   if (product) {
-    return res.status(409).json({ success: false, message: "Name already exits. please choose different name" });
+    return res
+      .status(StatusCodes.CONFLICT)
+      .json({ success: false, message: "Name already exits. please choose different name" });
   }
 
   const uploadPromises = req.files.map((file) => {
@@ -76,15 +80,19 @@ const addProduct = async (req, res) => {
 
       try {
         await newProduct.save();
-        return res.status(201).json({ success: true, message: "Product added succesfully" });
+        return res.status(StatusCodes.CREATED).json({ success: true, message: "Product added succesfully" });
       } catch (dbError) {
         console.error(dbError);
-        return res.status(500).json({ success: false, message: "Error saving product to database", dbError });
+        return res
+          .status(StatusCodes.INTERNAL_SERVER_ERROR)
+          .json({ success: false, message: "Error saving product to database", dbError });
       }
     })
     .catch((uploadError) => {
       console.error(uploadError);
-      return res.status(500).json({ success: false, message: "Error uploading images to Cloudinary", uploadError });
+      return res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ success: false, message: "Error uploading images to Cloudinary", uploadError });
     });
 };
 
@@ -94,7 +102,7 @@ async function editProduct(req, res) {
   try {
     const product = await Product.findById(id);
     if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+      return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: "Product not found" });
     }
 
     const updates = {};
@@ -106,7 +114,7 @@ async function editProduct(req, res) {
       });
 
       if (existingProduct) {
-        return res.status(400).json({
+        return res.status(StatusCodes.BAD_REQUEST).json({
           success: false,
           message: "A product with this name already exists",
         });
@@ -118,7 +126,7 @@ async function editProduct(req, res) {
     if (category) {
       const productCategory = await Category.findOne({ name: category });
       if (!productCategory) {
-        return res.status(404).json({ success: false, message: "Category not found" });
+        return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: "Category not found" });
       } else {
         updates.category = productCategory._id;
       }
@@ -161,23 +169,9 @@ async function editProduct(req, res) {
       updates.imageUrls = [...product.imageUrls, ...imageUrls];
     }
 
-    function extractPublicId(cloudinaryUrl) {
-  const urlParts = cloudinaryUrl.split("/upload/");
-  if (urlParts.length < 2) return null;
-
-  const rest = urlParts[1]; 
-  const parts = rest.split("/");
-
-  const withoutVersion = parts.slice(1).join("/");
-      console.log(withoutVersion.replace(/\.[^/.]+$/, ""))
-  return withoutVersion.replace(/\.[^/.]+$/, ""); 
-}
-
-console.log(deletedImages)
-
     if (deletedImages && deletedImages.length > 0) {
       const deletePromises = deletedImages.map(async (imageUrl) => {
-        const publicId = extractPublicId(imageUrl)
+        const publicId = extractPublicId(imageUrl);
         await cloudinary.uploader.destroy(publicId);
       });
 
@@ -193,11 +187,11 @@ console.log(deletedImages)
     const result = await Product.findByIdAndUpdate(id, updates, { new: true });
 
     if (result) {
-      res.status(200).json({ success: true, message: "Product updated successfully" });
+      res.status(StatusCodes.OK).json({ success: true, message: "Product updated successfully" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Error updating product", error });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: "Error updating product", error });
   }
 }
 
@@ -208,11 +202,13 @@ async function changeProductStatus(req, res) {
     const result = await Product.findByIdAndUpdate(id, { status: newStatus });
     if (result)
       res
-        .status(200)
+        .status(StatusCodes.OK)
         .json({ success: true, message: `Product ${action === "list" ? "listed" : "unlisted"} successfully.` });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Error toggling product status.", error });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: "Error toggling product status.", error });
   }
 }
 

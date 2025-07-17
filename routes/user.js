@@ -26,6 +26,7 @@ getWishlist,
 addProductToWishlist,
 deleteProductFromWishlist
 } = require('../controller/whishlistController')
+const { StatusCodes } = require('http-status-codes')
 
 router.get('/login',getLogin)
 router.post('/login',preventCache,userLogIn)
@@ -84,7 +85,7 @@ router.get('/about', getAbout)
 router.get('/logout',userLogOut)
 
 router.use((req, res) => {
-    res.status(404).render('user/error', {
+    res.status(StatusCodes.NOT_FOUND).render('user/error', {
         message: 'Oops! The page you are looking for does not exist in the Users section.'
     });
 });

@@ -11,6 +11,7 @@ const passport = require("passport");
 require("./passport");
 require("dotenv").config();
 const { preventCache } = require("./middleware/authMiddleware");
+const { StatusCodes } = require("http-status-codes");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -39,7 +40,7 @@ db();
 app.use(preventCache);
 
 app.get("/get-razorpay-key", (req, res) => {
-  res.status(200).json({ key: process.env.RAZORPAY_ID_KEY });
+  res.status(StatusCodes.OK).json({ key: process.env.RAZORPAY_ID_KEY });
 });
 
 app.use("/admin", adminRoute);
@@ -47,7 +48,7 @@ app.use("/auth", authRoute);
 app.use("/", userRoute);
 
 app.use((req, res, next) => {
-  res.status(404).render("user/error", {
+  res.status(StatusCodes.NOT_FOUND).render("user/error", {
     message: "Oops! The page you are looking for does not exist.",
     activePage: "404",
   });
