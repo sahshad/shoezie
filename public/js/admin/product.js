@@ -125,10 +125,13 @@ function appendImage(container, url) {
   const img = document.createElement("img");
   img.src = url;
   img.alt = "Product image";
-  img.style = "margin-right:10px; max-width: 70px; border: 1px solid #ccc; margin-bottom:10px; border-radius:6px;";
+  img.style =
+    "width: 70px; height: 70px; object-fit: cover; border: 1px solid #ccc; margin-right:10px; margin-bottom:10px; border-radius:6px;";
+
   img.classList.add("img-fluid");
 
   const deleteButton = document.createElement("button");
+  deleteButton.type = 'button'
   deleteButton.innerHTML = "✕";
   deleteButton.classList.add("product-image-remove-button");
 
@@ -142,9 +145,16 @@ function appendImage(container, url) {
     deleteButton.style.display = "none";
   };
 
-  deleteButton.onclick = () => {
-    imageWrapper.remove();
-    deletedImages.push(url);
+  deleteButton.onclick = (event) => {
+    const imgTag = event.target.previousElementSibling;
+    const url = imgTag.src
+    imageWrapper.remove()
+    if (url.startsWith("data:")) {
+      newImages = newImages.filter((image) => image !== url);
+    } else {
+      currentImagesLength --
+      deletedImages.push(url);
+    }
   };
 
   img.onclick = () => {
@@ -156,9 +166,31 @@ function appendImage(container, url) {
   container.appendChild(imageWrapper);
 }
 
-document.getElementById("editProductImage").addEventListener("change", function (event) {
+const editProductImageInput = document.getElementById("editProductImage");
+const imagesContainer = document.getElementById("editProductImageView");
+
+editProductImageInput.addEventListener("click", function (event) {
+  event.target.value = "";
+  newImages = []
+  const wrappers = imagesContainer.querySelectorAll(".image-wrapper");
+
+  wrappers.forEach((wrapper) => {
+    const dataUrl = wrapper.getAttribute("data-url");
+
+    if (dataUrl && dataUrl.startsWith("data:")) {
+      wrapper.remove();
+    }
+  });
+});
+
+editProductImageInput.addEventListener("change", function (event) {
   const files = event.target.files;
-  const imagesContainer = document.getElementById("editProductImageView");
+
+  if (currentImagesLength + newImages.length + files.length > 5) {
+    showErrorAlert("You can only upload up to 5 images.");
+    event.target.value = "";
+    return;
+  }
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
@@ -171,7 +203,7 @@ document.getElementById("editProductImage").addEventListener("change", function 
 
     reader.readAsDataURL(file);
   }
-  event.target.value = "";
+  // event.target.value = "";
 });
 
 let cropper;
@@ -225,8 +257,14 @@ const imageInput = document.getElementById("productImage");
 const imagePreview = document.getElementById("imagePreview");
 const cropImageButton = document.getElementById("cropImageButton");
 let croppedFiles = [];
-const originalFiles = [];
+let originalFiles = [];
 const imageGroup = document.querySelector(".img-group");
+
+imageInput.addEventListener("click", function () {
+  imageInput.value = "";
+  originalFiles = [];
+  croppedFiles = [];
+});
 
 imageInput.addEventListener("change", function (event) {
   imageGroup.innerHTML = "";
@@ -237,6 +275,7 @@ imageInput.addEventListener("change", function (event) {
 
   if (files.length > 5) {
     showErrorAlert("cannot add more than five images");
+    imageInput.value = "";
     return;
   }
 
@@ -255,6 +294,7 @@ imageInput.addEventListener("change", function (event) {
       img.style = "margin-right:10px; max-width: 70px; border: 1px solid #ccc; margin-bottom:10px; border-radius:6px;";
 
       const deleteButton = document.createElement("button");
+      deleteButton.type = 'button'
       deleteButton.innerHTML = "✕";
       deleteButton.classList.add("product-image-remove-button");
 
