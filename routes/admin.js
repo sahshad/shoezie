@@ -19,6 +19,7 @@ const { getCoupons,addCoupon, editCoupon,changeCouponStatus } = require('../cont
 const { getOffers,createOffer,changeOfferStatus,editOffer } = require('../controller/offers');
 
 const { getSalesReport,getCustomSalesReport,downloadSalesReport } = require('../controller/salesReport');
+const { StatusCodes } = require('http-status-codes');
 
 router.get('/login', getLogin);
 router.post('/login', getHome);
@@ -60,7 +61,7 @@ router.get('/sales-report/download',isAuthenticated,downloadSalesReport)
 router.get('/logout',getLogout)
 
 router.use((req, res) => {
-    res.status(404).render('admin/error', {
+    res.status(StatusCodes.NOT_FOUND).render('admin/error', {
         message: 'Oops! The page you are looking for does not exist in the Users section.',
     });
 });
