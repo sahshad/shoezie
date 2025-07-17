@@ -161,9 +161,23 @@ async function editProduct(req, res) {
       updates.imageUrls = [...product.imageUrls, ...imageUrls];
     }
 
+    function extractPublicId(cloudinaryUrl) {
+  const urlParts = cloudinaryUrl.split("/upload/");
+  if (urlParts.length < 2) return null;
+
+  const rest = urlParts[1]; 
+  const parts = rest.split("/");
+
+  const withoutVersion = parts.slice(1).join("/");
+      console.log(withoutVersion.replace(/\.[^/.]+$/, ""))
+  return withoutVersion.replace(/\.[^/.]+$/, ""); 
+}
+
+console.log(deletedImages)
+
     if (deletedImages && deletedImages.length > 0) {
       const deletePromises = deletedImages.map(async (imageUrl) => {
-        const publicId = imageUrl.split("/").pop().split(".")[0];
+        const publicId = extractPublicId(imageUrl)
         await cloudinary.uploader.destroy(publicId);
       });
 
