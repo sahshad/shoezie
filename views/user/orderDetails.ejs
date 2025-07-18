@@ -1,34 +1,36 @@
 <%- include('partials/header') %>
 
-    <link rel="stylesheet" href="/styles/user/partials/navbar.css">
-    <link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
+<link rel="stylesheet" href="/styles/user/partials/navbar.css">
+<link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
 </head>
+
 <style>
-    .card-body{
-        padding: 10px;
-    }
-    main{
-        padding-bottom: 100px;
-    }
+  .card-body {
+    padding: 10px;
+  }
+  main {
+    padding-bottom: 100px;
+  }
 </style>
+
 <body>
-<%- include('partials/navbar') %>
-<main>
+  <%- include('partials/navbar') %>
+  <main>
     <div class="container mt-5 ">
-        <div class="row d-flex justify-content-between">
-            <h5 class="mb-4">Order Details</h5>
-            <div>
-                <a href="/profile/orders" class="mr-3">Back to Orders</a>
-            </div>           
+      <div class="row d-flex justify-content-between">
+        <h5 class="mb-4">Order Details</h5>
+        <div>
+          <a href="/profile/orders" class="mr-3">Back to Orders</a>
         </div>
-       
-        <% if(order){ %>
-        <div class="card ">
-            <div class="card-header">
-                <h6>ORDER - <%= order.orderId %></h6>
-                <p class="m-0">Order Date: <%= order.orderDate.toLocaleDateString() %></p>
-                <p class="">Order Time: <%= order.orderDate.toLocaleTimeString() %></p>
-                <p>Status: <span class="badge <%= 
+      </div>
+
+      <% if(order){ %>
+      <div class="card ">
+        <div class="card-header">
+          <h6>ORDER - <%= order.orderId %></h6>
+          <p class="m-0">Order Date: <%= order.orderDate.toLocaleDateString() %></p>
+          <p class="">Order Time: <%= order.orderDate.toLocaleTimeString() %></p>
+          <p>Status: <span class="badge <%= 
                     order.orderStatus === 'Pending' ? 'badge-warning' :
                     order.orderStatus === 'Processing' ? 'badge-info' :
                     order.orderStatus === 'Shipped' ? 'badge-primary' :
@@ -36,176 +38,175 @@
                     order.orderStatus === 'Cancelled' ? 'badge-danger' :
                     order.orderStatus === 'Failed' ? 'badge-danger' : ''
                 %>">
-                    <%= order.orderStatus %>
-                </span></p>
-            </div>
-            <div class="card-body p-4">
-                <h6>Shipping Address</h6>
-                <p><%= order.shippingAddress.fullname %><br>
-                   <%= order.shippingAddress.address %><br>
-                   <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.pincode %><br>
-                   <%= order.shippingAddress.phone %></p>
+              <%= order.orderStatus %>
+            </span></p>
+        </div>
+        <div class="card-body p-4">
+          <h6>Shipping Address</h6>
+          <p><%= order.shippingAddress.fullname %><br>
+            <%= order.shippingAddress.address %><br>
+            <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.pincode %><br>
+            <%= order.shippingAddress.phone %></p>
 
-                <h6>Payment Information</h6>
-                <p>Payment Method: <%= order.paymentMethod %></p>
-                <p>Payment Status: <%= order.paymentStatus %></p>
-                <h6>Ordered Products</h6>
-                <table class="table w-75">
-                    <thead>
-                        <tr>
-                            <th scope="col">Image</th>
-                            <th scope="col">Product </th>
-                            <th scope="col">Price</th>
-                            <th scope="col">Quantity</th>
-                            <th scope="col">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% order.items.forEach(item => { %>
-                        <tr>
-                            <td><img src="<%= item.productId.imageUrls[0] %>" alt="<%= item.productId.name %>" style="width: 50px; height: auto;"></td>
+          <h6>Payment Information</h6>
+          <p>Payment Method: <%= order.paymentMethod %></p>
+          <p>Payment Status: <%= order.paymentStatus %></p>
+          <h6>Ordered Products</h6>
+          <table class="table w-75">
+            <thead>
+              <tr>
+                <th scope="col">Image</th>
+                <th scope="col">Product </th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% order.items.forEach(item => { %>
+              <tr>
+                <td><img src="<%= item.productId.imageUrls[0] %>" alt="<%= item.productId.name %>" style="width: 50px; height: auto;"></td>
 
-                            <td><%= item.productId.name %></td>
-                            <% let effectivePrice %>
-                            <% if(item.offerId){ %>
-                                <td>
-                                    <del>₹ <%= item.price %>.00</del>
-                                <% if(item.offerId.offerType === 'percentage' ){ %>
-                                    <% if(item.offerId.maxDiscount){ %>
-                                        <% if((item.productId.price * item.offerId.value / 100) > item.offerId.maxDiscount){ %>
-                                            
-                                        ₹ <%=(item.productId.price-item.offerId.maxDiscount).toFixed(2)  %>
-                                            </td>
-                                            <% effectivePrice = (item.productId.price-item.offerId.maxDiscount).toFixed(2) %>
-                                        <%}else{ %>
-                                            
-                                        ₹ <%=(item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2) %>
-                                            </td>
-                                            <% effectivePrice = (item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2)  %>
-                                        <%}%>
+                <td><%= item.productId.name %></td>
+                <% let effectivePrice %>
+                <% if(item.offerId){ %>
+                <td>
+                  <del>₹ <%= item.price %>.00</del>
+                  <% if(item.offerId.offerType === 'percentage' ){ %>
+                  <% if(item.offerId.maxDiscount){ %>
+                  <% if((item.productId.price * item.offerId.value / 100) > item.offerId.maxDiscount){ %>
+
+                  ₹ <%=(item.productId.price-item.offerId.maxDiscount).toFixed(2)  %>
+                </td>
+                <% effectivePrice = (item.productId.price-item.offerId.maxDiscount).toFixed(2) %>
+                <%}else{ %>
+
+                ₹ <%=(item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2) %>
+                </td>
+                <% effectivePrice = (item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2)  %>
+                <%}%>
                                     <% }else{ %>
-                                        ₹ <%=(item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2) %>
-                                        </td>
-                                        <% effectivePrice = (item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2) %>
-                                   <% } %>
-                               
-                            <% }else{ %>
-                                ₹ <%=(item.productId.price-item.offerId.value ).toFixed(2) %>
-                                </td>
-                                <%  effectivePrice = (item.productId.price-item.offerId.value ).toFixed(2) %>
-                            <% } %>
-                            <% }else{ %>
-                                <td>₹ <%= item.price %>.00</td>
-                                <% effectivePrice =  item.price %>
-                            <% } %>
-                            <td><%= item.quantity %></td>
-                            <td>₹ <%= (effectivePrice * item.quantity).toFixed(2) %></td>
-                        </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-                <div class="mt-4">
-                    <% if(order.couponDiscount){ %>
-                        <h6><small>Coupon Discount: -  ₹ <%= (order.couponDiscount).toFixed(2) %> </small></h6>
-                       <% } %>
-                       <h6>Total Price: ₹ <%= (order.totalAmount).toFixed(2) %></h6>
-                </div>
-               
-                <div class="row d-flex justify-content-between mt-3">
-                    <div>
+                ₹ <%=(item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2) %>
+                </td>
+                <% effectivePrice = (item.productId.price-(item.productId.price * item.offerId.value / 100)).toFixed(2) %>
+                <% } %>
 
-                    </div>
-                    <div>
-                        <% if(order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Failed' && order.orderStatus !== 'Returned'){ %>
-                            <% if(order.orderStatus !== 'Delivered'){ %>
-                                <button class="btn btn-danger mr-3" onclick="cancelOrder('<%= order._id %>')">Cancel Order</button>
-                            <% } %>
-                       <% } %>
-    
-                       <% if(order.orderStatus === 'Failed'){ %>
-                        <button class="btn btn-success mr-3" onclick="repayOrder('<%= order._id %>','<%=order.totalAmount %>')">Pay Now</button>
-                       <% } %>
-    
-                       <% if (order.orderStatus === 'Delivered' && !order.return.reason) { %>
-                        <button class="btn btn-outline-danger btn-sm mr-3" onclick="openReturnModal('<%= order._id %>','<%=order.updatedAt %>')">Request Return</button>
-                        <button class="btn btn-info mr-3" onclick="downloadInvoice('<%= order._id %>')">Download Invoice</button>
-                        <% } else if (order.return.reason) { %>
-                        <div>
-                            <strong>Return Status:</strong>
-                            <span class="badge <%= order.return.status === 'Pending' ? 'badge-warning' : 'badge-success' %>">
-                                <%= order.return.status %>
-                            </span>
-                            <% if (order.return.adminComments) { %>
-                            <p><em>Admin Comment: <%= order.return.adminComments %></em></p>
-                            <% } %>
-                        </div>
-                        <% } %>
-                    </div>
-                   
-                </div>
+                <% }else{ %>
+                ₹ <%=(item.productId.price-item.offerId.value ).toFixed(2) %>
+                </td>
+                <%  effectivePrice = (item.productId.price-item.offerId.value ).toFixed(2) %>
+                <% } %>
+                <% }else{ %>
+                <td>₹ <%= item.price %>.00</td>
+                <% effectivePrice =  item.price %>
+                <% } %>
+                <td><%= item.quantity %></td>
+                <td>₹ <%= (effectivePrice * item.quantity).toFixed(2) %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <div class="mt-4">
+            <% if(order.couponDiscount){ %>
+            <h6><small>Coupon Discount: - ₹ <%= (order.couponDiscount).toFixed(2) %> </small></h6>
+            <% } %>
+            <h6>Total Price: ₹ <%= (order.totalAmount).toFixed(2) %></h6>
+          </div>
+
+          <div class="row d-flex justify-content-between mt-3">
+            <div>
+
             </div>
+            <div>
+              <% if(order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Failed' && order.orderStatus !== 'Returned'){ %>
+              <% if(order.orderStatus !== 'Delivered'){ %>
+              <button class="btn btn-danger mr-3" onclick="cancelOrder('<%= order._id %>')">Cancel Order</button>
+              <% } %>
+              <% } %>
+
+              <% if(order.orderStatus === 'Failed'){ %>
+              <button class="btn btn-success mr-3" onclick="repayOrder('<%= order._id %>','<%=order.totalAmount %>')">Pay Now</button>
+              <% } %>
+
+              <% if (order.orderStatus === 'Delivered' && !order.return.reason) { %>
+              <button class="btn btn-outline-danger btn-sm mr-3" onclick="openReturnModal('<%= order._id %>','<%=order.updatedAt %>')">Request Return</button>
+              <button class="btn btn-info mr-3" onclick="downloadInvoice('<%= order._id %>')">Download Invoice</button>
+              <% } else if (order.return.reason) { %>
+              <div>
+                <strong>Return Status:</strong>
+                <span class="badge <%= order.return.status === 'Pending' ? 'badge-warning' : 'badge-success' %>">
+                  <%= order.return.status %>
+                </span>
+                <% if (order.return.adminComments) { %>
+                <p><em>Admin Comment: <%= order.return.adminComments %></em></p>
+                <% } %>
+              </div>
+              <% } %>
+            </div>
+
+          </div>
         </div>
-        <% } %>
+      </div>
+      <% } %>
     </div>
-</main>
+  </main>
 
 
-<!-- Modal for Return Reason -->
-<div class="modal fade" id="returnModal" tabindex="-1" role="dialog" aria-labelledby="returnModalLabel" aria-hidden="true">
+  <!-- Modal for Return Reason -->
+  <div class="modal fade" id="returnModal" tabindex="-1" role="dialog" aria-labelledby="returnModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="returnModalLabel">Request Return</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="orderId">
-                <form id="returnForm">
-                    <div class="form-group">
-                        <label for="returnReason">Reason for Return</label>
-                        <textarea class="form-control" id="returnReason" rows="3" required></textarea>
-                        <small id="reasonError" class="form-text text-danger d-none">
-                            Reason must be at least 10 characters long.
-                        </small>
-                    </div>
-                    <button type="button" class="btn btn-primary" id="submitButton" onclick="returnOrder()"  disabled>Submit</button>
-                </form>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="returnModalLabel">Request Return</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        <div class="modal-body">
+          <input type="hidden" id="orderId">
+          <form id="returnForm">
+            <div class="form-group">
+              <label for="returnReason">Reason for Return</label>
+              <textarea class="form-control" id="returnReason" rows="3" required></textarea>
+              <small id="reasonError" class="form-text text-danger d-none">
+                Reason must be at least 10 characters long.
+              </small>
+            </div>
+            <button type="button" class="btn btn-primary" id="submitButton" onclick="returnOrder()" disabled>Submit</button>
+          </form>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<%- include('partials/footer') %>
+  <%- include('partials/footer') %>
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<script>
-
-function downloadInvoice(orderId) {
-    window.location.href = `/profile/order/invoice/${orderId}`
-}
-
-     function openReturnModal(orderId,deliveredDate) {
-console.log(deliveredDate);
-
-        const deliveryDate = new Date(deliveredDate);
-    const today = new Date();
-    
-    const diffTime = Math.abs(today - deliveryDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays > 7) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Return Unavailable',
-            text: 'Return period has expired. You can only return within 7 days of delivery.',
-        });
-        return; 
+  <script>
+    function downloadInvoice(orderId) {
+      window.location.href = `/profile/order/invoice/${orderId}`
     }
-        document.getElementById('orderId').value = orderId
-        $('#returnModal').modal('show');
+
+    function openReturnModal(orderId, deliveredDate) {
+      console.log(deliveredDate);
+
+      const deliveryDate = new Date(deliveredDate);
+      const today = new Date();
+
+      const diffTime = Math.abs(today - deliveryDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays > 7) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Return Unavailable',
+          text: 'Return period has expired. You can only return within 7 days of delivery.',
+        });
+        return;
+      }
+      document.getElementById('orderId').value = orderId
+      $('#returnModal').modal('show');
     }
 
     const reasonInput = document.getElementById('returnReason');
@@ -213,196 +214,238 @@ console.log(deliveredDate);
     const submitButton = document.getElementById('submitButton');
 
     reasonInput.addEventListener('input', () => {
-        const reasonLength = reasonInput.value.trim().length;
+      const reasonLength = reasonInput.value.trim().length;
 
-        if (reasonLength < 10) {
-            reasonError.classList.remove('d-none'); 
-            submitButton.disabled = true;            
-        } else {
-            reasonError.classList.add('d-none');    
-            submitButton.disabled = false;          
-        }
+      if (reasonLength < 10) {
+        reasonError.classList.remove('d-none');
+        submitButton.disabled = true;
+      } else {
+        reasonError.classList.add('d-none');
+        submitButton.disabled = false;
+      }
     });
 
-async function returnOrder(){
+    async function returnOrder() {
 
-        const reason = reasonInput.value.trim();
-        const orderId = document.getElementById('orderId').value
+      const reason = reasonInput.value.trim();
+      const orderId = document.getElementById('orderId').value
 
-        fetch(`/profile/order/return/${orderId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reason })
+      fetch(`/profile/order/return/${orderId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            reason
+          })
         })
         .then(response => {
-            return response.json();
+          return response.json();
         })
         .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Return Requested!',
-                    text: 'Your return request has been submitted successfully.',
-                }).then(() => location.reload()); 
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: data.message || 'Something went wrong. Please try again later.',
-                });
-            }
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Return Requested!',
+              text: 'Your return request has been submitted successfully.',
+            }).then(() => location.reload());
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: data.message || 'Something went wrong. Please try again later.',
+            });
+          }
         })
         .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: error.message || 'Failed to submit return request.',
-            });
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.message || 'Failed to submit return request.',
+          });
         });
     }
 
     function cancelOrder(orderId) {
-
-            fetch(`/profile/orders/cancel/${orderId}`,{
-                method:'PATCH',
-                headers: {
-            'Content-Type': 'application/json'}
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you really want to cancel this order?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, cancel it!',
+        cancelButtonText: 'No, keep it'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`/profile/orders/cancel/${orderId}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json'
+              }
             })
-        .then(response => {
-            if (!response.ok) {
+            .then(response => {
+              if (!response.ok) {
                 throw new Error('Network response was not ok');
-            }
-            return response.json(); 
-        })
-        .then(data => {
-            console.log('Order canceled successfully:', data);
-            window.location.href='/profile/orders'
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
-        });
+              }
+              return response.json();
+            })
+            .then(data => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Cancelled!',
+                text: 'Your order has been cancelled.',
+                confirmButtonColor: '#000'
+              }).then(() => {
+                window.location.href = '/profile/orders';
+              });
+            })
+            .catch(error => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: error.message || 'Something went wrong!',
+              });
+            });
         }
+      });
+    }
 
-        async function fetchRazorpayKey() {
-    try {
+
+    async function fetchRazorpayKey() {
+      try {
         const response = await fetch('/get-razorpay-key');
         const data = await response.json();
         return data.key;
-    } catch (error) {
+      } catch (error) {
         console.error('Error fetching Razorpay key:', error);
+      }
     }
-}
 
-async function checkProduct(orderId) {
-    try {
+    async function checkProduct(orderId) {
+      try {
         const response = await fetch(`/profile/order/repay/check-product/${orderId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
 
-        const data = await response.json(); 
-        
+        const data = await response.json();
+
         if (data.success) {
-            return data; 
+          return data;
         } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: data.message,
-            });
-            return null; 
-        }
-    } catch (error) {
-        console.error('Error in fetch:', error);
-        Swal.fire({
+          Swal.fire({
             icon: 'error',
             title: 'Oops...',
-            text: error.message,
+            text: data.message,
+          });
+          return null;
+        }
+      } catch (error) {
+        console.error('Error in fetch:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: error.message,
         });
-        return null; 
+        return null;
+      }
     }
-}
 
-async function updateOrderStatus(orderId, razorpayResponse, status,totalAmount) {
-    const repay=true
-const data = { status, razorpayResponse, repay }
-try {
-    const response = await fetch(`/profile/order/repay/${orderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-
-    const res = await response.json()
-
-    if (res.success) {
-        Swal.fire({icon:'success',title:'payment done!',text:res.message})
-        .then(()=> window.location.href = '/profile/orders')
-    } else {
-        Swal.fire({icon:'error',title:'Oops..!',text:res.message,
-        showCancelButton:true,
-        confirmButtonText:'Try Again',
-        cancelButtonText:'Cancel',
-        reverseButtons:true,
-        confirmButtonColor:'#000',
-        cancelButtonColor:'#000'
+    async function updateOrderStatus(orderId, razorpayResponse, status, totalAmount) {
+      const repay = true
+      const data = {
+        status,
+        razorpayResponse,
+        repay
+      }
+      try {
+        const response = await fetch(`/profile/order/repay/${orderId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
         })
-        .then((result) => {
-            if(result.isConfirmed){
-                repayOrder(orderId , totalAmount)
-            }
-        })
+
+        const res = await response.json()
+
+        if (res.success) {
+          Swal.fire({
+              icon: 'success',
+              title: 'payment done!',
+              text: res.message
+            })
+            .then(() => window.location.href = '/profile/orders')
+        } else {
+          Swal.fire({
+              icon: 'error',
+              title: 'Oops..!',
+              text: res.message,
+              showCancelButton: true,
+              confirmButtonText: 'Try Again',
+              cancelButtonText: 'Cancel',
+              reverseButtons: true,
+              confirmButtonColor: '#000',
+              cancelButtonColor: '#000'
+            })
+            .then((result) => {
+              if (result.isConfirmed) {
+                repayOrder(orderId, totalAmount)
+              }
+            })
+        }
+      } catch (error) {
+        console.error('Error updating order status:', error);
+      }
     }
-} catch (error) {
-    console.error('Error updating order status:', error);
-}
-}
 
- async function repayOrder(orderId, totalAmount) {
+    async function repayOrder(orderId, totalAmount) {
       const product = await checkProduct(orderId)
 
-      if(!product){
+      if (!product) {
         return
       }
-      
-    try {
+
+      try {
         const razorpayKey = await fetchRazorpayKey();
         const options = {
-            key: razorpayKey,
-            amount: totalAmount * 100, // Amount in paisa
-            currency: "INR",
-            name: "SHOEZIE",
-            description: "Retry Payment",
-            handler: async function (response) {
-                // On successful payment, update the order status to 'Paid'
-                await updateOrderStatus(orderId, response, 'Paid',totalAmount);
+          key: razorpayKey,
+          amount: totalAmount * 100, // Amount in paisa
+          currency: "INR",
+          name: "SHOEZIE",
+          description: "Retry Payment",
+          handler: async function(response) {
+            // On successful payment, update the order status to 'Paid'
+            await updateOrderStatus(orderId, response, 'Paid', totalAmount);
+          },
+          theme: {
+            color: "#3399cc"
+          },
+          modal: {
+            ondismiss: async function() {
+              // ({
+              //     text: "Payment cancelled!",
+              //     duration: 3000,
+              //     backgroundColor: "#f44336",
+              // }).showToast();
+              // Mark order as 'Cancelled' if user cancels payment again
+              await updateOrderStatus(orderId, null, 'Failed', totalAmount);
             },
-            theme: { color: "#3399cc" },
-            modal: {
-                ondismiss: async function () {
-                    // ({
-                    //     text: "Payment cancelled!",
-                    //     duration: 3000,
-                    //     backgroundColor: "#f44336",
-                    // }).showToast();
-                    // Mark order as 'Cancelled' if user cancels payment again
-                    await updateOrderStatus(orderId, null, 'Failed',totalAmount);
-                },
-            },
+          },
         };
 
         const rzp = new Razorpay(options);
         rzp.open();
-    } catch (error) {
+      } catch (error) {
         console.log('Error initiating repayment:', error);
         alert('Failed to initiate repayment. Please try again.');
+      }
     }
-}
-            
-        
-</script>
+  </script>
 </body>
+
 </html>
