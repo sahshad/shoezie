@@ -13,6 +13,7 @@ const Wallet = require("../model/wallet");
 const Coupon = require("../model/coupon");
 const User = require("../model/user");
 const { StatusCodes } = require("http-status-codes");
+const Transaction = require("../model/transaction");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_ID_KEY,
@@ -94,10 +95,10 @@ async function createOrder(req, res) {
         }
         wallet.balance -= totalAmount;
 
-        wallet.transactions.push({ amount: totalAmount, type: "debit", date: new Date() });
-
+        // wallet.transactions.push({ amount: totalAmount, type: "debit", date: new Date() });
+        
         await wallet.save();
-
+        
         newOrder = new Order({
           userId,
           items,
@@ -108,6 +109,7 @@ async function createOrder(req, res) {
           paymentMethod,
           paymentStatus: "Paid",
         });
+        await Transaction.create({walletId: wallet.id, amount: totalAmount, type: 'debit', referenceId: newOrder._id})
       } else {
         newOrder = new Order({
           userId,
@@ -303,10 +305,9 @@ async function cancelOrder(req, res) {
         await wallet.save();
       }
       const totalAmount = parseFloat(order.totalAmount);
-      console.log(totalAmount);
 
       wallet.balance += totalAmount;
-      wallet.transactions.push({ amount: totalAmount, type: "credit" });
+      await Transaction.create({walletId: wallet._id, amount: totalAmount, type:'credit', referenceId:order._id})
       await wallet.save();
     }
 

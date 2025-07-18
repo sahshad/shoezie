@@ -1,70 +1,227 @@
 <%- include('partials/header') %>
 
-    <link rel="stylesheet" href="/styles/user/partials/navbar.css">
-    <link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
-    
+<link rel="stylesheet" href="/styles/user/partials/navbar.css">
+<link rel="stylesheet" href="/styles/user/partials/profileSidebar.css">
+<link rel="stylesheet" href="/styles/pagination.css">
+
 </head>
+
 <body>
 
-<!-- Navbar -->
-<%- include('partials/navbar') %>
+  <!-- Navbar -->
+  <%- include('partials/navbar') %>
 
-<!-- User Wallet Section -->
-<main>
+  <!-- User Wallet Section -->
+  <main>
     <div class="container mt-5">
-        <div class="row">
-            <%- include('partials/profileSidebar') %>
-            <div class="col-md-9 pl-5 mt-4">
-                <h5 class="mb-4">My Wallet</h5>
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Wallet Balance</h6>
-                        <h4 class="card-text">₹ <%= wallet.balance.toFixed(2) %></h4>
-                    </div>
-                </div>
-
-                <h5 class="mt-4">Transaction History</h5>
-                <div class="table-responsive">
-                    <% if (wallet.transactions && wallet.transactions.length > 0) { %>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% wallet.transactions.forEach((transaction, index) => { %>
-                                <tr>
-                                    <td><%= index + 1 %></td>
-                                    <td><%= new Date(transaction.date).toLocaleDateString() %></td>
-                                    <td>₹ <%= transaction.amount.toFixed(2) %></td>
-                                    <td>
-                                        <span class="badge <%= 
-                                            transaction.status === 'Completed' ? 'badge-success' :
-                                            transaction.status === 'Pending' ? 'badge-warning' :
-                                            transaction.status === 'Failed' ? 'badge-danger' :
-                                            '' // fallback class if needed
-                                        %>">
-                                            <%= transaction.type %>
-                                        </span>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
-                    <% } else { %>
-                        <p>No transactions available.</p>
-                    <% } %>
-                </div>
+      <div class="row">
+        <%- include('partials/profileSidebar') %>
+        <div class="col-md-9 pl-5 mt-4">
+          <h5 class="mb-4">My Wallet</h5>
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">Wallet Balance</h6>
+              <h4 class="card-text">₹ <%= wallet.balance.toFixed(2) %></h4>
             </div>
-        </div>
-    </div>
-</main>
+          </div>
 
-<%- include('partials/footer') %>
+          <h5 class="mt-4">Transaction History</h5>
+          <div class="table-responsive">
+            <% if (transactions && transactions.length > 0) { %>
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Reference ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% transactions.forEach((transaction, index) => { %>
+                <tr>
+                  <td><%= (currentPage - 1) * limit + index + 1 %></td>
+                  <td><%= new Date(transaction.createdAt).toLocaleDateString() %></td>
+                  <td>₹ <%= transaction.amount.toFixed(2) %></td>
+                  <td><%= transaction.type %></td>
+                  <td>
+                    <span class="badge <%= 
+                        transaction.status === 'Completed' ? 'badge-success' :
+                        transaction.status === 'Pending' ? 'badge-warning' :
+                        transaction.status === 'Failed' ? 'badge-danger' :
+                        '' %>">
+                      <%= transaction.status %>
+                    </span>
+                  </td>
+                  <td><a href="/profile/orders/<%= transaction.referenceId %>"><%= transaction.referenceId || '-' %></a></td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+<div class="d-flex justify-content-center mt-4">
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+
+      <% if (currentPage > 1) { %>
+        <li class="page-item">
+          <a class="page-link" href="?page=<%= currentPage - 1 %>&limit=<%= limit %>">Previous</a>
+        </li>
+      <% } %>
+
+      <% if (currentPage > 2) { %>
+        <li class="page-item">
+          <a class="page-link" href="?page=1&limit=<%= limit %>">1</a>
+        </li>
+        <% if (currentPage > 3) { %>
+          <li class="page-item disabled">
+            <span class="page-link">...</span>
+          </li>
+        <% } %>
+      <% } %>
+
+      <% for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) { %>
+        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+        </li>
+      <% } %>
+
+      <% if (currentPage < totalPages - 1) { %>
+        <% if (currentPage < totalPages - 2) { %>
+          <li class="page-item disabled">
+            <span class="page-link">...</span>
+          </li>
+        <% } %>
+        <li class="page-item">
+          <a class="page-link" href="?page=<%= totalPages %>&limit=<%= limit %>"><%= totalPages %></a>
+        </li>
+      <% } %>
+
+      <% if (currentPage < totalPages) { %>
+        <li class="page-item">
+          <a class="page-link" href="?page=<%= currentPage + 1 %>&limit=<%= limit %>">Next</a>
+        </li>
+      <% } %>
+
+    </ul>
+  </nav>
+</div>
+
+
+            <% } else { %>
+            <p>No transactions available.</p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
 
 </body>
+<!-- <script>
+  const tableBody = document.querySelector('table tbody');
+  const pagination = document.getElementById('pagination');
+  const limit = '<%= limit %>';
+  let currentPage = '<%= currentPage %>';
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString();
+  }
+
+  function renderTransactions(transactions, page) {
+    tableBody.innerHTML = '';
+
+    if (transactions.length === 0) {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td colspan="6" class="text-center">No transactions available.</td>`;
+      tableBody.appendChild(row);
+      return;
+    }
+
+    transactions.forEach((txn, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${(page - 1) * limit + index + 1}</td>
+        <td>${formatDate(txn.createdAt)}</td>
+        <td>₹ ${txn.amount.toFixed(2)}</td>
+        <td>${txn.type}</td>
+        <td>
+          <span class="badge ${
+            txn.status === 'Completed' ? 'badge-success' :
+            txn.status === 'Pending' ? 'badge-warning' :
+            txn.status === 'Failed' ? 'badge-danger' : ''
+          }">${txn.status}</span>
+        </td>
+        <td>${txn.referenceId || '-'}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  function renderPagination(currentPage, totalPages) {
+    pagination.innerHTML = '';
+
+    const createPageItem = (text, page, isActive = false) => {
+      const li = document.createElement('li');
+      li.className = `page-item ${isActive ? 'active' : ''}`;
+      const a = document.createElement('a');
+      a.className = 'page-link';
+      a.href = '#';
+      a.textContent = text;
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        if (page !== currentPage) loadPage(page);
+      });
+      li.appendChild(a);
+      return li;
+    };
+
+    if (currentPage > 1) {
+      pagination.appendChild(createPageItem('Previous', currentPage - 1));
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+      pagination.appendChild(createPageItem(i, i, i === currentPage));
+    }
+
+    if (currentPage < totalPages) {
+      pagination.appendChild(createPageItem('Next', currentPage + 1));
+    }
+  }
+
+  async function loadPage(page) {
+    try {
+      const response = await fetch(`/profile/wallet?page=${page}&limit=${limit}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch transactions.');
+
+      const data = await response.json();
+
+      currentPage = data.currentPage;
+      renderTransactions(data.transactions, currentPage);
+      renderPagination(data.currentPage, data.totalPages);
+
+      // Update browser URL without reloading the page
+      history.pushState({ page: currentPage }, '', `?page=${currentPage}`);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // Handle browser back/forward button navigation
+  window.addEventListener('popstate', (event) => {
+    const page = event.state?.page || 1;
+    loadPage(page);
+  });
+
+  // On initial load, render pagination client-side
+  renderPagination(currentPage, '<%= totalPages %>');
+</script> -->
+
 </html>
