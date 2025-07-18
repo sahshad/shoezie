@@ -6,7 +6,7 @@ const Transaction = require("../model/transaction");
 async function getWallet(req, res) {
   const userId = req.session.user;
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const limit = parseInt(req.query.limit) || 5;
   const skip = (page - 1) * limit;
 
   try {
@@ -29,7 +29,7 @@ async function getWallet(req, res) {
     if (!wallet) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "Wallet not found" });
     }
-    res.render("user/wallet", { wallet, user, transactions,  page,
+    res.render("user/wallet", { wallet, user, transactions,  currentPage:page,
       totalPages,
       limit });
   } catch (error) {
