@@ -45,6 +45,7 @@ It provides customers with a seamless shopping experience and equips administrat
 - Cloudinary (Image uploads)
 - Nodemailer (Email services)
 - express-session (Session management)
+- Razorpay (Payment gateway integration)
 
 ---
 
